@@ -6,8 +6,44 @@ import 'package:doodle_pad/app/admob/ads_banner.dart';
 import 'package:doodle_pad/app/admob/ads_helper.dart';
 import 'package:doodle_pad/app/routes/app_pages.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _pulseCtrl;
+  late Animation<double> _pulseAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat(reverse: true);
+    _pulseAnim = Tween<double>(begin: 1.0, end: 1.03).animate(
+      CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseCtrl.dispose();
+    super.dispose();
+  }
+
+  static const _features = [
+    (Icons.edit_rounded, 'feature_pen'),
+    (Icons.brush_rounded, 'feature_marker'),
+    (Icons.auto_fix_normal_rounded, 'feature_eraser'),
+    (Icons.palette_rounded, 'feature_colors'),
+    (Icons.undo_rounded, 'feature_undo'),
+    (Icons.share_rounded, 'feature_share'),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -85,53 +121,58 @@ class HomePage extends StatelessWidget {
 
                     SizedBox(height: 40.h),
 
-                    // Feature chips
+                    // Feature chips with stagger entrance animation
                     Wrap(
                       spacing: 8.w,
                       runSpacing: 8.h,
                       alignment: WrapAlignment.center,
-                      children: [
-                        _FeatureChip(
-                          icon: Icons.edit_rounded,
-                          label: 'feature_pen'.tr,
-                        ),
-                        _FeatureChip(
-                          icon: Icons.brush_rounded,
-                          label: 'feature_marker'.tr,
-                        ),
-                        _FeatureChip(
-                          icon: Icons.auto_fix_normal_rounded,
-                          label: 'feature_eraser'.tr,
-                        ),
-                        _FeatureChip(
-                          icon: Icons.palette_rounded,
-                          label: 'feature_colors'.tr,
-                        ),
-                        _FeatureChip(
-                          icon: Icons.undo_rounded,
-                          label: 'feature_undo'.tr,
-                        ),
-                        _FeatureChip(
-                          icon: Icons.share_rounded,
-                          label: 'feature_share'.tr,
-                        ),
-                      ],
+                      children: _features.asMap().entries.map((entry) {
+                        final idx = entry.key;
+                        final (icon, labelKey) = entry.value;
+                        return TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          duration: Duration(milliseconds: 400 + idx * 60),
+                          curve: Curves.easeOutBack,
+                          builder: (ctx, v, child) {
+                            return Transform.scale(
+                              scale: v,
+                              child: Opacity(
+                                opacity: v.clamp(0.0, 1.0),
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: _FeatureChip(
+                            icon: icon,
+                            label: labelKey.tr,
+                          ),
+                        );
+                      }).toList(),
                     ),
 
                     SizedBox(height: 48.h),
 
-                    // Start drawing CTA
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56.h,
-                      child: FilledButton.icon(
-                        onPressed: () => Get.toNamed(Routes.DRAW),
-                        icon: Icon(Icons.brush_rounded, size: 22.r),
-                        label: Text(
-                          'start_drawing'.tr,
-                          style: TextStyle(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.w700,
+                    // Start Drawing CTA with gentle pulse animation
+                    AnimatedBuilder(
+                      animation: _pulseAnim,
+                      builder: (context, child) {
+                        return Transform.scale(
+                          scale: _pulseAnim.value,
+                          child: child,
+                        );
+                      },
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 56.h,
+                        child: FilledButton.icon(
+                          onPressed: () => Get.toNamed(Routes.DRAW),
+                          icon: Icon(Icons.brush_rounded, size: 22.r),
+                          label: Text(
+                            'start_drawing'.tr,
+                            style: TextStyle(
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ),

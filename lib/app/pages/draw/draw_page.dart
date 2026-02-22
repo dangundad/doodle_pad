@@ -35,20 +35,48 @@ class DrawPage extends GetView<DoodleController> {
             ),
           ),
 
-          // Top toolbar (floating)
+          // Top toolbar with slide-down entrance animation
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            child: SafeArea(child: _TopToolbar(ctrl: controller)),
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0.0, end: 1.0),
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeOutCubic,
+              builder: (ctx, v, child) {
+                return Transform.translate(
+                  offset: Offset(0, -60 * (1 - v)),
+                  child: Opacity(
+                    opacity: v.clamp(0.0, 1.0),
+                    child: child,
+                  ),
+                );
+              },
+              child: SafeArea(child: _TopToolbar(ctrl: controller)),
+            ),
           ),
 
-          // Bottom toolbar (floating)
+          // Bottom toolbar with slide-up entrance animation
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
-            child: SafeArea(child: _BottomToolbar(ctrl: controller)),
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0.0, end: 1.0),
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeOutCubic,
+              builder: (ctx, v, child) {
+                return Transform.translate(
+                  offset: Offset(0, 60 * (1 - v)),
+                  child: Opacity(
+                    opacity: v.clamp(0.0, 1.0),
+                    child: child,
+                  ),
+                );
+              },
+              child: SafeArea(child: _BottomToolbar(ctrl: controller)),
+            ),
           ),
         ],
       ),
