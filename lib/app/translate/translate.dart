@@ -1,9 +1,3 @@
-// ================================================
-// DangunDad Flutter App - translate.dart Template
-// ================================================
-// mbti_pro 프로덕션 패턴 기반
-// 개발 시 한국어(ko)만 정의, 다국어는 추후 추가
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -32,21 +26,28 @@ class Languages extends Translations {
       'success': 'Success',
       'loading': 'Loading...',
       'no_data': 'No data',
+      'clear': 'Clear',
+      'back': 'Back',
+      'undo': 'Undo',
+      'redo': 'Redo',
 
-      // Settings
-      'dark_mode': 'Dark Mode',
-      'language': 'Language',
-      'about': 'About',
-      'version': 'Version',
-      'rate_app': 'Rate App',
-      'privacy_policy': 'Privacy Policy',
-      'remove_ads': 'Remove Ads',
+      // App
+      'app_name': 'Doodle Pad',
+      'app_subtitle': 'Express yourself freely',
+      'start_drawing': 'Start Drawing',
 
-      // Feedback
-      'send_feedback': 'Send Feedback',
-      'more_apps': 'More Apps',
+      // Features
+      'feature_pen': 'Pen',
+      'feature_marker': 'Marker',
+      'feature_eraser': 'Eraser',
+      'feature_colors': '16 Colors',
+      'feature_undo': 'Undo / Redo',
+      'feature_share': 'Share',
 
-      // ---- App-specific translations ----
+      // Canvas
+      'clear_canvas': 'Clear Canvas',
+      'clear_canvas_confirm': 'This will erase everything. Continue?',
+      'eraser_mode': 'Eraser — drag to erase',
     },
     'ko': {
       // 공통
@@ -65,21 +66,28 @@ class Languages extends Translations {
       'success': '성공',
       'loading': '로딩 중...',
       'no_data': '데이터 없음',
+      'clear': '지우기',
+      'back': '뒤로',
+      'undo': '실행 취소',
+      'redo': '다시 실행',
 
-      // 설정
-      'dark_mode': '다크 모드',
-      'language': '언어',
-      'about': '앱 정보',
-      'version': '버전',
-      'rate_app': '앱 평가',
-      'privacy_policy': '개인정보처리방침',
-      'remove_ads': '광고 제거',
+      // 앱
+      'app_name': '두들 패드',
+      'app_subtitle': '자유롭게 나만의 그림을 그려보세요',
+      'start_drawing': '그림 그리기 시작',
 
-      // 피드백
-      'send_feedback': '피드백 보내기',
-      'more_apps': '더 많은 앱',
+      // 기능
+      'feature_pen': '펜',
+      'feature_marker': '마커',
+      'feature_eraser': '지우개',
+      'feature_colors': '16가지 색상',
+      'feature_undo': '실행 취소 / 다시 실행',
+      'feature_share': '공유',
 
-      // ---- 앱별 번역 추가 ----
+      // 캔버스
+      'clear_canvas': '캔버스 초기화',
+      'clear_canvas_confirm': '모든 내용이 삭제됩니다. 계속하시겠어요?',
+      'eraser_mode': '지우개 — 드래그하여 지우기',
     },
   };
 }
