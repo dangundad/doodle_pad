@@ -1,11 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class Languages extends Translations {
-  static const List<Locale> supportedLocales = [
-    Locale('en'),
-    Locale('ko'),
-  ];
+  static const List<Locale> supportedLocales = [Locale('en'), Locale('ko')];
 
   @override
   Map<String, Map<String, String>> get keys => {
@@ -30,6 +27,22 @@ class Languages extends Translations {
       'back': 'Back',
       'undo': 'Undo',
       'redo': 'Redo',
+      'history': 'History',
+      'stats': 'Stats',
+      'settings_page': 'Settings',
+      'open_history': 'History',
+      'open_stats': 'Stats',
+      'clear_all': 'Clear All',
+      'refresh': 'Refresh',
+      'no_history': 'No history',
+      'unknown_event': 'Unknown Event',
+      'history_subtitle': 'Screen: @screen / Route: @route',
+      'total_events': 'Total Events',
+      'today_events': 'Today',
+      'week_events': 'This Week',
+      'unique_routes': 'Routes',
+      'unique_screens': 'Screens',
+      'top_events': 'Top Events',
 
       // App
       'app_name': 'Doodle Pad',
@@ -47,47 +60,8 @@ class Languages extends Translations {
       // Canvas
       'clear_canvas': 'Clear Canvas',
       'clear_canvas_confirm': 'This will erase everything. Continue?',
-      'eraser_mode': 'Eraser — drag to erase',
+      'eraser_mode': 'Eraser ??drag to erase',
     },
-    'ko': {
-      // 공통
-      'settings': '설정',
-      'save': '저장',
-      'cancel': '취소',
-      'delete': '삭제',
-      'edit': '편집',
-      'share': '공유',
-      'reset': '초기화',
-      'done': '완료',
-      'ok': '확인',
-      'yes': '예',
-      'no': '아니오',
-      'error': '오류',
-      'success': '성공',
-      'loading': '로딩 중...',
-      'no_data': '데이터 없음',
-      'clear': '지우기',
-      'back': '뒤로',
-      'undo': '실행 취소',
-      'redo': '다시 실행',
-
-      // 앱
-      'app_name': '두들 패드',
-      'app_subtitle': '자유롭게 나만의 그림을 그려보세요',
-      'start_drawing': '그림 그리기 시작',
-
-      // 기능
-      'feature_pen': '펜',
-      'feature_marker': '마커',
-      'feature_eraser': '지우개',
-      'feature_colors': '16가지 색상',
-      'feature_undo': '실행 취소 / 다시 실행',
-      'feature_share': '공유',
-
-      // 캔버스
-      'clear_canvas': '캔버스 초기화',
-      'clear_canvas_confirm': '모든 내용이 삭제됩니다. 계속하시겠어요?',
-      'eraser_mode': '지우개 — 드래그하여 지우기',
-    },
+    'ko': {},
   };
 }

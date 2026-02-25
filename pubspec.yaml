@@ -1,61 +1,41 @@
 # ================================================
 # DangunDad Flutter App - pubspec.yaml Template
 # ================================================
-# 사용법: 새 프로젝트에 이 내용을 복사 후 doodle_pad, Free drawing canvas with brushes and sharing 치환
-
 name: doodle_pad
-description: "Free drawing canvas with brushes and sharing"
-publish_to: 'none'
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.8.0
+  sdk: ">=3.8.0 <4.0.0"
 
 dependencies:
+  flex_color_scheme: ^8.4.0
   flutter:
     sdk: flutter
+  flutter_localization: ^0.3.3
   flutter_localizations:
     sdk: flutter
-
-  # 상태 관리 & 라우팅
+  flutter_screenutil: ^5.9.3
   get: ^4.7.3
-
-  # 로컬 저장소
+  google_fonts: ^8.0.2
+  google_mobile_ads: ^7.0.0
   hive_ce: ^2.19.3
   hive_ce_flutter: ^2.3.4
-  path_provider: ^2.1.5
-
-  # UI
-  flutter_screenutil: ^5.9.3
-  flex_color_scheme: ^8.4.0
-  google_fonts: ^6.3.2
-  lucide_icons_flutter: ^3.1.9
-
-  # 광고
-  google_mobile_ads: ^6.0.0
-
-  # 유틸리티
+  in_app_purchase: ^3.2.3
   intl: ^0.20.2
+  lucide_icons_flutter: ^3.1.10
+  path_provider: ^2.1.5
   share_plus: ^12.0.1
 
-  # ---- 앱별 추가 패키지 (필요시 아래 주석 해제) ----
-  # fl_chart: ^0.70.2              # 차트 (가계부, 습관, 통계)
-  # flutter_local_notifications:    # 알림 (타이머, 리마인더)
-  # just_audio: ^0.9.42            # 오디오 재생 (수면 사운드)
-  # mobile_scanner: ^6.0.5         # QR/바코드 스캔
-  # qr_flutter: ^4.1.0             # QR 코드 생성
-  # http: ^1.3.0                   # HTTP 요청 (환율 API, 퀴즈 API)
-  # pedometer: ^4.0.2              # 만보기 센서
-
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^6.0.0
-  hive_ce_generator: ^1.11.1
   build_runner: ^2.11.0
   change_app_package_name: ^1.5.0
   flutter_launcher_icons: ^0.14.4
+  flutter_lints: ^6.0.0
   flutter_native_splash: ^2.4.7
+  flutter_test:
+    sdk: flutter
+  hive_ce_generator: ^1.11.1
 
 flutter:
   uses-material-design: true
@@ -63,4 +43,3 @@ flutter:
   assets:
     - assets/images/
     - assets/data/
-    # - assets/sounds/             # 사운드 앱용

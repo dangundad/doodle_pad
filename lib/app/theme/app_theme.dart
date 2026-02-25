@@ -1,82 +1,41 @@
-// ================================================
-// DangunDad Flutter App - app_theme.dart Template
-// ================================================
-// 앱별 FlexScheme 변경 (https://rydmike.com/flexcolorscheme/themesplayground)
-// mbti_pro 프로덕션 패턴 기반
-
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/material.dart';
 
 abstract final class AppTheme {
-  // TODO: 앱별 FlexScheme 변경
-  static const FlexScheme _scheme = FlexScheme.pinkM3;
+  static const _subThemesData = FlexSubThemesData(
+    blendOnLevel: 10,
+    blendOnColors: false,
+    sliderTrackHeight: 8,
+    fabSchemeColor: SchemeColor.primary,
+    segmentedButtonSchemeColor: SchemeColor.primary,
+    segmentedButtonSelectedForegroundSchemeColor: SchemeColor.onPrimary,
+  );
 
-  static ThemeData light = _buildLightTheme();
-  static ThemeData dark = _buildDarkTheme();
+  static const _subThemesDataDark = FlexSubThemesData(
+    blendOnLevel: 20,
+    sliderTrackHeight: 8,
+    fabSchemeColor: SchemeColor.primary,
+    segmentedButtonSchemeColor: SchemeColor.primary,
+    segmentedButtonSelectedForegroundSchemeColor: SchemeColor.onPrimary,
+  );
 
-  static ThemeData _buildLightTheme() {
-    final base = FlexThemeData.light(
-      scheme: _scheme,
-      subThemesData: const FlexSubThemesData(
-        interactionEffects: true,
-        tintedDisabledControls: true,
-        useM2StyleDividerInM3: true,
-        inputDecoratorIsFilled: true,
-        inputDecoratorBorderType: FlexInputBorderType.outline,
-        alignedDropdown: true,
-        navigationRailUseIndicator: true,
-      ),
-      visualDensity: FlexColorScheme.comfortablePlatformDensity,
-      cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
-    );
+  static ThemeData light = FlexThemeData.light(
+    scheme: FlexScheme.blueWhale,
+    surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+    blendLevel: 9,
+    subThemesData: _subThemesData,
+    visualDensity: FlexColorScheme.comfortablePlatformDensity,
+    useMaterial3: true,
+    swapLegacyOnMaterial3: true,
+  );
 
-    return base.copyWith(dialogTheme: _buildDialogTheme(base));
-  }
-
-  static ThemeData _buildDarkTheme() {
-    final base = FlexThemeData.dark(
-      scheme: _scheme,
-      subThemesData: const FlexSubThemesData(
-        interactionEffects: true,
-        tintedDisabledControls: true,
-        blendOnColors: true,
-        useM2StyleDividerInM3: true,
-        inputDecoratorIsFilled: true,
-        inputDecoratorBorderType: FlexInputBorderType.outline,
-        alignedDropdown: true,
-        navigationRailUseIndicator: true,
-      ),
-      visualDensity: FlexColorScheme.comfortablePlatformDensity,
-      cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
-    );
-
-    return base.copyWith(dialogTheme: _buildDialogTheme(base));
-  }
-
-  static DialogThemeData _buildDialogTheme(ThemeData base) {
-    final scheme = base.colorScheme;
-
-    return DialogThemeData(
-      backgroundColor: scheme.surface,
-      surfaceTintColor: scheme.primary,
-      elevation: 6,
-      shadowColor: scheme.shadow.withValues(alpha: 0.2),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
-      iconColor: scheme.secondary,
-      titleTextStyle: base.textTheme.titleLarge?.copyWith(
-        color: scheme.onSurface,
-        fontWeight: FontWeight.w700,
-      ),
-      contentTextStyle: base.textTheme.bodyMedium?.copyWith(
-        color: scheme.onSurfaceVariant,
-        height: 1.4,
-      ),
-      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-    );
-  }
+  static ThemeData dark = FlexThemeData.dark(
+    scheme: FlexScheme.blueWhale,
+    surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+    blendLevel: 15,
+    subThemesData: _subThemesDataDark,
+    visualDensity: FlexColorScheme.comfortablePlatformDensity,
+    useMaterial3: true,
+    swapLegacyOnMaterial3: true,
+  );
 }
