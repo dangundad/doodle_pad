@@ -91,6 +91,18 @@ class Languages extends Translations {
       'unique_screens': '고유 화면 수',
       'unknown_event': '알 수 없는 활동',
       'week_events': '이번 주 활동',
+      'save': '저장',
+      'saved': '저장됨',
+      'save_canvas': '캔버스 저장',
+      'save_success': '그림이 저장되었습니다',
+      'save_error': '저장에 실패했습니다',
+      'gallery': '갤러리',
+      'gallery_empty': '저장된 그림이 없습니다',
+      'gallery_subtitle': '저장된 그림을 불러오거나 공유하세요',
+      'load_drawing': '불러오기',
+      'load_drawing_confirm': '현재 그림을 지우고 저장된 그림을 불러오시겠습니까?',
+      'delete_drawing': '그림 삭제',
+      'delete_drawing_confirm': '이 그림을 삭제하시겠습니까?',
     },
   };
 }

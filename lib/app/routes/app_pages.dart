@@ -3,6 +3,7 @@
 import 'package:get/get.dart';
 import 'package:doodle_pad/app/bindings/app_binding.dart';
 import 'package:doodle_pad/app/pages/draw/draw_page.dart';
+import 'package:doodle_pad/app/pages/gallery/gallery_page.dart';
 import 'package:doodle_pad/app/pages/history/history_page.dart';
 import 'package:doodle_pad/app/pages/home/home_page.dart';
 import 'package:doodle_pad/app/pages/settings/settings_page.dart';
@@ -26,6 +27,7 @@ class AppPages {
       name: _Paths.DRAW,
       page: () => const DrawPage(),
     ),
+    GetPage(name: _Paths.GALLERY, page: () => const GalleryPage()),
     GetPage(name: _Paths.SETTINGS, page: () => const SettingsPage()),
     GetPage(name: _Paths.HISTORY, page: () => const HistoryPage()),
     GetPage(name: _Paths.STATS, page: () => const StatsPage()),
@@ -34,6 +36,6 @@ class AppPages {
       page: () => const PremiumPage(),
       binding: PremiumBinding(),
     ),
-];
+  ];
 }
 

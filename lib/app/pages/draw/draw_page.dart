@@ -139,7 +139,9 @@ class _TopToolbar extends StatelessWidget {
               ),
               onPressed: ctrl.canUndo
                   ? () {
-                      _maybeHaptic(settingCtrl);
+                      if (settingCtrl.hapticEnabled.value) {
+                        HapticFeedback.lightImpact();
+                      }
                       ctrl.undo();
                     }
                   : null,
@@ -165,10 +167,32 @@ class _TopToolbar extends StatelessWidget {
               onPressed: () => _confirmClear(context, cs, settingCtrl),
               tooltip: 'clear_canvas'.tr,
             ),
+            // 저장 버튼
+            Obx(() => IconButton(
+              icon: ctrl.isSaving.value
+                  ? SizedBox(
+                      width: 20.r,
+                      height: 20.r,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: cs.primary,
+                      ),
+                    )
+                  : Icon(Icons.save_rounded, color: cs.primary),
+              onPressed: ctrl.isSaving.value
+                  ? null
+                  : () {
+                      _maybeHaptic(settingCtrl);
+                      ctrl.saveCanvas();
+                    },
+              tooltip: 'save_canvas'.tr,
+            )),
             IconButton(
               icon: const Icon(Icons.share_rounded),
               onPressed: () {
-                _maybeHaptic(settingCtrl);
+                if (settingCtrl.hapticEnabled.value) {
+                  HapticFeedback.mediumImpact();
+                }
                 ctrl.shareCanvas();
               },
               tooltip: 'share'.tr,

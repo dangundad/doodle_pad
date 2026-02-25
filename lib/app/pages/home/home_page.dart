@@ -338,6 +338,11 @@ class _HomeTopActions extends StatelessWidget {
       child: Row(
         children: [
           IconButton(
+            onPressed: () => Get.toNamed(Routes.GALLERY),
+            icon: Icon(Icons.photo_library_rounded, color: cs.primary),
+            tooltip: 'gallery'.tr,
+          ),
+          IconButton(
             onPressed: () => Get.toNamed(Routes.HISTORY),
             icon: Icon(Icons.history_rounded, color: cs.onSurface),
             tooltip: 'open_history'.tr,

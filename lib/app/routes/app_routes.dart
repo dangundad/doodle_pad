@@ -11,6 +11,7 @@ abstract class Routes {
   static const SETTINGS = _Paths.SETTINGS;
   static const HISTORY = _Paths.HISTORY;
   static const STATS = _Paths.STATS;
+  static const GALLERY = _Paths.GALLERY;
 }
 
 abstract class _Paths {
@@ -20,4 +21,5 @@ abstract class _Paths {
   static const SETTINGS = '/settings';
   static const HISTORY = '/history';
   static const STATS = '/stats';
+  static const GALLERY = '/gallery';
 }
