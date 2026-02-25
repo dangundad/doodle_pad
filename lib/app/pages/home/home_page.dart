@@ -230,25 +230,58 @@ class _HomePageState extends State<HomePage>
                           scale: _pulseAnim.value,
                           child: child,
                         ),
-                        child: SizedBox(
+                        child: Container(
                           width: double.infinity,
-                          height: 56.h,
-                          child: FilledButton.icon(
-                            onPressed: () async {
-                              if (_settingController.hapticEnabled.value) {
-                                HapticFeedback.selectionClick();
-                              }
-                              await Get.toNamed(Routes.DRAW);
-                              if (_settingController.showBrushGuide.value) {
-                                HapticFeedback.mediumImpact();
-                              }
-                            },
-                            icon: Icon(Icons.brush_rounded, size: 22.r),
-                            label: Text(
-                              'start_drawing'.tr,
-                              style: TextStyle(
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.w700,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [cs.primary, cs.tertiary],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                            borderRadius: BorderRadius.circular(16.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: cs.primary.withValues(alpha: 0.35),
+                                blurRadius: 14,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(16.r),
+                              onTap: () async {
+                                if (_settingController.hapticEnabled.value) {
+                                  HapticFeedback.selectionClick();
+                                }
+                                await Get.toNamed(Routes.DRAW);
+                                if (_settingController
+                                    .showBrushGuide.value) {
+                                  HapticFeedback.mediumImpact();
+                                }
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 16.h),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.brush_rounded,
+                                      size: 22.r,
+                                      color: cs.onPrimary,
+                                    ),
+                                    SizedBox(width: 10.w),
+                                    Text(
+                                      'start_drawing'.tr,
+                                      style: TextStyle(
+                                        fontSize: 18.sp,
+                                        fontWeight: FontWeight.w700,
+                                        color: cs.onPrimary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
