@@ -1,0 +1,15 @@
+#dart run flutter_native_splash:create
+flutter_native_splash:
+  color: "#333333"
+  color_dark: "#333333"
+  image: assets/images/splash/splash.png
+  android_12:
+    image: assets/images/splash/splash.png
+    icon_background_color: "#333333"
+    icon_background_color_dark: "#333333"
+  android: true
+  ios: true
+  web: false
+  android_gravity: center
+  ios_content_mode: center
+  fullscreen: true

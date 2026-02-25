@@ -1,0 +1,271 @@
+<af>
+ - Foutoplossings en prestasieverbeterings
+</af>
+
+<am>
+ - Bug መፍትሄዎች እና የአፈጻጸም ማሻሻያዎች
+</am>
+
+<ar>
+ - إصلاحات الأخطاء وتحسينات الأداء
+</ar>
+
+<az-AZ>
+ - Bug fixes və performans yaxşılaşdırılması
+</az-AZ>
+
+<bg>
+ - Корекции на грешки и подобрения в производителността
+</bg>
+
+<bn-BD>
+ - বাগ সংশোধন এবং কর্মক্ষমতা উন্নতি
+</bn-BD>
+
+<ca>
+ - Correcció d'errors i millores de rendiment
+</ca>
+
+<cs-CZ>
+ - Opravy chyb a vylepšení výkonu
+</cs-CZ>
+
+<da-DK>
+ - Fejlrettelser og forbedringer af ydeevnen
+</da-DK>
+
+<de-DE>
+ - Fehlerbehebungen und Leistungsverbesserungen
+</de-DE>
+
+<el-GR>
+ - Διορθώσεις σφαλμάτων και βελτιώσεις απόδοσης
+</el-GR>
+
+<en-AU>
+ - Bug fixes and performance improvements
+</en-AU>
+
+<en-CA>
+ - Bug fixes and performance improvements
+</en-CA>
+
+<en-GB>
+ - Bug fixes and performance improvements
+</en-GB>
+
+<en-IN>
+ - Bug fixes and performance improvements
+</en-IN>
+
+<en-SG>
+ - Bug fixes and performance improvements
+</en-SG>
+
+<en-US>
+ - Bug fixes and performance improvements
+</en-US>
+
+<en-ZA>
+ - Bug fixes and performance improvements
+</en-ZA>
+
+<es-419>
+ - Corrección de errores y mejoras de rendimiento
+</es-419>
+
+<es-ES>
+ - Corrección de errores y mejoras de rendimiento
+</es-ES>
+
+<es-US>
+ - Corrección de errores y mejoras de rendimiento
+</es-US>
+
+<et>
+ - Veaparandused ja jõudluse parandamine
+</et>
+
+<fa>
+ - رفع اشکال و بهبود عملکرد
+</fa>
+
+<fa-AE>
+ - رفع اشکال و بهبود عملکرد
+</fa-AE>
+
+<fa-AF>
+ - رفع اشکال و بهبود عملکرد
+</fa-AF>
+
+<fa-IR>
+ - رفع اشکال و بهبود عملکرد
+</fa-IR>
+
+<fi-FI>
+ - Virheenkorjauksia ja suorituskyvyn parannuksia
+</fi-FI>
+
+<fil>
+ - Mga bug fix at pagpapabuti ng pagganap
+</fil>
+
+<fr-CA>
+ - Corrections de bugs et améliorations des performances
+</fr-CA>
+
+<fr-FR>
+ - Corrections de bugs et améliorations des performances
+</fr-FR>
+
+<hi-IN>
+ - बग फिक्स और प्रदर्शन में सुधार
+</hi-IN>
+
+<hr>
+ - Ispravci pogrešaka i poboljšanja performansi
+</hr>
+
+<hu-HU>
+ - Hibajavítások és teljesítménybeli fejlesztések
+</hu-HU>
+
+<hy-AM>
+ - Bug-ի շտկումները եւ կատարողականության բարելավումները
+</hy-AM>
+
+<id>
+ - Perbaikan bug dan peningkatan kinerja
+</id>
+
+<is-IS>
+ - Villuleiðréttingar og endurbætur á afköstum
+</is-IS>
+
+<it-IT>
+ - Correzioni di bug e miglioramenti delle prestazioni
+</it-IT>
+
+<iw-IL>
+ - תיקוני באגים ושיפורי ביצועים
+</iw-IL>
+
+<ja-JP>
+ - バグ修正とパフォーマンスの改善
+</ja-JP>
+
+<km-KH>
+ - ការ ជួសជុល Bug និង ការ ធ្វើ ឲ្យ ប្រសើរ ឡើង នូវ សមត្ថភាព
+</km-KH>
+
+<kn-IN>
+ - ದೋಷ ಪರಿಹಾರಗಳು ಮತ್ತು ಕಾರ್ಯಕ್ಷಮತೆ ಸುಧಾರಣೆಗಳು
+</kn-IN>
+
+<ko-KR>
+ - 버그 수정 및 성능 개선
+</ko-KR>
+
+<lo-LA>
+ - Bug fixes ແລະ ການປັບປຸງການປະຕິບັດງານ
+</lo-LA>
+
+<lt>
+ - Klaidų taisymas ir našumo patobulinimai
+</lt>
+
+<lv>
+ - Kļūdu labojumi un veiktspējas uzlabojumi
+</lv>
+
+<ml-IN>
+ - ബഗ് പരിഹാരങ്ങളും പ്രകടന മെച്ചപ്പെടുത്തലുകളും
+</ml-IN>
+
+<mr-IN>
+ - बग फिक्स आणि कार्यक्षमता सुधारणा
+</mr-IN>
+
+<ms>
+ - Pembetulan pepijat dan penambahbaikan prestasi
+</ms>
+
+<ms-MY>
+ - Pembetulan pepijat dan penambahbaikan prestasi
+</ms-MY>
+
+<ne-NP>
+ - बग फिक्स र प्रदर्शन सुधार
+</ne-NP>
+
+<nl-NL>
+ - Bugfixes en prestatieverbeteringen
+</nl-NL>
+
+<no-NO>
+ - Feilrettinger og ytelsesforbedringer
+</no-NO>
+
+<pl-PL>
+ - Poprawki błędów i ulepszenia wydajności
+</pl-PL>
+
+<pt-BR>
+ - Correções de bugs e melhorias de desempenho
+</pt-BR>
+
+<pt-PT>
+ - Correções de bugs e melhorias de desempenho
+</pt-PT>
+
+<ro>
+ - Remedieri de erori și îmbunătățiri ale performanței
+</ro>
+
+<ru-RU>
+ - Исправлены ошибки и улучшена производительность
+</ru-RU>
+
+<sk>
+ - Opravy chýb a zvýšenie výkonu
+</sk>
+
+<sq>
+ - Rregullime të gabimeve dhe përmirësime të performancës
+</sq>
+
+<sv-SE>
+ - Felkorrigeringar och prestandaförbättringar
+</sv-SE>
+
+<sw>
+ - Maboresho ya Bug na Ufanisi
+</sw>
+
+<ta-IN>
+ - பகுப்புகள் உதவிக்கு மற்றும் செயல்பாட்டின் மேம்படுத்தல்கள்
+</ta-IN>
+
+<th>
+ - การแก้ไขข้อบกพร่องและการปรับปรุงประสิทธิภาพ
+</th>
+
+<tr-TR>
+ - Hata düzeltmeleri ve performans iyileştirmeleri
+</tr-TR>
+
+<uk>
+ - Виправлення помилок та поліпшення продуктивності
+</uk>
+
+<vi>
+ - Sửa lỗi và cải thiện hiệu suất
+</vi>
+
+<zh-CN>
+ - 修复错误和性能改进
+</zh-CN>
+
+<zh-TW>
+ - 修復錯誤和性能改進
+</zh-TW>

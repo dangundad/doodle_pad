@@ -9,8 +9,6 @@
 import 'package:get/get.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 
-import 'package:doodle_pad/hive_registrar.g.dart';
-
 class HiveService extends GetxService {
   static HiveService get to => Get.find();
 
@@ -28,7 +26,6 @@ class HiveService extends GetxService {
   /// Hive 초기화 (main.dart에서 await 호출)
   static Future<void> init() async {
     await Hive.initFlutter();
-    Hive.registerAdapters();
 
     await Future.wait([
       Hive.openBox(SETTINGS_BOX),
@@ -90,10 +87,7 @@ class HiveService extends GetxService {
   // ============================================
 
   Future<void> clearAllData() async {
-    await Future.wait([
-      settingsBox.clear(),
-      appDataBox.clear(),
-    ]);
+    await Future.wait([settingsBox.clear(), appDataBox.clear()]);
     Get.log('모든 데이터 삭제 완료');
   }
 }
