@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:doodle_pad/app/admob/ads_interstitial.dart';
+import 'package:doodle_pad/app/admob/ads_rewarded.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
 import 'package:doodle_pad/app/utils/app_constants.dart';
@@ -215,6 +217,8 @@ class PurchaseService extends GetxService {
 
     isPremium.value = true;
     await _savePremiumStatus(true);
+    await _syncAdsForPremiumStatus(true);
+
     isLoading.value = false;
 
     statusMessage.value = 'purchase_success'.tr;
@@ -235,6 +239,7 @@ class PurchaseService extends GetxService {
             defaultValue: false,
           ) ??
           false;
+      await _syncAdsForPremiumStatus(isPremium.value);
     } catch (e) {
       isPremium.value = false;
       errorMessage.value = e.toString();
@@ -252,5 +257,26 @@ class PurchaseService extends GetxService {
   Future<void> setPremiumForDebug(bool value) async {
     isPremium.value = value;
     await _savePremiumStatus(value);
+    await _syncAdsForPremiumStatus(value);
+    await _syncAdsForPremiumStatus(value);
+  }
+
+  Future<void> _syncAdsForPremiumStatus(bool isPremiumActive) async {
+    if (isPremiumActive) {
+      if (Get.isRegistered<InterstitialAdManager>()) {
+        await Get.delete<InterstitialAdManager>();
+      }
+      if (Get.isRegistered<RewardedAdManager>()) {
+        await Get.delete<RewardedAdManager>();
+      }
+      return;
+    }
+
+    if (!Get.isRegistered<InterstitialAdManager>()) {
+      Get.put(InterstitialAdManager(), permanent: true);
+    }
+    if (!Get.isRegistered<RewardedAdManager>()) {
+      Get.put(RewardedAdManager(), permanent: true);
+    }
   }
 }

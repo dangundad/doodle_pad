@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
+import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/pages/draw/widgets/canvas_painter.dart';
 
 class DrawPage extends GetView<DoodleController> {
@@ -10,6 +12,8 @@ class DrawPage extends GetView<DoodleController> {
 
   @override
   Widget build(BuildContext context) {
+    final settingCtrl = SettingController.to;
+
     return Scaffold(
       backgroundColor: Colors.grey.shade300,
       body: Stack(
@@ -19,7 +23,12 @@ class DrawPage extends GetView<DoodleController> {
             child: RepaintBoundary(
               key: controller.canvasKey,
               child: GestureDetector(
-                onPanStart: (d) => controller.startStroke(d.localPosition),
+                onPanStart: (d) {
+                  if (settingCtrl.hapticEnabled.value) {
+                    HapticFeedback.selectionClick();
+                  }
+                  controller.startStroke(d.localPosition);
+                },
                 onPanUpdate: (d) => controller.continueStroke(d.localPosition),
                 onPanEnd: (_) => controller.endStroke(),
                 child: Obx(() {
@@ -84,7 +93,7 @@ class DrawPage extends GetView<DoodleController> {
   }
 }
 
-// ─── Top Toolbar ──────────────────────────────────────────
+// Top Toolbar
 
 class _TopToolbar extends StatelessWidget {
   final DoodleController ctrl;
@@ -92,6 +101,7 @@ class _TopToolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingCtrl = SettingController.to;
     final cs = Theme.of(context).colorScheme;
 
     return Container(
@@ -114,7 +124,7 @@ class _TopToolbar extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.arrow_back_rounded),
               onPressed: () {
-                ctrl.clearCanvas();
+                _maybeHaptic(settingCtrl);
                 Get.back();
               },
               tooltip: 'back'.tr,
@@ -127,7 +137,12 @@ class _TopToolbar extends StatelessWidget {
                     ? cs.onSurface
                     : cs.onSurface.withValues(alpha: 0.3),
               ),
-              onPressed: ctrl.canUndo ? ctrl.undo : null,
+              onPressed: ctrl.canUndo
+                  ? () {
+                      _maybeHaptic(settingCtrl);
+                      ctrl.undo();
+                    }
+                  : null,
               tooltip: 'undo'.tr,
             ),
             IconButton(
@@ -137,17 +152,25 @@ class _TopToolbar extends StatelessWidget {
                     ? cs.onSurface
                     : cs.onSurface.withValues(alpha: 0.3),
               ),
-              onPressed: ctrl.canRedo ? ctrl.redo : null,
+              onPressed: ctrl.canRedo
+                  ? () {
+                      _maybeHaptic(settingCtrl);
+                      ctrl.redo();
+                    }
+                  : null,
               tooltip: 'redo'.tr,
             ),
             IconButton(
               icon: Icon(Icons.delete_outline_rounded, color: cs.error),
-              onPressed: () => _confirmClear(context, cs),
-              tooltip: 'clear'.tr,
+              onPressed: () => _confirmClear(context, cs, settingCtrl),
+              tooltip: 'clear_canvas'.tr,
             ),
             IconButton(
               icon: const Icon(Icons.share_rounded),
-              onPressed: ctrl.shareCanvas,
+              onPressed: () {
+                _maybeHaptic(settingCtrl);
+                ctrl.shareCanvas();
+              },
               tooltip: 'share'.tr,
             ),
           ],
@@ -156,11 +179,31 @@ class _TopToolbar extends StatelessWidget {
     );
   }
 
-  void _confirmClear(BuildContext context, ColorScheme cs) {
+  void _maybeHaptic(SettingController settingCtrl) {
+    if (!settingCtrl.hapticEnabled.value) return;
+    HapticFeedback.selectionClick();
+  }
+
+  void _confirmClear(
+    BuildContext context,
+    ColorScheme cs,
+    SettingController settingCtrl,
+  ) {
+    if (!settingCtrl.askBeforeClear.value) {
+      settingCtrl.logEvent(
+        'clear_canvas_direct',
+        'draw',
+        metadata: {'source': 'toolbar', 'confirm': false},
+      );
+      ctrl.clearCanvas();
+      return;
+    }
+
     Get.dialog(
       AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.r)),
+          borderRadius: BorderRadius.circular(20.r),
+        ),
         title: Text('clear_canvas'.tr),
         content: Text('clear_canvas_confirm'.tr),
         actions: [
@@ -170,7 +213,15 @@ class _TopToolbar extends StatelessWidget {
           ),
           FilledButton(
             onPressed: () {
+              settingCtrl.logEvent(
+                'clear_canvas',
+                'draw',
+                metadata: {'source': 'toolbar', 'confirm': true},
+              );
               ctrl.clearCanvas();
+              if (settingCtrl.hapticEnabled.value) {
+                HapticFeedback.heavyImpact();
+              }
               Get.back();
             },
             style: FilledButton.styleFrom(backgroundColor: cs.error),
@@ -182,7 +233,7 @@ class _TopToolbar extends StatelessWidget {
   }
 }
 
-// ─── Bottom Toolbar ───────────────────────────────────────
+// Bottom Toolbar
 
 class _BottomToolbar extends StatelessWidget {
   final DoodleController ctrl;
@@ -190,6 +241,7 @@ class _BottomToolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingCtrl = SettingController.to;
     final cs = Theme.of(context).colorScheme;
     return Container(
       margin: EdgeInsets.fromLTRB(12.w, 0, 12.w, 8.h),
@@ -217,13 +269,23 @@ class _BottomToolbar extends StatelessWidget {
           ),
           SizedBox(height: 10.h),
           _ColorPalette(ctrl: ctrl),
+          SizedBox(height: 4.h),
+          if (settingCtrl.showBrushGuide.value)
+            Text(
+              'brush_guide_desc'.tr,
+              style: TextStyle(
+                fontSize: 11.sp,
+                color: cs.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
         ],
       ),
     );
   }
 }
 
-// ─── Brush Type Selector ──────────────────────────────────
+// Brush Type Selector
 
 class _BrushTypeSelector extends StatelessWidget {
   final DoodleController ctrl;
@@ -231,6 +293,7 @@ class _BrushTypeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingCtrl = SettingController.to;
     final cs = Theme.of(context).colorScheme;
     return Obx(() {
       return Row(
@@ -238,7 +301,12 @@ class _BrushTypeSelector extends StatelessWidget {
         children: BrushType.values.map((type) {
           final selected = ctrl.brushType.value == type;
           return GestureDetector(
-            onTap: () => ctrl.brushType.value = type,
+            onTap: () {
+              if (settingCtrl.hapticEnabled.value) {
+                HapticFeedback.selectionClick();
+              }
+              ctrl.brushType.value = type;
+            },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               margin: EdgeInsets.only(right: 8.w),
@@ -280,7 +348,7 @@ class _BrushTypeSelector extends StatelessWidget {
   }
 }
 
-// ─── Brush Size Slider ────────────────────────────────────
+// Brush Size Slider
 
 class _BrushSizeSlider extends StatelessWidget {
   final DoodleController ctrl;
@@ -332,7 +400,7 @@ class _BrushSizeSlider extends StatelessWidget {
   }
 }
 
-// ─── Color Palette ────────────────────────────────────────
+// Color Palette
 
 class _ColorPalette extends StatelessWidget {
   final DoodleController ctrl;
@@ -340,6 +408,7 @@ class _ColorPalette extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingCtrl = SettingController.to;
     final cs = Theme.of(context).colorScheme;
     return Obx(() {
       final isEraser = ctrl.brushType.value == BrushType.eraser;
@@ -368,7 +437,12 @@ class _ColorPalette extends StatelessWidget {
             final c = DoodleController.colorPalette[i];
             final selected = ctrl.brushColor.value == c;
             return GestureDetector(
-              onTap: () => ctrl.brushColor.value = c,
+              onTap: () {
+                if (settingCtrl.hapticEnabled.value) {
+                  HapticFeedback.selectionClick();
+                }
+                ctrl.brushColor.value = c;
+              },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
                 width: selected ? 36.r : 30.r,

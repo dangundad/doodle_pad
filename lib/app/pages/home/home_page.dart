@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/admob/ads_banner.dart';
 import 'package:doodle_pad/app/admob/ads_helper.dart';
 import 'package:doodle_pad/app/routes/app_pages.dart';
@@ -18,6 +20,9 @@ class _HomePageState extends State<HomePage>
   late AnimationController _pulseCtrl;
   late Animation<double> _pulseAnim;
 
+  final SettingController _settingController = Get.find<SettingController>();
+  bool _didShowWelcome = false;
+
   @override
   void initState() {
     super.initState();
@@ -30,12 +35,59 @@ class _HomePageState extends State<HomePage>
       begin: 1.0,
       end: 1.03,
     ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      SettingController.to.recordHomeOpen(Get.currentRoute);
+      _maybeShowWelcome();
+    });
   }
 
   @override
   void dispose() {
     _pulseCtrl.dispose();
     super.dispose();
+  }
+
+  void _maybeShowWelcome() {
+    if (_didShowWelcome) return;
+    if (!_settingController.isFirstRun.value) return;
+    _didShowWelcome = true;
+
+    Get.dialog(
+      AlertDialog(
+        title: Text('onboarding_title'.tr),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('onboarding_message'.tr),
+            SizedBox(height: 14.h),
+            _FeatureChip(icon: Icons.gesture, label: 'brush_guide'.tr),
+            SizedBox(height: 10.h),
+            _FeatureChip(icon: Icons.undo_rounded, label: 'feature_undo'.tr),
+            SizedBox(height: 10.h),
+            _FeatureChip(icon: Icons.ios_share, label: 'share'.tr),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              await _settingController.setShowBrushGuide(false);
+              await _settingController.finishFirstRun();
+              Get.back();
+            },
+            child: Text('onboarding_skip'.tr),
+          ),
+          FilledButton(
+            onPressed: () async {
+              await _settingController.finishFirstRun();
+              Get.back();
+            },
+            child: Text('onboarding_start'.tr),
+          ),
+        ],
+      ),
+    );
   }
 
   static const _features = [
@@ -67,11 +119,12 @@ class _HomePageState extends State<HomePage>
         child: SafeArea(
           child: Column(
             children: [
+              _HomeTopActions(),
               Expanded(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.symmetric(
                     horizontal: 24.r,
-                    vertical: 20.r,
+                    vertical: 12.r,
                   ),
                   child: Column(
                     children: [
@@ -181,7 +234,15 @@ class _HomePageState extends State<HomePage>
                           width: double.infinity,
                           height: 56.h,
                           child: FilledButton.icon(
-                            onPressed: () => Get.toNamed(Routes.DRAW),
+                            onPressed: () async {
+                              if (_settingController.hapticEnabled.value) {
+                                HapticFeedback.selectionClick();
+                              }
+                              await Get.toNamed(Routes.DRAW);
+                              if (_settingController.showBrushGuide.value) {
+                                HapticFeedback.mediumImpact();
+                              }
+                            },
                             icon: Icon(Icons.brush_rounded, size: 22.r),
                             label: Text(
                               'start_drawing'.tr,
@@ -194,6 +255,16 @@ class _HomePageState extends State<HomePage>
                         ),
                       ),
                       SizedBox(height: 20.h),
+                      TextButton.icon(
+                        onPressed: () {
+                          _settingController.recordSettingsOpen(
+                            from: 'home_button',
+                          );
+                          Get.toNamed(Routes.SETTINGS);
+                        },
+                        icon: Icon(Icons.settings_rounded, size: 18.r),
+                        label: Text('settings'.tr),
+                      ),
                     ],
                   ),
                 ),
@@ -219,6 +290,37 @@ class _HomePageState extends State<HomePage>
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _HomeTopActions extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(12.w, 10.h, 8.w, 4.h),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: () => Get.toNamed(Routes.HISTORY),
+            icon: Icon(Icons.history_rounded, color: cs.onSurface),
+            tooltip: 'open_history'.tr,
+          ),
+          IconButton(
+            onPressed: () => Get.toNamed(Routes.STATS),
+            icon: Icon(Icons.bar_chart_rounded, color: cs.onSurface),
+            tooltip: 'open_stats'.tr,
+          ),
+          const Spacer(),
+          IconButton(
+            onPressed: () => Get.toNamed(Routes.SETTINGS),
+            icon: Icon(Icons.settings_rounded, color: cs.onSurface),
+            tooltip: 'settings'.tr,
+          ),
+        ],
       ),
     );
   }

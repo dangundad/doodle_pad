@@ -7,6 +7,7 @@ import 'package:doodle_pad/app/controllers/doodle_controller.dart';
 import 'package:doodle_pad/app/services/activity_log_service.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
 import 'package:doodle_pad/app/controllers/history_controller.dart';
+import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/controllers/stats_controller.dart';
 
 import 'package:doodle_pad/app/services/purchase_service.dart';
@@ -51,6 +52,10 @@ class AppBinding implements Bindings {
       Get.put(DoodleController(), permanent: true);
     }
 
+    if (!Get.isRegistered<SettingController>()) {
+      Get.put(SettingController(), permanent: true);
+    }
+
     if (!Get.isRegistered<ActivityLogService>()) {
       Get.put(ActivityLogService(), permanent: true);
     }
@@ -72,4 +77,3 @@ class AppBinding implements Bindings {
     }
   }
 }
-

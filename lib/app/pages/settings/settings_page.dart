@@ -2,120 +2,292 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/routes/app_pages.dart';
 
-class SettingsPage extends GetView<dynamic> {
+class SettingsPage extends GetView<SettingController> {
   const SettingsPage({super.key});
+
+  static const Map<String, String> _languageOptions = {
+    'en': 'English',
+    'ko': '한국어',
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(_loc('settings', 'Settings'))),
+      body: SafeArea(
+        child: Obx(
+          () => ListView(
+            padding: EdgeInsets.all(16.w),
+            children: [
+              _SettingsSection(
+                title: _loc('quick_actions', 'Quick actions'),
+                icon: Icons.dashboard_customize,
+                children: [
+                  _ListItem(
+                    icon: Icons.history,
+                    title: _loc('open_history', 'Open history'),
+                    subtitle: _loc(
+                      'open_history_desc',
+                      'Check previous drawings and activity',
+                    ),
+                    onTap: () {
+                      _track('open_history', 'settings');
+                      Get.toNamed(Routes.HISTORY);
+                    },
+                  ),
+                  _ListItem(
+                    icon: Icons.bar_chart,
+                    title: _loc('open_stats', 'Open stats'),
+                    subtitle: _loc(
+                      'open_stats_desc',
+                      'Review drawing usage and totals',
+                    ),
+                    onTap: () {
+                      _track('open_stats', 'settings');
+                      Get.toNamed(Routes.STATS);
+                    },
+                  ),
+                  _ListItem(
+                    icon: Icons.auto_awesome,
+                    title: _loc('premium_title', 'Premium'),
+                    subtitle: _loc(
+                      'premium_subtitle',
+                      'Unlock premium features',
+                    ),
+                    onTap: () {
+                      _track('open_premium', 'settings');
+                      Get.toNamed(Routes.PREMIUM);
+                    },
+                  ),
+                ],
+              ),
+              SizedBox(height: 14.h),
+              _SettingsSection(
+                title: _loc('drawing_settings', 'Drawing settings'),
+                icon: Icons.draw,
+                children: [
+                  _BuildSwitchTile(
+                    value: controller.hapticEnabled.value,
+                    title: _loc('haptic_feedback', 'Haptic feedback'),
+                    subtitle: _loc(
+                      'haptic_feedback_desc',
+                      'Vibrate when interacting with tools',
+                    ),
+                    icon: Icons.vibration,
+                    onChanged: controller.setHapticEnabled,
+                  ),
+                  _BuildSwitchTile(
+                    value: controller.showBrushGuide.value,
+                    title: _loc('show_brush_guide', 'Show brush guide'),
+                    subtitle: _loc(
+                      'show_brush_guide_desc',
+                      'Show first-launch guide popup on app startup',
+                    ),
+                    icon: Icons.tips_and_updates,
+                    onChanged: controller.setShowBrushGuide,
+                  ),
+                  _BuildSwitchTile(
+                    value: controller.askBeforeClear.value,
+                    title: _loc('ask_before_clear', 'Ask before clear'),
+                    subtitle: _loc(
+                      'ask_before_clear_desc',
+                      'Confirm before deleting all strokes',
+                    ),
+                    icon: Icons.clear,
+                    onChanged: controller.setAskBeforeClear,
+                  ),
+                  _BuildLanguageTile(
+                    value: controller.language.value,
+                    options: _languageOptions,
+                    onChanged: (value) {
+                      if (value != null) {
+                        controller.setLanguage(value);
+                        _track(
+                          'change_language',
+                          'settings',
+                          metadata: {'language': value},
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+              SizedBox(height: 14.h),
+              _SettingsSection(
+                title: _loc('data_and_support', 'Data and support'),
+                icon: Icons.cleaning_services,
+                children: [
+                  _ListItem(
+                    icon: Icons.delete_outline,
+                    title: _loc('clear_data', 'Clear local data'),
+                    subtitle: _loc(
+                      'clear_data_desc',
+                      'Reset app preferences and usage history',
+                    ),
+                    onTap: () => _confirmAndClear(),
+                  ),
+                  _ListItem(
+                    icon: Icons.feedback,
+                    title: _loc('feedback', 'Send feedback'),
+                    subtitle: _loc(
+                      'feedback_desc',
+                      'Share your improvement ideas',
+                    ),
+                    onTap: () {
+                      _track('open_feedback', 'settings');
+                      Get.snackbar(
+                        _loc('feedback', 'Send feedback'),
+                        _loc(
+                          'feedback_tip',
+                          'Feature is planned. Thank you for waiting.',
+                        ),
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor:
+                            Get.theme.colorScheme.surfaceContainerHigh,
+                        colorText: Get.theme.colorScheme.onSurface,
+                        duration: const Duration(seconds: 2),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _confirmAndClear() async {
+    final shouldClear = await Get.dialog<bool>(
+      AlertDialog(
+        title: Text(_loc('clear_data', 'Clear local data')),
+        content: Text(
+          _loc(
+            'clear_data_confirm',
+            'This will reset local preferences and usage logs. Continue?',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: Text(_loc('cancel', 'Cancel')),
+          ),
+          FilledButton(
+            onPressed: () => Get.back(result: true),
+            child: Text(_loc('confirm', 'Confirm')),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldClear != true) {
+      return;
+    }
+
+    controller.logEvent('clear_local_data', 'settings');
+    await controller.clearAppSettings();
+
+    Get.snackbar(
+      _loc('clear_data', 'Clear local data'),
+      _loc('clear_data_complete', 'Local data has been removed.'),
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Get.theme.colorScheme.surfaceContainerHigh,
+      colorText: Get.theme.colorScheme.onSurface,
+      duration: const Duration(seconds: 2),
+    );
+  }
+
+  void _track(
+    String eventName,
+    String screen, {
+    Map<String, dynamic>? metadata,
+  }) {
+    controller.logEvent(eventName, screen, metadata: metadata ?? const {});
+  }
+}
+
+class _BuildLanguageTile extends StatelessWidget {
+  final String value;
+  final Map<String, String> options;
+  final ValueChanged<String?> onChanged;
+
+  const _BuildLanguageTile({
+    required this.value,
+    required this.options,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: SafeArea(
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                cs.surface,
-                cs.surfaceContainerLowest.withValues(alpha: 0.94),
-                cs.surfaceContainerLow.withValues(alpha: 0.9),
-              ],
-            ),
-          ),
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(18.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 10.h),
-                Text(
-                  'settings'.tr,
-                  style: TextStyle(
-                    fontSize: 30.sp,
-                    fontWeight: FontWeight.w800,
-                    color: cs.onSurface,
-                  ),
+    return ListTile(
+      leading: Icon(Icons.language, color: cs.primary),
+      title: Text(_loc('language', 'Language')),
+      subtitle: Padding(
+        padding: EdgeInsets.only(top: 8.h),
+        child: Wrap(
+          spacing: 8.w,
+          children: options.entries
+              .map(
+                (entry) => ChoiceChip(
+                  label: Text(entry.value),
+                  selected: value == entry.key,
+                  onSelected: (selected) {
+                    if (selected) {
+                      onChanged(entry.key);
+                    }
+                  },
                 ),
-                SizedBox(height: 6.h),
-                Text(
-                  'settings_page'.tr,
-                  style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13.sp),
-                ),
-                SizedBox(height: 20.h),
-                _SettingsSection(
-                  icon: Icons.apps,
-                  title: 'app_name'.tr,
-                  children: [
-                    _ListItem(
-                      icon: Icons.history,
-                      title: 'open_history'.tr,
-                      subtitle: 'open_history'.tr,
-                      onTap: () => Get.toNamed(Routes.HISTORY),
-                    ),
-                    _ListItem(
-                      icon: Icons.bar_chart,
-                      title: 'open_stats'.tr,
-                      subtitle: 'open_stats'.tr,
-                      onTap: () => Get.toNamed(Routes.STATS),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 14.h),
-                _SettingsSection(
-                  icon: Icons.workspace_premium,
-                  title: 'premium_title'.tr,
-                  children: [
-                    _ListItem(
-                      icon: Icons.auto_awesome,
-                      title: 'premium_title'.tr,
-                      subtitle: 'premium_subtitle'.tr,
-                      onTap: () => Get.toNamed(Routes.PREMIUM),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 14.h),
-                _SettingsSection(
-                  icon: Icons.support_agent,
-                  title: 'send_feedback'.tr,
-                  children: [
-                    _ListItem(
-                      icon: Icons.apps,
-                      title: 'more_apps'.tr,
-                      subtitle: 'privacy_policy'.tr,
-                      onTap: () {},
-                      enabled: false,
-                    ),
-                    _ListItem(
-                      icon: Icons.privacy_tip,
-                      title: 'privacy_policy'.tr,
-                      subtitle: 'privacy_policy'.tr,
-                      onTap: () {},
-                      enabled: false,
-                    ),
-                  ],
-                ),
-                SizedBox(height: 24.h),
-              ],
-            ),
-          ),
+              )
+              .toList(),
         ),
       ),
     );
   }
 }
 
-class _SettingsSection extends StatelessWidget {
-  final IconData icon;
+class _BuildSwitchTile extends StatelessWidget {
+  final bool value;
   final String title;
+  final String subtitle;
+  final IconData icon;
+  final ValueChanged<bool> onChanged;
+
+  const _BuildSwitchTile({
+    required this.value,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return SwitchListTile(
+      value: value,
+      onChanged: onChanged,
+      secondary: Icon(icon, color: cs.primary),
+      title: Text(title),
+      subtitle: Text(subtitle),
+    );
+  }
+}
+
+class _SettingsSection extends StatelessWidget {
+  final String title;
+  final IconData icon;
   final List<Widget> children;
 
   const _SettingsSection({
-    required this.icon,
     required this.title,
+    required this.icon,
     required this.children,
   });
 
@@ -126,20 +298,13 @@ class _SettingsSection extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: cs.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: cs.outline.withValues(alpha: 0.34)),
-        boxShadow: [
-          BoxShadow(
-            color: cs.shadow.withValues(alpha: 0.06),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.25)),
       ),
       child: Column(
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(16.w, 12.h, 12.w, 10.h),
+            padding: EdgeInsets.fromLTRB(14.w, 12.h, 12.w, 10.h),
             child: Row(
               children: [
                 Icon(icon, size: 18.r, color: cs.primary),
@@ -147,16 +312,15 @@ class _SettingsSection extends StatelessWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 15.sp,
                     fontWeight: FontWeight.w700,
-                    color: cs.onSurface,
+                    fontSize: 15.sp,
                   ),
                 ),
               ],
             ),
           ),
           const Divider(height: 1),
-          for (final child in children) child,
+          ...children,
         ],
       ),
     );
@@ -168,67 +332,29 @@ class _ListItem extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback onTap;
-  final bool enabled;
 
   const _ListItem({
     required this.icon,
     required this.title,
     required this.subtitle,
     required this.onTap,
-    this.enabled = true,
   });
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return InkWell(
-      onTap: enabled ? onTap : null,
-      child: Opacity(
-        opacity: enabled ? 1 : 0.55,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-          child: Row(
-            children: [
-              Container(
-                width: 36.r,
-                height: 36.r,
-                decoration: BoxDecoration(
-                  color: cs.primaryContainer.withValues(alpha: 0.45),
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Icon(icon, size: 18.r, color: cs.primary),
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        color: cs.onSurface,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14.sp,
-                      ),
-                    ),
-                    SizedBox(height: 3.h),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        color: cs.onSurfaceVariant,
-                        fontSize: 11.sp,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(Icons.chevron_right, color: cs.onSurfaceVariant, size: 18.r),
-            ],
-          ),
-        ),
-      ),
+    return ListTile(
+      leading: Icon(icon, color: cs.primary),
+      title: Text(title),
+      subtitle: Text(subtitle),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: onTap,
     );
   }
+}
+
+String _loc(String key, String fallback) {
+  final translated = key.tr;
+  return translated == key ? fallback : translated;
 }
