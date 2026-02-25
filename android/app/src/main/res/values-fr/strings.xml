@@ -1,5 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">Altimètre</string>
+    <string name="app_name">Minuteur</string>
+
+    <!-- Device Admin -->
+    <string name="device_admin_description">Permet à Sleep Timer d\'éteindre l\'écran à la fin du minuteur.</string>
+    <string name="device_admin_disable_warning">Extinction automatique de l\'écran désactivée.</string>
+
+    <!-- Accessibility Service -->
+    <string name="accessibility_service_description">Touche l\'écran pour mettre en pause le média à la fin du minuteur. Compatible YouTube Shorts.</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_name">Minuteur</string>
+    <string name="notification_channel_description">Notification du minuteur</string>
+    <string name="notification_channel_alert_name">Alertes du minuteur</string>
+    <string name="notification_channel_alert_description">Notifications d\'alerte du minuteur</string>
+    <string name="notification_title">Minuteur</string>
+    <string name="notification_extend">+5min</string>
+    <string name="notification_cancel">Annuler</string>
+    <string name="notification_remaining_minutes">%d min restantes</string>
+    <string name="notification_remaining_hours">%d h restantes</string>
+    <string name="notification_remaining_hours_minutes">%1$d h %2$d min restantes</string>
+    <string name="notification_alert_title">Minuteur bientôt terminé</string>
+    <string name="notification_alert_message">%d min restantes</string>
+    <string name="notification_shake_extend_title">Minuteur prolongé</string>
+    <string name="notification_shake_extend_message">+%d min</string>
+    <string name="notification_timer_complete_title">Minuteur terminé</string>
+    <string name="notification_timer_complete_message">%s</string>
+
+    <!-- Action names for notification (short) -->
+    <string name="action_pause_media">Pause</string>
+    <string name="action_enable_dnd">NPD</string>
+    <string name="action_lower_brightness">Sombre</string>
+    <string name="action_go_to_home">Accueil</string>
+    <string name="action_turn_off_screen">Écran éteint</string>
+
+    <!-- Quick Settings Tile -->
+    <string name="tile_label">Minuteur</string>
+    <string name="tile_off">Éteint</string>
+    <string name="tile_running">En cours</string>
+    <string name="tile_paused">En pause</string>
+    <string name="tile_tap_to_start">Appuyez pour démarrer</string>
+    <string name="tile_tap_to_resume">Appuyez pour reprendre</string>
+
+    <!-- Widget -->
+    <string name="widget_description">Widget Sleep Timer</string>
+    <string name="widget_small_description">Widget de contrôle du minuteur</string>
+    <string name="widget_medium_description">Widget minuteur avec contrôles</string>
+    <string name="widget_placeholder_text">Touchez pour lancer le minuteur</string>
+    <string name="widget_placeholder_author">- Sleep Timer</string>
+    <string name="widget_next_button_desc">Démarrer/Arrêter le minuteur</string>
 </resources>

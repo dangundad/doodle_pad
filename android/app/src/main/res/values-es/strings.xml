@@ -1,5 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">Altímetro</string>
+    <string name="app_name">Temporizador</string>
+
+    <!-- Device Admin -->
+    <string name="device_admin_description">Permite a Sleep Timer apagar la pantalla al terminar el temporizador.</string>
+    <string name="device_admin_disable_warning">El apagado automático de pantalla quedará desactivado.</string>
+
+    <!-- Accessibility Service -->
+    <string name="accessibility_service_description">Toca la pantalla para pausar medios al terminar el temporizador. Compatible con YouTube Shorts.</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_name">Temporizador</string>
+    <string name="notification_channel_description">Notificación del temporizador</string>
+    <string name="notification_channel_alert_name">Alertas del temporizador</string>
+    <string name="notification_channel_alert_description">Notificaciones de alerta del temporizador</string>
+    <string name="notification_title">Temporizador</string>
+    <string name="notification_extend">+5min</string>
+    <string name="notification_cancel">Cancelar</string>
+    <string name="notification_remaining_minutes">%d min restantes</string>
+    <string name="notification_remaining_hours">%d h restantes</string>
+    <string name="notification_remaining_hours_minutes">%1$d h %2$d min restantes</string>
+    <string name="notification_alert_title">Temporizador terminando</string>
+    <string name="notification_alert_message">%d min restantes</string>
+    <string name="notification_shake_extend_title">Temporizador extendido</string>
+    <string name="notification_shake_extend_message">+%d min</string>
+    <string name="notification_timer_complete_title">Temporizador completado</string>
+    <string name="notification_timer_complete_message">%s</string>
+
+    <!-- Action names for notification (short) -->
+    <string name="action_pause_media">Pausado</string>
+    <string name="action_enable_dnd">No molestar</string>
+    <string name="action_lower_brightness">Oscurecer</string>
+    <string name="action_go_to_home">Inicio</string>
+    <string name="action_turn_off_screen">Pantalla apagada</string>
+
+    <!-- Quick Settings Tile -->
+    <string name="tile_label">Temporizador</string>
+    <string name="tile_off">Apagado</string>
+    <string name="tile_running">En curso</string>
+    <string name="tile_paused">En pausa</string>
+    <string name="tile_tap_to_start">Toca para iniciar</string>
+    <string name="tile_tap_to_resume">Toca para reanudar</string>
+
+    <!-- Widget -->
+    <string name="widget_description">Widget de Sleep Timer</string>
+    <string name="widget_small_description">Widget de control del temporizador</string>
+    <string name="widget_medium_description">Widget con controles de temporizador</string>
+    <string name="widget_placeholder_text">Toca para iniciar el temporizador</string>
+    <string name="widget_placeholder_author">- Sleep Timer</string>
+    <string name="widget_next_button_desc">Iniciar/Detener temporizador</string>
 </resources>

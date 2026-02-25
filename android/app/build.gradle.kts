@@ -74,7 +74,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            
         }
         getByName("debug") {
             isDebuggable = true
@@ -105,8 +104,4 @@ dependencies {
     // AdMob Android 15 호환성을 위한 최신 의존성
     implementation("com.google.android.gms:play-services-ads:24.7.0")
     implementation("com.google.android.ump:user-messaging-platform:3.1.0")
-
-    // in app purchase
-    implementation("com.android.billingclient:billing:8.1.0")
-    implementation("com.android.billingclient:billing-ktx:8.1.0")
 }

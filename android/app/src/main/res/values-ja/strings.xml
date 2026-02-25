@@ -1,5 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">高度計</string>
+    <string name="app_name">スリープタイマー</string>
+
+    <!-- Device Admin -->
+    <string name="device_admin_description">デバイス管理者権限で、タイマー終了時に画面をオフにできます。</string>
+    <string name="device_admin_disable_warning">無効にすると自動で画面を消せません。</string>
+
+    <!-- Accessibility Service -->
+    <string name="accessibility_service_description">タイマー終了時に画面をタップしてメディアを一時停止します。YouTube Shortsなどに対応。</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_name">スリープタイマー</string>
+    <string name="notification_channel_description">タイマー通知</string>
+    <string name="notification_channel_alert_name">タイマー警告</string>
+    <string name="notification_channel_alert_description">タイマー警告通知</string>
+    <string name="notification_title">スリープタイマー</string>
+    <string name="notification_extend">+5分</string>
+    <string name="notification_cancel">キャンセル</string>
+    <string name="notification_remaining_minutes">残り%d分</string>
+    <string name="notification_remaining_hours">残り%d時間</string>
+    <string name="notification_remaining_hours_minutes">残り%1$d時間%2$d分</string>
+    <string name="notification_alert_title">タイマー終了間近</string>
+    <string name="notification_alert_message">残り%d分</string>
+    <string name="notification_shake_extend_title">タイマー延長</string>
+    <string name="notification_shake_extend_message">+%d分</string>
+    <string name="notification_timer_complete_title">タイマー完了</string>
+    <string name="notification_timer_complete_message">%s</string>
+
+    <!-- Action names for notification (short) -->
+    <string name="action_pause_media">一時停止</string>
+    <string name="action_enable_dnd">DND</string>
+    <string name="action_lower_brightness">暗く</string>
+    <string name="action_go_to_home">ホーム</string>
+    <string name="action_turn_off_screen">画面オフ</string>
+
+    <!-- Quick Settings Tile -->
+    <string name="tile_label">スリープタイマー</string>
+    <string name="tile_off">オフ</string>
+    <string name="tile_running">実行中</string>
+    <string name="tile_paused">一時停止中</string>
+    <string name="tile_tap_to_start">タップして開始</string>
+    <string name="tile_tap_to_resume">タップして再開</string>
+
+    <!-- Widget -->
+    <string name="widget_description">スリープタイマーウィジェット</string>
+    <string name="widget_small_description">タイマー操作ウィジェット</string>
+    <string name="widget_medium_description">操作付きタイマーウィジェット</string>
+    <string name="widget_placeholder_text">タップしてタイマー開始</string>
+    <string name="widget_placeholder_author">- スリープタイマー</string>
+    <string name="widget_next_button_desc">タイマー開始/停止</string>
 </resources>

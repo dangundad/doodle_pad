@@ -1,5 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">Altimeter</string>
+    <string name="app_name">Timer Tidur</string>
+
+    <!-- Device Admin -->
+    <string name="device_admin_description">Memungkinkan Sleep Timer mematikan layar saat timer selesai.</string>
+    <string name="device_admin_disable_warning">Fitur layar mati otomatis akan dinonaktifkan.</string>
+
+    <!-- Accessibility Service -->
+    <string name="accessibility_service_description">Mengetuk layar untuk menjeda media saat timer selesai. Mendukung YouTube Shorts.</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_name">Timer Tidur</string>
+    <string name="notification_channel_description">Notifikasi timer</string>
+    <string name="notification_channel_alert_name">Peringatan timer</string>
+    <string name="notification_channel_alert_description">Notifikasi peringatan timer</string>
+    <string name="notification_title">Timer Tidur</string>
+    <string name="notification_extend">+5mnt</string>
+    <string name="notification_cancel">Batal</string>
+    <string name="notification_remaining_minutes">%d mnt tersisa</string>
+    <string name="notification_remaining_hours">%d jam tersisa</string>
+    <string name="notification_remaining_hours_minutes">%1$d jam %2$d mnt tersisa</string>
+    <string name="notification_alert_title">Timer akan segera selesai</string>
+    <string name="notification_alert_message">%d mnt tersisa</string>
+    <string name="notification_shake_extend_title">Timer diperpanjang</string>
+    <string name="notification_shake_extend_message">+%d mnt</string>
+    <string name="notification_timer_complete_title">Timer selesai</string>
+    <string name="notification_timer_complete_message">%s</string>
+
+    <!-- Action names for notification (short) -->
+    <string name="action_pause_media">Dijeda</string>
+    <string name="action_enable_dnd">JG</string>
+    <string name="action_lower_brightness">Redup</string>
+    <string name="action_go_to_home">Beranda</string>
+    <string name="action_turn_off_screen">Layar mati</string>
+
+    <!-- Quick Settings Tile -->
+    <string name="tile_label">Timer Tidur</string>
+    <string name="tile_off">Mati</string>
+    <string name="tile_running">Berjalan</string>
+    <string name="tile_paused">Dijeda</string>
+    <string name="tile_tap_to_start">Ketuk untuk mulai</string>
+    <string name="tile_tap_to_resume">Ketuk untuk lanjut</string>
+
+    <!-- Widget -->
+    <string name="widget_description">Widget Sleep Timer</string>
+    <string name="widget_small_description">Widget kontrol timer</string>
+    <string name="widget_medium_description">Widget timer dengan kontrol</string>
+    <string name="widget_placeholder_text">Ketuk untuk mulai timer</string>
+    <string name="widget_placeholder_author">- Sleep Timer</string>
+    <string name="widget_next_button_desc">Mulai/Stop timer</string>
 </resources>

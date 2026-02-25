@@ -1,7 +1,10 @@
 {
-  "CLAUDE_CODE_MAX_OUTPUT_TOKENS": 60000,
   "permissions": {
     "allow": [
+      "Bash(flutter pub:*)",
+      "Bash(flutter analyze:*)",
+      "Read(C:\\Users\\oyj21/**)",
+      "WebSearch",
       "Bash(flutter pub:*)",
       "Bash(flutter analyze:*)",
       "Bash(flutter run:*)",
@@ -38,18 +41,25 @@
       "Bash(git restore:*)",
       "Bash(dart analyze:*)",
       "Bash(dart format:*)",
-      "Bash(xargs ls:*)",
-      "WebFetch(domain:help.syncfusion.com)",
-      "Bash(git diff:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "WebFetch(domain:raw.githubusercontent.com)",
-      "WebFetch(domain:developers.google.com)"
+      "Bash(git push:*)",
+      "WebFetch(domain:m3.material.io)",
+      "WebFetch(domain:play.google.com)",
+      "WebFetch(domain:medium.com)",
+      "Bash(tree:*)",
+      "Bash(echo:*)",
+      "Bash(powershell -Command:*)",
+      "WebFetch(domain:apps.apple.com)",
+      "WebFetch(domain:docs.page)",
+      "Bash(findstr:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": [],
     "defaultMode": "bypassPermissions",
-    "additionalDirectories": []
+    "additionalDirectories": [
+      "C:\\Users\\oyj21\\Github_Workspace\\fireai_chat",
+      "C:\\Users\\oyj21\\Github_Workspace\\mbti"
+    ]
   },
   "env": {
     "ENABLE_TOOL_SEARCH": "1",

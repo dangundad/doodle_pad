@@ -1,5 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">高度计</string>
+    <string name="app_name">睡眠定时器</string>
+
+    <!-- Device Admin -->
+    <string name="device_admin_description">设备管理员权限让睡眠定时器在计时结束时关闭屏幕。</string>
+    <string name="device_admin_disable_warning">禁用后，睡眠定时器无法自动关闭屏幕。</string>
+
+    <!-- Accessibility Service -->
+    <string name="accessibility_service_description">睡眠定时器使用无障碍功能来暂停不响应标准控制的媒体（如YouTube Shorts）。计时结束时点击屏幕中央以暂停播放。</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_name">睡眠定时器</string>
+    <string name="notification_channel_description">定时器通知</string>
+    <string name="notification_channel_alert_name">定时器警告</string>
+    <string name="notification_channel_alert_description">定时器警告通知</string>
+    <string name="notification_title">睡眠定时器</string>
+    <string name="notification_extend">+5分钟</string>
+    <string name="notification_cancel">取消</string>
+    <string name="notification_remaining_minutes">剩余%d分钟</string>
+    <string name="notification_remaining_hours">剩余%d小时</string>
+    <string name="notification_remaining_hours_minutes">剩余%1$d小时%2$d分钟</string>
+    <string name="notification_alert_title">定时器即将结束</string>
+    <string name="notification_alert_message">剩余%d分钟</string>
+    <string name="notification_shake_extend_title">定时器已延长</string>
+    <string name="notification_shake_extend_message">+%d分钟</string>
+    <string name="notification_timer_complete_title">定时器完成</string>
+    <string name="notification_timer_complete_message">%s</string>
+
+    <!-- Action names for notification (short) -->
+    <string name="action_pause_media">已暂停</string>
+    <string name="action_enable_dnd">勿扰</string>
+    <string name="action_lower_brightness">调暗</string>
+    <string name="action_go_to_home">主屏幕</string>
+    <string name="action_turn_off_screen">关屏</string>
+
+    <!-- Quick Settings Tile -->
+    <string name="tile_label">睡眠定时器</string>
+    <string name="tile_off">关闭</string>
+    <string name="tile_running">运行中</string>
+    <string name="tile_paused">已暂停</string>
+    <string name="tile_tap_to_start">轻触启动</string>
+    <string name="tile_tap_to_resume">轻触恢复</string>
+
+    <!-- Widget -->
+    <string name="widget_description">睡眠定时器小组件</string>
+    <string name="widget_small_description">计时控制小组件</string>
+    <string name="widget_medium_description">带控件的计时小组件</string>
+    <string name="widget_placeholder_text">点击开始计时</string>
+    <string name="widget_placeholder_author">- 睡眠定时器</string>
+    <string name="widget_next_button_desc">开始/停止计时</string>
 </resources>

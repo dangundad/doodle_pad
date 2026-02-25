@@ -1,5 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">Высотомер</string>
+    <string name="app_name">Таймер сна</string>
+
+    <!-- Device Admin -->
+    <string name="device_admin_description">Права администратора позволяют Sleep Timer гасить экран после завершения таймера.</string>
+    <string name="device_admin_disable_warning">Без них Sleep Timer не сможет выключать экран автоматически.</string>
+
+    <!-- Accessibility Service -->
+    <string name="accessibility_service_description">Sleep Timer использует специальные возможности для приостановки медиа, которое не реагирует на стандартные элементы управления (например, YouTube Shorts). По окончании таймера касается центра экрана для паузы воспроизведения.</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_name">Таймер сна</string>
+    <string name="notification_channel_description">Уведомление таймера</string>
+    <string name="notification_channel_alert_name">Предупреждения таймера</string>
+    <string name="notification_channel_alert_description">Уведомления о предупреждениях таймера</string>
+    <string name="notification_title">Таймер сна</string>
+    <string name="notification_extend">+5мин</string>
+    <string name="notification_cancel">Отмена</string>
+    <string name="notification_remaining_minutes">Осталось %d мин</string>
+    <string name="notification_remaining_hours">Осталось %d ч</string>
+    <string name="notification_remaining_hours_minutes">Осталось %1$d ч %2$d мин</string>
+    <string name="notification_alert_title">Таймер скоро завершится</string>
+    <string name="notification_alert_message">Осталось %d мин</string>
+    <string name="notification_shake_extend_title">Таймер продлён</string>
+    <string name="notification_shake_extend_message">+%d мин</string>
+    <string name="notification_timer_complete_title">Таймер завершён</string>
+    <string name="notification_timer_complete_message">%s</string>
+
+    <!-- Action names for notification (short) -->
+    <string name="action_pause_media">Пауза</string>
+    <string name="action_enable_dnd">НБ</string>
+    <string name="action_lower_brightness">Темно</string>
+    <string name="action_go_to_home">Главная</string>
+    <string name="action_turn_off_screen">Экран выкл</string>
+
+    <!-- Quick Settings Tile -->
+    <string name="tile_label">Таймер сна</string>
+    <string name="tile_off">Выкл</string>
+    <string name="tile_running">Работает</string>
+    <string name="tile_paused">Пауза</string>
+    <string name="tile_tap_to_start">Нажмите для запуска</string>
+    <string name="tile_tap_to_resume">Нажмите для продолжения</string>
+
+    <!-- Widget -->
+    <string name="widget_description">Виджет таймера сна</string>
+    <string name="widget_small_description">Виджет управления таймером</string>
+    <string name="widget_medium_description">Таймер со средствами управления</string>
+    <string name="widget_placeholder_text">Нажмите, чтобы запустить таймер</string>
+    <string name="widget_placeholder_author">- Таймер сна</string>
+    <string name="widget_next_button_desc">Запуск/остановка таймера</string>
 </resources>

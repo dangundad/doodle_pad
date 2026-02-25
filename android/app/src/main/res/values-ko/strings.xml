@@ -1,5 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">고도계</string>
+    <string name="app_name">수면 타이머</string>
+
+    <!-- Device Admin -->
+    <string name="device_admin_description">기기 관리자 권한이 있어야 타이머 종료 시 화면을 끌 수 있습니다.</string>
+    <string name="device_admin_disable_warning">비활성화하면 자동으로 화면을 끌 수 없습니다.</string>
+
+    <!-- Accessibility Service -->
+    <string name="accessibility_service_description">타이머 종료 시 화면을 탭하여 미디어를 일시정지합니다. YouTube Shorts 등 지원.</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_name">수면 타이머</string>
+    <string name="notification_channel_description">타이머 알림</string>
+    <string name="notification_channel_alert_name">타이머 경고</string>
+    <string name="notification_channel_alert_description">타이머 경고 알림</string>
+    <string name="notification_title">수면 타이머</string>
+    <string name="notification_extend">+5분</string>
+    <string name="notification_cancel">취소</string>
+    <string name="notification_remaining_minutes">%d분 남음</string>
+    <string name="notification_remaining_hours">%d시간 남음</string>
+    <string name="notification_remaining_hours_minutes">%1$d시간 %2$d분 남음</string>
+    <string name="notification_alert_title">타이머 곧 종료</string>
+    <string name="notification_alert_message">%d분 남음</string>
+    <string name="notification_shake_extend_title">타이머 연장됨</string>
+    <string name="notification_shake_extend_message">+%d분</string>
+    <string name="notification_timer_complete_title">타이머 완료</string>
+    <string name="notification_timer_complete_message">%s</string>
+
+    <!-- Action names for notification (short) -->
+    <string name="action_pause_media">일시정지</string>
+    <string name="action_enable_dnd">방해금지</string>
+    <string name="action_lower_brightness">밝기 낮춤</string>
+    <string name="action_go_to_home">홈</string>
+    <string name="action_turn_off_screen">화면 끔</string>
+
+    <!-- Quick Settings Tile -->
+    <string name="tile_label">수면 타이머</string>
+    <string name="tile_off">꺼짐</string>
+    <string name="tile_running">실행 중</string>
+    <string name="tile_paused">일시정지</string>
+    <string name="tile_tap_to_start">탭하여 시작</string>
+    <string name="tile_tap_to_resume">탭하여 재개</string>
+
+    <!-- Widget -->
+    <string name="widget_description">수면 타이머 위젯</string>
+    <string name="widget_small_description">타이머 제어 위젯</string>
+    <string name="widget_medium_description">타이머 제어 위젯</string>
+    <string name="widget_placeholder_text">탭하여 타이머 시작</string>
+    <string name="widget_placeholder_author">- 수면 타이머</string>
+    <string name="widget_next_button_desc">타이머 시작/중지</string>
 </resources>

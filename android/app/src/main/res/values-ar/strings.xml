@@ -1,5 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">مقياس ارتفاع</string>
+    <string name="app_name">مؤقت النوم</string>
+
+    <!-- Device Admin -->
+    <string name="device_admin_description">صلاحية مشرف الجهاز تتيح لمؤقت النوم إيقاف الشاشة عند انتهاء المؤقت.</string>
+    <string name="device_admin_disable_warning">إذا عُطلت فلن يتمكن مؤقت النوم من إيقاف الشاشة تلقائيًا.</string>
+
+    <!-- Accessibility Service -->
+    <string name="accessibility_service_description">يستخدم مؤقت النوم إمكانية الوصول لإيقاف الوسائط التي لا تستجيب للتحكم القياسي (مثل YouTube Shorts). عند انتهاء المؤقت، يلمس منتصف الشاشة لإيقاف التشغيل مؤقتًا.</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_name">مؤقت النوم</string>
+    <string name="notification_channel_description">إشعار المؤقت</string>
+    <string name="notification_channel_alert_name">تنبيهات المؤقت</string>
+    <string name="notification_channel_alert_description">إشعارات تنبيه المؤقت</string>
+    <string name="notification_title">مؤقت النوم</string>
+    <string name="notification_extend">+5 دقائق</string>
+    <string name="notification_cancel">إلغاء</string>
+    <string name="notification_remaining_minutes">متبقي %d دقيقة</string>
+    <string name="notification_remaining_hours">متبقي %d ساعة</string>
+    <string name="notification_remaining_hours_minutes">متبقي %1$d ساعة %2$d دقيقة</string>
+    <string name="notification_alert_title">المؤقت على وشك الانتهاء</string>
+    <string name="notification_alert_message">متبقي %d دقيقة</string>
+    <string name="notification_shake_extend_title">تم تمديد المؤقت</string>
+    <string name="notification_shake_extend_message">+%d دقيقة</string>
+    <string name="notification_timer_complete_title">اكتمل المؤقت</string>
+    <string name="notification_timer_complete_message">%s</string>
+
+    <!-- Action names for notification (short) -->
+    <string name="action_pause_media">إيقاف مؤقت</string>
+    <string name="action_enable_dnd">عدم الإزعاج</string>
+    <string name="action_lower_brightness">خافت</string>
+    <string name="action_go_to_home">الرئيسية</string>
+    <string name="action_turn_off_screen">إيقاف الشاشة</string>
+
+    <!-- Quick Settings Tile -->
+    <string name="tile_label">مؤقت النوم</string>
+    <string name="tile_off">إيقاف</string>
+    <string name="tile_running">يعمل</string>
+    <string name="tile_paused">متوقف مؤقتًا</string>
+    <string name="tile_tap_to_start">اضغط للبدء</string>
+    <string name="tile_tap_to_resume">اضغط للمتابعة</string>
+
+    <!-- Widget -->
+    <string name="widget_description">أداة مؤقت النوم</string>
+    <string name="widget_small_description">أداة التحكم بالمؤقت</string>
+    <string name="widget_medium_description">أداة مؤقت مع تحكم</string>
+    <string name="widget_placeholder_text">اضغط لبدء المؤقت</string>
+    <string name="widget_placeholder_author">- مؤقت النوم</string>
+    <string name="widget_next_button_desc">بدء/إيقاف المؤقت</string>
 </resources>

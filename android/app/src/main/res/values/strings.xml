@@ -2,4 +2,45 @@
 
 <resources>
     <string name="app_name">Sleep Timer</string>
+
+    <!-- Device Admin -->
+    <string name="device_admin_description">Allows Sleep Timer to turn off the screen when the timer ends.</string>
+    <string name="device_admin_disable_warning">Screen auto-off feature will be disabled.</string>
+
+    <!-- Accessibility Service -->
+    <string name="accessibility_service_description">Pauses media by tapping the screen when the timer ends. Supports apps like YouTube Shorts.</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_name">Sleep Timer</string>
+    <string name="notification_channel_description">Timer notification</string>
+    <string name="notification_channel_alert_name">Timer Alerts</string>
+    <string name="notification_channel_alert_description">Timer warning notifications</string>
+    <string name="notification_title">Sleep Timer</string>
+    <string name="notification_extend">+5min</string>
+    <string name="notification_cancel">Cancel</string>
+    <string name="notification_remaining_minutes">%d min remaining</string>
+    <string name="notification_remaining_hours">%d hr remaining</string>
+    <string name="notification_remaining_hours_minutes">%1$d hr %2$d min remaining</string>
+    <string name="notification_alert_title">Timer ending soon</string>
+    <string name="notification_alert_message">%d min left</string>
+    <string name="notification_shake_extend_title">Timer extended</string>
+    <string name="notification_shake_extend_message">+%d min</string>
+    <string name="notification_timer_complete_title">Timer complete</string>
+    <string name="notification_timer_complete_message">%s</string>
+
+    <!-- Action names for notification (short) -->
+    <string name="action_pause_media">Paused</string>
+    <string name="action_enable_dnd">DND</string>
+    <string name="action_lower_brightness">Dim</string>
+    <string name="action_go_to_home">Home</string>
+    <string name="action_turn_off_screen">Screen off</string>
+
+    <!-- Quick Settings Tile -->
+    <string name="tile_label">Sleep Timer</string>
+    <string name="tile_off">Off</string>
+    <string name="tile_running">Running</string>
+    <string name="tile_paused">Paused</string>
+    <string name="tile_tap_to_start">Tap to start</string>
+    <string name="tile_tap_to_resume">Tap to resume</string>
+
 </resources>

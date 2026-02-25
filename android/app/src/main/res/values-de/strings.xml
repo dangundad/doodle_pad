@@ -1,5 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">Höhenmesser</string>
+    <string name="app_name">Sleep Timer</string>
+
+    <!-- Device Admin -->
+    <string name="device_admin_description">Ermöglicht Sleep Timer, den Bildschirm bei Timer-Ende auszuschalten.</string>
+    <string name="device_admin_disable_warning">Automatisches Ausschalten des Bildschirms deaktiviert.</string>
+
+    <!-- Accessibility Service -->
+    <string name="accessibility_service_description">Tippt den Bildschirm an, um Medien bei Timer-Ende zu pausieren. Unterstützt YouTube Shorts u.a.</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_name">Sleep Timer</string>
+    <string name="notification_channel_description">Timer-Benachrichtigung</string>
+    <string name="notification_channel_alert_name">Timer-Warnungen</string>
+    <string name="notification_channel_alert_description">Timer-Warnbenachrichtigungen</string>
+    <string name="notification_title">Sleep Timer</string>
+    <string name="notification_extend">+5min</string>
+    <string name="notification_cancel">Abbrechen</string>
+    <string name="notification_remaining_minutes">%d Min verbleibend</string>
+    <string name="notification_remaining_hours">%d Std verbleibend</string>
+    <string name="notification_remaining_hours_minutes">%1$d Std %2$d Min verbleibend</string>
+    <string name="notification_alert_title">Timer endet bald</string>
+    <string name="notification_alert_message">%d Min übrig</string>
+    <string name="notification_shake_extend_title">Timer verlängert</string>
+    <string name="notification_shake_extend_message">+%d Min</string>
+    <string name="notification_timer_complete_title">Timer beendet</string>
+    <string name="notification_timer_complete_message">%s</string>
+
+    <!-- Action names for notification (short) -->
+    <string name="action_pause_media">Pausiert</string>
+    <string name="action_enable_dnd">DND</string>
+    <string name="action_lower_brightness">Dimmen</string>
+    <string name="action_go_to_home">Startseite</string>
+    <string name="action_turn_off_screen">Bildschirm aus</string>
+
+    <!-- Quick Settings Tile -->
+    <string name="tile_label">Sleep Timer</string>
+    <string name="tile_off">Aus</string>
+    <string name="tile_running">Läuft</string>
+    <string name="tile_paused">Pausiert</string>
+    <string name="tile_tap_to_start">Tippen zum Starten</string>
+    <string name="tile_tap_to_resume">Tippen zum Fortsetzen</string>
+
+    <!-- Widget -->
+    <string name="widget_description">Sleep-Timer-Widget</string>
+    <string name="widget_small_description">Timer-Steuerung</string>
+    <string name="widget_medium_description">Timer mit Steuerelementen</string>
+    <string name="widget_placeholder_text">Tippen, um Timer zu starten</string>
+    <string name="widget_placeholder_author">- Sleep Timer</string>
+    <string name="widget_next_button_desc">Timer starten/stoppen</string>
 </resources>
