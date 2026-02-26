@@ -2,6 +2,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/admob/ads_banner.dart';
@@ -191,11 +192,18 @@ class _HomePageState extends State<HomePage>
                         width: double.infinity,
                         padding: EdgeInsets.all(16.r),
                         decoration: BoxDecoration(
-                          color: cs.surface.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(16.r),
+                          color: cs.surfaceContainerLow,
+                          borderRadius: BorderRadius.circular(20.r),
                           border: Border.all(
-                            color: cs.outline.withValues(alpha: 0.18),
+                            color: cs.outline.withValues(alpha: 0.15),
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.07),
+                              blurRadius: 16,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
                         child: Wrap(
                           spacing: 8.w,
@@ -241,9 +249,15 @@ class _HomePageState extends State<HomePage>
                             borderRadius: BorderRadius.circular(16.r),
                             boxShadow: [
                               BoxShadow(
-                                color: cs.primary.withValues(alpha: 0.35),
-                                blurRadius: 14,
-                                offset: const Offset(0, 5),
+                                color: cs.primary.withValues(alpha: 0.45),
+                                blurRadius: 20,
+                                spreadRadius: 1,
+                                offset: const Offset(0, 6),
+                              ),
+                              BoxShadow(
+                                color: cs.tertiary.withValues(alpha: 0.20),
+                                blurRadius: 10,
+                                offset: const Offset(0, 2),
                               ),
                             ],
                           ),
@@ -287,16 +301,53 @@ class _HomePageState extends State<HomePage>
                           ),
                         ),
                       ),
-                      SizedBox(height: 20.h),
-                      TextButton.icon(
-                        onPressed: () {
-                          _settingController.recordSettingsOpen(
-                            from: 'home_button',
-                          );
-                          Get.toNamed(Routes.SETTINGS);
-                        },
-                        icon: Icon(Icons.settings_rounded, size: 18.r),
-                        label: Text('settings'.tr),
+                      SizedBox(height: 16.h),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: cs.surfaceContainerLow,
+                          borderRadius: BorderRadius.circular(14.r),
+                          border: Border.all(
+                            color: cs.outline.withValues(alpha: 0.15),
+                          ),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(14.r),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(14.r),
+                            onTap: () {
+                              _settingController.recordSettingsOpen(
+                                from: 'home_button',
+                              );
+                              Get.toNamed(Routes.SETTINGS);
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 20.w,
+                                vertical: 14.h,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    LucideIcons.settings,
+                                    size: 18.r,
+                                    color: cs.onSurfaceVariant,
+                                  ),
+                                  SizedBox(width: 8.w),
+                                  Text(
+                                    'settings'.tr,
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      color: cs.onSurfaceVariant,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -333,32 +384,86 @@ class _HomeTopActions extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return Padding(
-      padding: EdgeInsets.fromLTRB(12.w, 10.h, 8.w, 4.h),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: () => Get.toNamed(Routes.GALLERY),
-            icon: Icon(Icons.photo_library_rounded, color: cs.primary),
-            tooltip: 'gallery'.tr,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          color: cs.surface.withValues(alpha: 0.85),
+          padding: EdgeInsets.fromLTRB(12.w, 10.h, 8.w, 4.h),
+          child: Row(
+            children: [
+              _HeaderIconButton(
+                icon: LucideIcons.image,
+                color: cs.primary,
+                tooltip: 'gallery'.tr,
+                onTap: () => Get.toNamed(Routes.GALLERY),
+              ),
+              SizedBox(width: 4.w),
+              _HeaderIconButton(
+                icon: LucideIcons.history,
+                color: cs.onSurface,
+                tooltip: 'open_history'.tr,
+                onTap: () => Get.toNamed(Routes.HISTORY),
+              ),
+              SizedBox(width: 4.w),
+              _HeaderIconButton(
+                icon: LucideIcons.chartBarBig,
+                color: cs.onSurface,
+                tooltip: 'open_stats'.tr,
+                onTap: () => Get.toNamed(Routes.STATS),
+              ),
+              const Spacer(),
+              _HeaderIconButton(
+                icon: LucideIcons.settings,
+                color: cs.onSurface,
+                tooltip: 'settings'.tr,
+                onTap: () => Get.toNamed(Routes.SETTINGS),
+              ),
+            ],
           ),
-          IconButton(
-            onPressed: () => Get.toNamed(Routes.HISTORY),
-            icon: Icon(Icons.history_rounded, color: cs.onSurface),
-            tooltip: 'open_history'.tr,
+        ),
+        // Gradient accent line (AppBar bottom pattern)
+        Container(
+          height: 3,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [cs.primary, cs.tertiary],
+            ),
           ),
-          IconButton(
-            onPressed: () => Get.toNamed(Routes.STATS),
-            icon: Icon(Icons.bar_chart_rounded, color: cs.onSurface),
-            tooltip: 'open_stats'.tr,
+        ),
+      ],
+    );
+  }
+}
+
+class _HeaderIconButton extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  const _HeaderIconButton({
+    required this.icon,
+    required this.color,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12.r),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12.r),
+          onTap: onTap,
+          child: Padding(
+            padding: EdgeInsets.all(10.r),
+            child: Icon(icon, size: 22.r, color: color),
           ),
-          const Spacer(),
-          IconButton(
-            onPressed: () => Get.toNamed(Routes.SETTINGS),
-            icon: Icon(Icons.settings_rounded, color: cs.onSurface),
-            tooltip: 'settings'.tr,
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -377,12 +482,17 @@ class _FeatureChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: cs.outline.withValues(alpha: 0.2)),
+        border: Border.all(color: cs.primary.withValues(alpha: 0.12)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: cs.primary.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
           ),
         ],
       ),
