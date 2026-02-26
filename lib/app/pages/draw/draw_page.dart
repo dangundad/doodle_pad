@@ -320,42 +320,79 @@ class _BrushTypeSelector extends StatelessWidget {
     final settingCtrl = SettingController.to;
     final cs = Theme.of(context).colorScheme;
     return Obx(() {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: BrushType.values.map((type) {
-          final selected = ctrl.brushType.value == type;
-          return GestureDetector(
-            onTap: () {
-              if (settingCtrl.hapticEnabled.value) {
-                HapticFeedback.selectionClick();
-              }
-              ctrl.brushType.value = type;
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              margin: EdgeInsets.only(right: 8.w),
-              width: 44.r,
-              height: 44.r,
-              decoration: BoxDecoration(
-                color: selected
-                    ? cs.primaryContainer
-                    : cs.surfaceContainerHigh,
-                borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(
-                  color: selected ? cs.primary : Colors.transparent,
-                  width: 2,
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: BrushType.values.map((type) {
+            final selected = ctrl.brushType.value == type;
+            final isSpecial =
+                type == BrushType.watercolor || type == BrushType.airbrush;
+            final isLocked = isSpecial &&
+                (type == BrushType.watercolor
+                    ? !ctrl.isWatercolorUnlocked.value
+                    : !ctrl.isAirbrushUnlocked.value);
+
+            return GestureDetector(
+              onTap: () {
+                if (settingCtrl.hapticEnabled.value) {
+                  HapticFeedback.selectionClick();
+                }
+                if (isLocked) {
+                  ctrl.unlockBrush(type);
+                } else {
+                  ctrl.brushType.value = type;
+                }
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: EdgeInsets.only(right: 6.w),
+                width: 44.r,
+                height: 44.r,
+                decoration: BoxDecoration(
+                  color: selected
+                      ? cs.primaryContainer
+                      : isLocked
+                          ? cs.surfaceContainerLow
+                          : cs.surfaceContainerHigh,
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: selected
+                        ? cs.primary
+                        : isSpecial
+                            ? cs.tertiary.withValues(alpha: 0.5)
+                            : Colors.transparent,
+                    width: 2,
+                  ),
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Icon(
+                      _brushIcon(type),
+                      size: 20.r,
+                      color: selected
+                          ? cs.primary
+                          : isLocked
+                              ? cs.onSurface.withValues(alpha: 0.35)
+                              : cs.onSurfaceVariant,
+                    ),
+                    if (isLocked)
+                      Positioned(
+                        right: 4.r,
+                        bottom: 4.r,
+                        child: Icon(
+                          Icons.lock_rounded,
+                          size: 10.r,
+                          color: cs.tertiary,
+                        ),
+                      ),
+                  ],
                 ),
               ),
-              child: Center(
-                child: Icon(
-                  _brushIcon(type),
-                  size: 20.r,
-                  color: selected ? cs.primary : cs.onSurfaceVariant,
-                ),
-              ),
-            ),
-          );
-        }).toList(),
+            );
+          }).toList(),
+        ),
       );
     });
   }
@@ -368,6 +405,10 @@ class _BrushTypeSelector extends StatelessWidget {
         return Icons.brush_rounded;
       case BrushType.eraser:
         return Icons.auto_fix_normal_rounded;
+      case BrushType.watercolor:
+        return Icons.water_drop_rounded;
+      case BrushType.airbrush:
+        return Icons.blur_on_rounded;
     }
   }
 }
@@ -382,7 +423,8 @@ class _BrushSizeSlider extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Obx(() {
-      final isEraser = ctrl.brushType.value == BrushType.eraser;
+      final brushT = ctrl.brushType.value;
+      final isEraser = brushT == BrushType.eraser;
       final minSize = isEraser ? 10.0 : 2.0;
       final maxSize = isEraser ? 60.0 : 30.0;
       final size = ctrl.brushSize.value.clamp(minSize, maxSize);
@@ -435,14 +477,25 @@ class _ColorPalette extends StatelessWidget {
     final settingCtrl = SettingController.to;
     final cs = Theme.of(context).colorScheme;
     return Obx(() {
-      final isEraser = ctrl.brushType.value == BrushType.eraser;
+      final brushT = ctrl.brushType.value;
+      final isEraser = brushT == BrushType.eraser;
+      final isWatercolor = brushT == BrushType.watercolor;
+      final isAirbrush = brushT == BrushType.airbrush;
 
-      if (isEraser) {
+      if (isEraser || isWatercolor || isAirbrush) {
+        String modeText;
+        if (isEraser) {
+          modeText = 'eraser_mode'.tr;
+        } else if (isWatercolor) {
+          modeText = 'watercolor_mode'.tr;
+        } else {
+          modeText = 'airbrush_mode'.tr;
+        }
         return SizedBox(
           height: 36.r,
           child: Center(
             child: Text(
-              'eraser_mode'.tr,
+              modeText,
               style: TextStyle(
                 fontSize: 12.sp,
                 color: cs.onSurfaceVariant,

@@ -4,12 +4,14 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import 'package:doodle_pad/app/admob/ads_rewarded.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
 
-enum BrushType { pen, marker, eraser }
+enum BrushType { pen, marker, eraser, watercolor, airbrush }
 
 class DrawingStroke {
   final List<Offset> points;
@@ -17,6 +19,7 @@ class DrawingStroke {
   final double width;
   final bool isEraser;
   final StrokeCap cap;
+  final BrushType brushType;
 
   DrawingStroke({
     required this.points,
@@ -24,6 +27,7 @@ class DrawingStroke {
     required this.width,
     this.isEraser = false,
     this.cap = StrokeCap.round,
+    this.brushType = BrushType.pen,
   });
 }
 
@@ -46,6 +50,12 @@ class DoodleController extends GetxController {
   // Gallery state
   final savedDrawings = <String>[].obs;
   final isSaving = false.obs;
+
+  // Special brush unlock state
+  static const _watercolorUnlockedKey = 'watercolor_unlocked';
+  static const _airbrushUnlockedKey = 'airbrush_unlocked';
+  final isWatercolorUnlocked = false.obs;
+  final isAirbrushUnlocked = false.obs;
 
   // Color palette (16 colors)
   static const colorPalette = [
@@ -77,6 +87,15 @@ class DoodleController extends GetxController {
   void onInit() {
     super.onInit();
     _loadSavedPaths();
+    _loadBrushUnlockState();
+  }
+
+  void _loadBrushUnlockState() {
+    final hive = HiveService.to;
+    isWatercolorUnlocked.value =
+        hive.getSetting<bool>(_watercolorUnlockedKey) ?? false;
+    isAirbrushUnlocked.value =
+        hive.getSetting<bool>(_airbrushUnlockedKey) ?? false;
   }
 
   void _loadSavedPaths() {
@@ -97,24 +116,89 @@ class DoodleController extends GetxController {
   }
 
   void startStroke(Offset point) {
-    final isEraser = brushType.value == BrushType.eraser;
-    final isMarker = brushType.value == BrushType.marker;
+    final type = brushType.value;
+    final isEraser = type == BrushType.eraser;
+    final isMarker = type == BrushType.marker;
+    final isWatercolor = type == BrushType.watercolor;
+    final isAirbrush = type == BrushType.airbrush;
+
+    double widthMultiplier;
+    if (isEraser) {
+      widthMultiplier = 4.0;
+    } else if (isMarker) {
+      widthMultiplier = 2.5;
+    } else if (isWatercolor) {
+      widthMultiplier = 2.0;
+    } else if (isAirbrush) {
+      widthMultiplier = 1.0;
+    } else {
+      widthMultiplier = 1.0;
+    }
+
     _currentStroke = DrawingStroke(
       points: [point],
-      color: isEraser
-          ? Colors.transparent
-          : Color(brushColor.value),
-      width: brushSize.value *
-          (isEraser
-              ? 4.0
-              : isMarker
-                  ? 2.5
-                  : 1.0),
+      color: isEraser ? Colors.transparent : Color(brushColor.value),
+      width: brushSize.value * widthMultiplier,
       isEraser: isEraser,
       cap: isMarker ? StrokeCap.square : StrokeCap.round,
+      brushType: type,
     );
     _undoStack.clear();
     strokes.add(_currentStroke!);
+  }
+
+  // Special brush unlock via rewarded ad
+  void unlockBrush(BrushType type) {
+    if (!Get.isRegistered<RewardedAdManager>()) return;
+
+    final alreadyUnlocked = type == BrushType.watercolor
+        ? isWatercolorUnlocked.value
+        : isAirbrushUnlocked.value;
+    if (alreadyUnlocked) {
+      brushType.value = type;
+      return;
+    }
+
+    Get.defaultDialog(
+      title: type == BrushType.watercolor ? 'watercolor_brush'.tr : 'airbrush_brush'.tr,
+      titleStyle: TextStyle(color: Get.theme.colorScheme.onSurface),
+      backgroundColor: Get.theme.colorScheme.surface,
+      middleText: 'brush_unlock_message'.tr,
+      middleTextStyle: TextStyle(color: Get.theme.colorScheme.onSurfaceVariant),
+      textConfirm: 'watch_ad'.tr,
+      textCancel: 'cancel'.tr,
+      confirmTextColor: Get.theme.colorScheme.onPrimary,
+      cancelTextColor: Get.theme.colorScheme.onSurface,
+      buttonColor: Get.theme.colorScheme.primary,
+      onConfirm: () {
+        Get.back();
+        _watchRewardedAdForBrush(type);
+      },
+    );
+  }
+
+  void _watchRewardedAdForBrush(BrushType type) {
+    RewardedAdManager.to.showAdIfAvailable(
+      onUserEarnedReward: (RewardItem reward) {
+        if (type == BrushType.watercolor) {
+          isWatercolorUnlocked.value = true;
+          HiveService.to.setSetting(_watercolorUnlockedKey, true);
+        } else if (type == BrushType.airbrush) {
+          isAirbrushUnlocked.value = true;
+          HiveService.to.setSetting(_airbrushUnlockedKey, true);
+        }
+        brushType.value = type;
+        Get.snackbar(
+          'brush_unlocked'.tr,
+          type == BrushType.watercolor
+              ? 'watercolor_brush'.tr
+              : 'airbrush_brush'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 2),
+          icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+        );
+      },
+    );
   }
 
   void continueStroke(Offset point) {

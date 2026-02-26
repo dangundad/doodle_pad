@@ -103,6 +103,13 @@ class Languages extends Translations {
       'load_drawing_confirm': '현재 그림을 지우고 저장된 그림을 불러오시겠습니까?',
       'delete_drawing': '그림 삭제',
       'delete_drawing_confirm': '이 그림을 삭제하시겠습니까?',
+      'watercolor_brush': '수채화 브러시',
+      'airbrush_brush': '에어브러시',
+      'watercolor_mode': '수채화 모드',
+      'airbrush_mode': '에어브러시 모드',
+      'brush_unlock_message': '짧은 광고를 시청하면 이 브러시를 영구적으로 잠금 해제할 수 있어요!',
+      'brush_unlocked': '브러시 잠금 해제!',
+      'watch_ad': '광고 보기',
     },
   };
 }
