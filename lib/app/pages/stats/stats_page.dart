@@ -50,6 +50,14 @@ class StatsPage extends GetView<StatsController> {
                   ],
                 ),
               ),
+              Container(
+                height: 3,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [cs.primary, cs.tertiary],
+                  ),
+                ),
+              ),
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () => controller.refresh(),

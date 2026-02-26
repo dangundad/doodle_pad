@@ -43,6 +43,17 @@ class GalleryPage extends GetView<DoodleController> {
             onPressed: () => Get.toNamed(Routes.DRAW),
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(3),
+          child: Container(
+            height: 3,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [cs.primary, cs.tertiary],
+              ),
+            ),
+          ),
+        ),
       ),
       body: Obx(() {
         if (controller.savedDrawings.isEmpty) {

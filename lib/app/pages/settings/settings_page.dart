@@ -16,7 +16,23 @@ class SettingsPage extends GetView<SettingController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_loc('settings', 'Settings'))),
+      appBar: AppBar(
+        title: Text(_loc('settings', 'Settings')),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(3),
+          child: Container(
+            height: 3,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Get.theme.colorScheme.primary,
+                  Get.theme.colorScheme.tertiary,
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Obx(
           () => ListView(

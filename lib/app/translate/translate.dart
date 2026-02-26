@@ -99,6 +99,7 @@ class Languages extends Translations {
       'gallery': '갤러리',
       'gallery_empty': '저장된 그림이 없습니다',
       'gallery_subtitle': '저장된 그림을 불러오거나 공유하세요',
+      'saved_drawings': '저장된 그림',
       'load_drawing': '불러오기',
       'load_drawing_confirm': '현재 그림을 지우고 저장된 그림을 불러오시겠습니까?',
       'delete_drawing': '그림 삭제',

@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import 'package:doodle_pad/app/controllers/doodle_controller.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/admob/ads_banner.dart';
 import 'package:doodle_pad/app/admob/ads_helper.dart';
@@ -231,7 +232,9 @@ class _HomePageState extends State<HomePage>
                           }).toList(),
                         ),
                       ),
-                      SizedBox(height: 36.h),
+                      SizedBox(height: 20.h),
+                      _SavedDrawingsCard(),
+                      SizedBox(height: 20.h),
                       AnimatedBuilder(
                         animation: _pulseAnim,
                         builder: (context, child) => Transform.scale(
@@ -466,6 +469,93 @@ class _HeaderIconButton extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _SavedDrawingsCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final cs = Get.theme.colorScheme;
+    final doodle = Get.isRegistered<DoodleController>()
+        ? DoodleController.to
+        : null;
+
+    return Obx(() {
+      final count = doodle?.savedDrawings.length ?? 0;
+      return GestureDetector(
+        onTap: () => Get.toNamed(Routes.GALLERY),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                cs.primaryContainer,
+                cs.secondaryContainer.withValues(alpha: 0.7),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20.r),
+            boxShadow: [
+              BoxShadow(
+                color: cs.primary.withValues(alpha: 0.12),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 48.r,
+                height: 48.r,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: cs.onPrimaryContainer.withValues(alpha: 0.12),
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.photo_library_rounded,
+                    size: 24.r,
+                    color: cs.onPrimaryContainer,
+                  ),
+                ),
+              ),
+              SizedBox(width: 14.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'saved_drawings'.tr,
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: cs.onPrimaryContainer.withValues(alpha: 0.7),
+                      ),
+                    ),
+                    SizedBox(height: 2.h),
+                    Text(
+                      '$count',
+                      style: TextStyle(
+                        fontSize: 22.sp,
+                        fontWeight: FontWeight.w800,
+                        color: cs.onPrimaryContainer,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: 20.r,
+                color: cs.onPrimaryContainer.withValues(alpha: 0.55),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
   }
 }
 

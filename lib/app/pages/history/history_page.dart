@@ -163,31 +163,44 @@ class HistoryPage extends GetView<HistoryController> {
   }
 
   Widget _buildHeader(BuildContext context, ColorScheme cs) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(20.w, 8.h, 14.w, 10.h),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              'history'.tr,
-              style: TextStyle(
-                fontSize: 28.sp,
-                fontWeight: FontWeight.w800,
-                color: cs.onSurface,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(20.w, 8.h, 14.w, 10.h),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'history'.tr,
+                  style: TextStyle(
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.w800,
+                    color: cs.onSurface,
+                  ),
+                ),
               ),
+              IconButton(
+                onPressed: controller.clearAll,
+                tooltip: 'clear_all'.tr,
+                icon: Icon(
+                  Icons.delete_outline,
+                  size: 20.r,
+                  color: cs.error,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          height: 3,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [cs.primary, cs.tertiary],
             ),
           ),
-          IconButton(
-            onPressed: controller.clearAll,
-            tooltip: 'clear_all'.tr,
-            icon: Icon(
-              Icons.delete_outline,
-              size: 20.r,
-              color: cs.error,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
