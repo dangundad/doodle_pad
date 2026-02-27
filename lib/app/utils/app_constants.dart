@@ -58,3 +58,13 @@ abstract class PurchaseConstants {
     PREMIUM_YEARLY_ANDROID,
   ];
 }
+
+/// 앱 평가 설정
+abstract class RateMyAppConfig {
+  static const String PREFIX = 'doodlePad_rateMyApp_';
+  static const int MIN_DAYS = 3;
+  static const int MIN_LAUNCHES = 5;
+  static const int REMIND_DAYS = 7;
+  static const int REMIND_LAUNCHES = 10;
+  static const String APP_STORE_ID = '0000000000'; // TODO: App Store Connect ID
+}

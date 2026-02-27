@@ -11,6 +11,7 @@ import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/controllers/stats_controller.dart';
 
 import 'package:doodle_pad/app/services/purchase_service.dart';
+import 'package:doodle_pad/app/services/app_rating_service.dart';
 import 'package:doodle_pad/app/controllers/premium_controller.dart';
 
 class AppBinding implements Bindings {
@@ -74,6 +75,10 @@ class AppBinding implements Bindings {
 
     if (!Get.isRegistered<RewardedAdManager>()) {
       Get.put(RewardedAdManager(), permanent: true);
+    }
+
+    if (!Get.isRegistered<AppRatingService>()) {
+      Get.put(AppRatingService(), permanent: true);
     }
   }
 }
