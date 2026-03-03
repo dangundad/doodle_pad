@@ -1,6 +1,7 @@
 ﻿import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:doodle_pad/app/admob/ads_interstitial.dart';
@@ -16,6 +17,7 @@ class PurchaseService extends GetxService {
 
   final RxBool available = false.obs;
   final RxBool isPremium = false.obs;
+  final RxBool isDevPremium = false.obs;
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
   final RxString statusMessage = ''.obs;
@@ -251,6 +253,23 @@ class PurchaseService extends GetxService {
       await HiveService.to.setSetting(HiveKeys.IS_PREMIUM, value);
     } catch (e) {
       errorMessage.value = e.toString();
+    }
+  }
+
+  bool get hasActivePremium => isPremium.value || isDevPremium.value;
+
+  String get premiumPriceWithFallback {
+    final price = products.firstWhereOrNull(
+      (p) => p.id == PurchaseConstants.ANDROID_PRODUCT_IDS[0],
+    )?.price;
+    return price ?? r'$2.99';
+  }
+
+  void toggleDevPremium() {
+    if (kDebugMode) {
+      isDevPremium.value = !isDevPremium.value;
+      unawaited(_syncAdsForPremiumStatus(hasActivePremium));
+      Get.log('Dev premium: ${isDevPremium.value}');
     }
   }
 
