@@ -10,6 +10,7 @@ import 'package:share_plus/share_plus.dart';
 
 import 'package:doodle_pad/app/admob/ads_rewarded.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
+import 'package:vibration/vibration.dart';
 
 enum BrushType { pen, marker, eraser, watercolor, airbrush }
 
@@ -84,14 +85,33 @@ class DoodleController extends GetxController {
   // Canvas RepaintBoundary key
   final canvasKey = GlobalKey();
 
+  bool _hasVibrator = false;
+
   bool get canUndo => strokes.isNotEmpty;
   bool get canRedo => _undoStack.isNotEmpty;
 
   @override
   void onInit() {
     super.onInit();
+    Vibration.hasVibrator().then((v) => _hasVibrator = v);
     _loadSavedPaths();
     _loadBrushUnlockState();
+  }
+
+  void hapticSelection() {
+    if (_hasVibrator) Vibration.vibrate(duration: 30);
+  }
+
+  void hapticLight() {
+    if (_hasVibrator) Vibration.vibrate(duration: 50);
+  }
+
+  void hapticMedium() {
+    if (_hasVibrator) Vibration.vibrate(duration: 100);
+  }
+
+  void hapticHeavy() {
+    if (_hasVibrator) Vibration.vibrate(duration: 200);
   }
 
   void _loadBrushUnlockState() {

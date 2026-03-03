@@ -1,5 +1,4 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -270,12 +269,12 @@ class _HomePageState extends State<HomePage>
                               borderRadius: BorderRadius.circular(16.r),
                               onTap: () async {
                                 if (_settingController.hapticEnabled.value) {
-                                  HapticFeedback.selectionClick();
+                                  DoodleController.to.hapticSelection();
                                 }
                                 await Get.toNamed(Routes.DRAW);
                                 if (_settingController
                                     .showBrushGuide.value) {
-                                  HapticFeedback.mediumImpact();
+                                  DoodleController.to.hapticMedium();
                                 }
                               },
                               child: Padding(

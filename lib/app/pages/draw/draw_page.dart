@@ -1,5 +1,4 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
@@ -25,7 +24,7 @@ class DrawPage extends GetView<DoodleController> {
               child: GestureDetector(
                 onPanStart: (d) {
                   if (settingCtrl.hapticEnabled.value) {
-                    HapticFeedback.selectionClick();
+                    controller.hapticSelection();
                   }
                   controller.startStroke(d.localPosition);
                 },
@@ -140,7 +139,7 @@ class _TopToolbar extends StatelessWidget {
               onPressed: ctrl.canUndo
                   ? () {
                       if (settingCtrl.hapticEnabled.value) {
-                        HapticFeedback.lightImpact();
+                        ctrl.hapticLight();
                       }
                       ctrl.undo();
                     }
@@ -191,7 +190,7 @@ class _TopToolbar extends StatelessWidget {
               icon: const Icon(Icons.share_rounded),
               onPressed: () {
                 if (settingCtrl.hapticEnabled.value) {
-                  HapticFeedback.mediumImpact();
+                  ctrl.hapticMedium();
                 }
                 ctrl.shareCanvas();
               },
@@ -205,7 +204,7 @@ class _TopToolbar extends StatelessWidget {
 
   void _maybeHaptic(SettingController settingCtrl) {
     if (!settingCtrl.hapticEnabled.value) return;
-    HapticFeedback.selectionClick();
+    ctrl.hapticSelection();
   }
 
   void _confirmClear(
@@ -244,7 +243,7 @@ class _TopToolbar extends StatelessWidget {
               );
               ctrl.clearCanvas();
               if (settingCtrl.hapticEnabled.value) {
-                HapticFeedback.heavyImpact();
+                ctrl.hapticHeavy();
               }
               Get.back();
             },
@@ -336,7 +335,7 @@ class _BrushTypeSelector extends StatelessWidget {
             return GestureDetector(
               onTap: () {
                 if (settingCtrl.hapticEnabled.value) {
-                  HapticFeedback.selectionClick();
+                  ctrl.hapticSelection();
                 }
                 if (isLocked) {
                   ctrl.unlockBrush(type);
@@ -516,7 +515,7 @@ class _ColorPalette extends StatelessWidget {
             return GestureDetector(
               onTap: () {
                 if (settingCtrl.hapticEnabled.value) {
-                  HapticFeedback.selectionClick();
+                  ctrl.hapticSelection();
                 }
                 ctrl.brushColor.value = c;
               },

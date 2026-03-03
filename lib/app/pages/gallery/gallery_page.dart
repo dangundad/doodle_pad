@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
@@ -190,7 +189,7 @@ class GalleryPage extends GetView<DoodleController> {
     // 현재 캔버스 초기화 후 이 파일을 배경으로 드로우 페이지 이동
     // (현재 구조상 Stroke 복원은 불가이므로 이미지를 참고용 배경으로 활용)
     controller.clearCanvas();
-    if (settingCtrl.hapticEnabled.value) HapticFeedback.lightImpact();
+    if (settingCtrl.hapticEnabled.value) controller.hapticLight();
     Get.toNamed(Routes.DRAW);
   }
 
