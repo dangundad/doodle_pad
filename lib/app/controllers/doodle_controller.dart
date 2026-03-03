@@ -20,6 +20,9 @@ class DrawingStroke {
   final bool isEraser;
   final StrokeCap cap;
   final BrushType brushType;
+  /// Fixed seed for the airbrush Random, so the spray pattern is stable
+  /// across repaints (avoids flickering when other strokes are updated).
+  final int seed;
 
   DrawingStroke({
     required this.points,
@@ -28,7 +31,8 @@ class DrawingStroke {
     this.isEraser = false,
     this.cap = StrokeCap.round,
     this.brushType = BrushType.pen,
-  });
+    int? seed,
+  }) : seed = seed ?? DateTime.now().microsecondsSinceEpoch;
 }
 
 class DoodleController extends GetxController {
@@ -116,6 +120,13 @@ class DoodleController extends GetxController {
   }
 
   void startStroke(Offset point) {
+    // If a stroke was already in progress (multi-touch or interrupted gesture),
+    // remove the dangling incomplete stroke from the list before starting fresh.
+    if (_currentStroke != null) {
+      strokes.remove(_currentStroke);
+      _currentStroke = null;
+    }
+
     final type = brushType.value;
     final isEraser = type == BrushType.eraser;
     final isMarker = type == BrushType.marker;
@@ -135,6 +146,9 @@ class DoodleController extends GetxController {
       widthMultiplier = 1.0;
     }
 
+    // Clear redo stack only when the user intentionally starts a new stroke.
+    _undoStack.clear();
+
     _currentStroke = DrawingStroke(
       points: [point],
       color: isEraser ? Colors.transparent : Color(brushColor.value),
@@ -143,7 +157,6 @@ class DoodleController extends GetxController {
       cap: isMarker ? StrokeCap.square : StrokeCap.round,
       brushType: type,
     );
-    _undoStack.clear();
     strokes.add(_currentStroke!);
   }
 

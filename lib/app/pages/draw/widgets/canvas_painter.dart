@@ -44,6 +44,51 @@ class CanvasPainter extends CustomPainter {
     canvas.restore();
   }
 
+  /// Build a smooth Bezier path through [points].
+  ///
+  /// Uses midpoint-chaining quadratic Bezier curves so every segment is
+  /// C1-continuous (tangent-matched at joins).  The final segment goes
+  /// directly to the last point via a quadratic curve (control point =
+  /// the second-to-last raw point), removing the straight-line kink that
+  /// `lineTo` produces when the finger is lifted mid-curve.
+  Path _buildSmoothPath(List<Offset> points) {
+    final path = Path()
+      ..moveTo(points.first.dx, points.first.dy);
+
+    if (points.length == 2) {
+      // Only two points: straight line is the best we can do.
+      path.lineTo(points[1].dx, points[1].dy);
+      return path;
+    }
+
+    // For every interior point, curve from the previous midpoint to the
+    // next midpoint with the interior point as the Bezier control.
+    for (int i = 1; i < points.length - 1; i++) {
+      final mid = Offset(
+        (points[i].dx + points[i + 1].dx) / 2,
+        (points[i].dy + points[i + 1].dy) / 2,
+      );
+      path.quadraticBezierTo(
+        points[i].dx,
+        points[i].dy,
+        mid.dx,
+        mid.dy,
+      );
+    }
+
+    // Fix: finish the path with a curve to the true last point instead of
+    // a straight lineTo, so the stroke tip is smooth.
+    final n = points.length;
+    path.quadraticBezierTo(
+      points[n - 2].dx,
+      points[n - 2].dy,
+      points[n - 1].dx,
+      points[n - 1].dy,
+    );
+
+    return path;
+  }
+
   void _drawNormal(Canvas canvas, DrawingStroke stroke) {
     final paint = Paint()
       ..color = stroke.isEraser ? Colors.transparent : stroke.color
@@ -65,25 +110,7 @@ class CanvasPainter extends CustomPainter {
               stroke.isEraser ? BlendMode.clear : BlendMode.srcOver,
       );
     } else {
-      final path = Path()
-        ..moveTo(stroke.points.first.dx, stroke.points.first.dy);
-      for (int i = 1; i < stroke.points.length; i++) {
-        if (i < stroke.points.length - 1) {
-          final mid = Offset(
-            (stroke.points[i].dx + stroke.points[i + 1].dx) / 2,
-            (stroke.points[i].dy + stroke.points[i + 1].dy) / 2,
-          );
-          path.quadraticBezierTo(
-            stroke.points[i].dx,
-            stroke.points[i].dy,
-            mid.dx,
-            mid.dy,
-          );
-        } else {
-          path.lineTo(stroke.points[i].dx, stroke.points[i].dy);
-        }
-      }
-      canvas.drawPath(path, paint);
+      canvas.drawPath(_buildSmoothPath(stroke.points), paint);
     }
   }
 
@@ -116,32 +143,18 @@ class CanvasPainter extends CustomPainter {
       canvas.drawCircle(stroke.points.first, stroke.width, paint);
       canvas.drawCircle(stroke.points.first, stroke.width * 0.6, innerPaint);
     } else {
-      final path = Path()
-        ..moveTo(stroke.points.first.dx, stroke.points.first.dy);
-      for (int i = 1; i < stroke.points.length; i++) {
-        if (i < stroke.points.length - 1) {
-          final mid = Offset(
-            (stroke.points[i].dx + stroke.points[i + 1].dx) / 2,
-            (stroke.points[i].dy + stroke.points[i + 1].dy) / 2,
-          );
-          path.quadraticBezierTo(
-            stroke.points[i].dx,
-            stroke.points[i].dy,
-            mid.dx,
-            mid.dy,
-          );
-        } else {
-          path.lineTo(stroke.points[i].dx, stroke.points[i].dy);
-        }
-      }
+      final path = _buildSmoothPath(stroke.points);
       canvas.drawPath(path, paint);
       canvas.drawPath(path, innerPaint);
     }
   }
 
   void _drawAirbrush(Canvas canvas, DrawingStroke stroke) {
-    // Airbrush: scattered dots around each point simulate spray effect
-    final random = math.Random(42);
+    // Airbrush: scattered dots around each point simulate spray effect.
+    // Use the stroke's fixed seed so the spray pattern is identical on every
+    // repaint, preventing the "flickering dots" artifact that occurs when other
+    // strokes are added/removed and this stroke is re-drawn with a new Random.
+    final random = math.Random(stroke.seed);
     final dotPaint = Paint()
       ..style = PaintingStyle.fill
       ..blendMode = BlendMode.srcOver;
@@ -169,11 +182,16 @@ class CanvasPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CanvasPainter oldDelegate) =>
-      strokes.length != oldDelegate.strokes.length ||
-      (strokes.isNotEmpty &&
-          strokes.last.points.length !=
-              (oldDelegate.strokes.isNotEmpty
-                  ? oldDelegate.strokes.last.points.length
-                  : 0));
+  bool shouldRepaint(CanvasPainter oldDelegate) {
+    // The controller passes the same RxList reference on every rebuild, so
+    // comparing strokes.length or strokes.last.points.length between old and
+    // new delegates always yields identical values (same object).  Returning
+    // `true` unconditionally ensures the canvas is repainted whenever Obx
+    // triggers a rebuild — which is the correct, desired behaviour here.
+    // Performance is acceptable because Obx only rebuilds when an observable
+    // actually changes (strokes.refresh() / strokes.add() / strokes.remove()).
+    if (bgColor != oldDelegate.bgColor) return true;
+    // Always repaint: delegate instances are different only when Obx fires.
+    return true;
+  }
 }
