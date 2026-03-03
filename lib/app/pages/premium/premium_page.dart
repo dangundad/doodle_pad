@@ -11,7 +11,7 @@ class PremiumPage extends GetView<PremiumController> {
   @override
   Widget build(BuildContext context) {
     final service = PurchaseService.to;
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Scaffold(
       backgroundColor: Colors.transparent,

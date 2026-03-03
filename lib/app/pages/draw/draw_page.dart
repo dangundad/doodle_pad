@@ -102,7 +102,7 @@ class _TopToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settingCtrl = SettingController.to;
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Container(
       margin: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 0),
@@ -266,7 +266,7 @@ class _BottomToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settingCtrl = SettingController.to;
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Container(
       margin: EdgeInsets.fromLTRB(12.w, 0, 12.w, 8.h),
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
@@ -318,7 +318,7 @@ class _BrushTypeSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settingCtrl = SettingController.to;
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Obx(() {
       return SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -421,7 +421,7 @@ class _BrushSizeSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Obx(() {
       final brushT = ctrl.brushType.value;
       final isEraser = brushT == BrushType.eraser;
@@ -475,7 +475,7 @@ class _ColorPalette extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settingCtrl = SettingController.to;
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Obx(() {
       final brushT = ctrl.brushType.value;
       final isEraser = brushT == BrushType.eraser;

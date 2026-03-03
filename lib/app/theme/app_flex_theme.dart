@@ -1,7 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-abstract final class AppTheme {
+abstract final class AppFlexTheme {
   static const Color _textPrimary = Color(0xFF1D2938);
   static const Color _textSecondary = Color(0xFF6A7788);
   static const Color _line = Color(0xFFD6DFEA);
@@ -277,4 +277,3 @@ abstract final class AppTheme {
     );
   }
 }
-

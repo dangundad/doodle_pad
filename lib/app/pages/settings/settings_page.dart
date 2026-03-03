@@ -239,7 +239,7 @@ class _BuildLanguageTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return ListTile(
       leading: Icon(Icons.language, color: cs.primary),
@@ -284,7 +284,7 @@ class _BuildSwitchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return SwitchListTile(
       value: value,
@@ -309,7 +309,7 @@ class _SettingsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Container(
       decoration: BoxDecoration(
@@ -358,7 +358,7 @@ class _ListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return ListTile(
       leading: Icon(icon, color: cs.primary),

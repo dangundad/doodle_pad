@@ -14,7 +14,7 @@ import 'package:doodle_pad/app/admob/ads_helper.dart';
 import 'package:doodle_pad/app/bindings/app_binding.dart';
 import 'package:doodle_pad/app/routes/app_pages.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
-import 'package:doodle_pad/app/theme/app_theme.dart';
+import 'package:doodle_pad/app/theme/app_flex_theme.dart';
 import 'package:doodle_pad/app/translate/translate.dart';
 
 Future<void> main() async {
@@ -69,8 +69,8 @@ class DoodlePadApp extends StatelessWidget {
       fallbackLocale: const Locale('en'),
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.system,
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
+      theme: AppFlexTheme.light,
+      darkTheme: AppFlexTheme.dark,
       home: const Scaffold(body: SizedBox.shrink()),
     );
   }
@@ -100,8 +100,8 @@ class DoodlePadApp extends StatelessWidget {
           defaultTransition: Transition.fadeIn,
           initialBinding: AppBinding(),
           themeMode: ThemeMode.system,
-          theme: AppTheme.light,
-          darkTheme: AppTheme.dark,
+          theme: AppFlexTheme.light,
+          darkTheme: AppFlexTheme.dark,
           scrollBehavior: ScrollBehavior().copyWith(overscroll: false),
           navigatorKey: Get.key,
           getPages: AppPages.routes,
