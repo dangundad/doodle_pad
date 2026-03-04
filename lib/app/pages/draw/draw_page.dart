@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
@@ -223,34 +224,105 @@ class _TopToolbar extends StatelessWidget {
     }
 
     Get.dialog(
-      AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.r),
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28.r)),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: 20.h),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [cs.errorContainer, cs.error.withValues(alpha: 0.3)],
+                ),
+              ),
+              child: Center(
+                child: Container(
+                  width: 52.r,
+                  height: 52.r,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: cs.error.withValues(alpha: 0.15),
+                  ),
+                  child: Icon(LucideIcons.trash2, size: 26.r, color: cs.error),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 8.h),
+              child: Column(
+                children: [
+                  Text(
+                    'clear_canvas'.tr,
+                    style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700),
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    'clear_canvas_confirm'.tr,
+                    style: TextStyle(fontSize: 14.sp, color: cs.onSurfaceVariant),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: Get.back,
+                      child: Text('cancel'.tr),
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [cs.error, cs.errorContainer],
+                        ),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12.r),
+                          onTap: () {
+                            settingCtrl.logEvent(
+                              'clear_canvas',
+                              'draw',
+                              metadata: {'source': 'toolbar', 'confirm': true},
+                            );
+                            ctrl.clearCanvas();
+                            if (settingCtrl.hapticEnabled.value) {
+                              ctrl.hapticHeavy();
+                            }
+                            Get.back();
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 12.h),
+                            child: Center(
+                              child: Text(
+                                'clear'.tr,
+                                style: TextStyle(
+                                  color: cs.onError,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        title: Text('clear_canvas'.tr),
-        content: Text('clear_canvas_confirm'.tr),
-        actions: [
-          TextButton(
-            onPressed: Get.back,
-            child: Text('cancel'.tr),
-          ),
-          FilledButton(
-            onPressed: () {
-              settingCtrl.logEvent(
-                'clear_canvas',
-                'draw',
-                metadata: {'source': 'toolbar', 'confirm': true},
-              );
-              ctrl.clearCanvas();
-              if (settingCtrl.hapticEnabled.value) {
-                ctrl.hapticHeavy();
-              }
-              Get.back();
-            },
-            style: FilledButton.styleFrom(backgroundColor: cs.error),
-            child: Text('clear'.tr),
-          ),
-        ],
       ),
     );
   }
