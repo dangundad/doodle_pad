@@ -43,7 +43,7 @@ class SettingController extends GetxController {
     showBrushGuide.value = _readBool(box, _kShowBrushGuideKey, true);
     askBeforeClear.value = _readBool(box, _kAskBeforeClearKey, true);
     language.value = _readString(box, _kLanguageKey, 'en');
-    Get.updateLocale(Locale(language.value));
+    Get.updateLocale(language.value == 'ko' ? const Locale('ko') : const Locale('en'));
   }
 
   Future<void> setHapticEnabled(bool value) async {
