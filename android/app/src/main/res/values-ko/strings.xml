@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">수면 타이머</string>
+    <string name="app_name">두들 패드</string>
 
     <!-- Device Admin -->
     <string name="device_admin_description">기기 관리자 권한이 있어야 타이머 종료 시 화면을 끌 수 있습니다.</string>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">Sleep Timer</string>
+    <string name="app_name">Doodle Pad</string>
 
     <!-- Device Admin -->
     <string name="device_admin_description">Allows Sleep Timer to turn off the screen when the timer ends.</string>

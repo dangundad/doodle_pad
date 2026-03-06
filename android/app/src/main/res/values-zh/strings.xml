@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">睡眠定时器</string>
+    <string name="app_name">塗鴉本</string>
 
     <!-- Device Admin -->
     <string name="device_admin_description">设备管理员权限让睡眠定时器在计时结束时关闭屏幕。</string>

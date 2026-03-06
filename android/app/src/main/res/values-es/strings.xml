@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">Temporizador</string>
+    <string name="app_name">Bloc de Dibujo</string>
 
     <!-- Device Admin -->
     <string name="device_admin_description">Permite a Sleep Timer apagar la pantalla al terminar el temporizador.</string>

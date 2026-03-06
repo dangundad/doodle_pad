@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">スリープタイマー</string>
+    <string name="app_name">落書きパッド</string>
 
     <!-- Device Admin -->
     <string name="device_admin_description">デバイス管理者権限で、タイマー終了時に画面をオフにできます。</string>

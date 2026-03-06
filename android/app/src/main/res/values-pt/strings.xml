@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">Cronômetro</string>
+    <string name="app_name">Bloco Desenho</string>
 
     <!-- Device Admin -->
     <string name="device_admin_description">Permite ao Sleep Timer desligar a tela ao fim do timer.</string>

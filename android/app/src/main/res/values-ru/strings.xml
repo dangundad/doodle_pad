@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">Таймер сна</string>
+    <string name="app_name">Блокнот Рисования</string>
 
     <!-- Device Admin -->
     <string name="device_admin_description">Права администратора позволяют Sleep Timer гасить экран после завершения таймера.</string>

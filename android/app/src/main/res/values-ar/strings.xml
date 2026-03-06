@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">مؤقت النوم</string>
+    <string name="app_name">لوحة الرسم</string>
 
     <!-- Device Admin -->
     <string name="device_admin_description">صلاحية مشرف الجهاز تتيح لمؤقت النوم إيقاف الشاشة عند انتهاء المؤقت.</string>
