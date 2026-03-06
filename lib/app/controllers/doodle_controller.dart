@@ -10,6 +10,7 @@ import 'package:share_plus/share_plus.dart';
 
 import 'package:doodle_pad/app/admob/ads_rewarded.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
+import 'package:doodle_pad/app/utils/app_toast.dart';
 import 'package:vibration/vibration.dart';
 
 enum BrushType { pen, marker, eraser, watercolor, airbrush }
@@ -221,14 +222,13 @@ class DoodleController extends GetxController {
           HiveService.to.setSetting(_airbrushUnlockedKey, true);
         }
         brushType.value = type;
-        Get.snackbar(
-          'brush_unlocked'.tr,
-          type == BrushType.watercolor
-              ? 'watercolor_brush'.tr
-              : 'airbrush_brush'.tr,
-          snackPosition: SnackPosition.BOTTOM,
-          duration: const Duration(seconds: 2),
-          icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+        AppToast.show(
+          AppToastMessage.success(
+            title: 'brush_unlocked'.tr,
+            description: type == BrushType.watercolor
+                ? 'watercolor_brush'.tr
+                : 'airbrush_brush'.tr,
+          ),
         );
       },
     );
@@ -291,9 +291,12 @@ class DoodleController extends GetxController {
   /// 그림 저장 (갤러리에 추가)
   Future<void> saveCanvas() async {
     if (strokes.isEmpty) {
-      Get.snackbar('save_canvas'.tr, 'gallery_empty'.tr,
-          snackPosition: SnackPosition.BOTTOM,
-          duration: const Duration(seconds: 2));
+      AppToast.show(
+        AppToastMessage.info(
+          title: 'save_canvas'.tr,
+          description: 'gallery_empty'.tr,
+        ),
+      );
       return;
     }
 
@@ -301,8 +304,12 @@ class DoodleController extends GetxController {
     try {
       final path = await _savePng();
       if (path == null) {
-        Get.snackbar('error'.tr, 'save_error'.tr,
-            snackPosition: SnackPosition.BOTTOM);
+        AppToast.show(
+          AppToastMessage.error(
+            title: 'error'.tr,
+            description: 'save_error'.tr,
+          ),
+        );
         return;
       }
 
@@ -312,16 +319,19 @@ class DoodleController extends GetxController {
       // Hive에 경로 목록 저장
       await HiveService.to.setSetting(_savedPathsKey, savedDrawings.toList());
 
-      Get.snackbar(
-        'save_canvas'.tr,
-        'save_success'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        duration: const Duration(seconds: 2),
-        icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+      AppToast.show(
+        AppToastMessage.success(
+          title: 'save_canvas'.tr,
+          description: 'save_success'.tr,
+        ),
       );
-    } catch (e) {
-      Get.snackbar('error'.tr, 'save_error'.tr,
-          snackPosition: SnackPosition.BOTTOM);
+    } catch (_) {
+      AppToast.show(
+        AppToastMessage.error(
+          title: 'error'.tr,
+          description: 'save_error'.tr,
+        ),
+      );
     } finally {
       isSaving.value = false;
     }
@@ -335,6 +345,12 @@ class DoodleController extends GetxController {
     } catch (_) {}
     savedDrawings.remove(path);
     await HiveService.to.setSetting(_savedPathsKey, savedDrawings.toList());
+    AppToast.show(
+      AppToastMessage.success(
+        title: 'delete_drawing'.tr,
+        description: 'delete_drawing_complete'.tr,
+      ),
+    );
   }
 
   /// 공유 (임시 파일로 저장 후 공유)
@@ -355,8 +371,13 @@ class DoodleController extends GetxController {
       await SharePlus.instance.share(
         ShareParams(files: [XFile(file.path, mimeType: 'image/png')]),
       );
-    } catch (e) {
-      Get.snackbar('error'.tr, '$e', snackPosition: SnackPosition.BOTTOM);
+    } catch (_) {
+      AppToast.show(
+        AppToastMessage.error(
+          title: 'error'.tr,
+          description: 'share_error'.tr,
+        ),
+      );
     }
   }
 }

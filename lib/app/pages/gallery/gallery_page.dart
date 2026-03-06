@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/routes/app_pages.dart';
+import 'package:doodle_pad/app/utils/app_toast.dart';
 
 class GalleryPage extends GetView<DoodleController> {
   const GalleryPage({super.key});
@@ -191,6 +192,12 @@ class GalleryPage extends GetView<DoodleController> {
     controller.clearCanvas();
     if (settingCtrl.hapticEnabled.value) controller.hapticLight();
     Get.toNamed(Routes.DRAW);
+    AppToast.show(
+      AppToastMessage.info(
+        title: 'load_drawing'.tr,
+        description: 'load_drawing_message'.tr,
+      ),
+    );
   }
 
   void _shareDrawing(String path) async {
@@ -199,8 +206,13 @@ class GalleryPage extends GetView<DoodleController> {
       await SharePlus.instance.share(
         ShareParams(files: [xFile]),
       );
-    } catch (e) {
-      Get.snackbar('error'.tr, '$e', snackPosition: SnackPosition.BOTTOM);
+    } catch (_) {
+      AppToast.show(
+        AppToastMessage.error(
+          title: 'error'.tr,
+          description: 'share_error'.tr,
+        ),
+      );
     }
   }
 

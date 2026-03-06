@@ -3,10 +3,29 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_ce/hive.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'package:doodle_pad/app/services/app_rating_service.dart';
 import 'package:doodle_pad/app/services/activity_log_service.dart';
+import 'package:doodle_pad/app/utils/app_constants.dart';
+import 'package:doodle_pad/app/utils/app_toast.dart';
+
+typedef CanLaunchUrlFn = Future<bool> Function(Uri uri);
+typedef LaunchUrlFn = Future<bool> Function(Uri uri, LaunchMode mode);
+typedef RateAppFn = Future<void> Function();
 
 class SettingController extends GetxController {
+  SettingController({
+    bool loadOnInit = true,
+    CanLaunchUrlFn? canLaunchUrlFn,
+    LaunchUrlFn? launchUrlFn,
+    RateAppFn? rateAppFn,
+  }) : _loadOnInit = loadOnInit,
+       _canLaunchUrlFn = canLaunchUrlFn ?? canLaunchUrl,
+       _launchUrlFn =
+           launchUrlFn ?? ((uri, mode) => launchUrl(uri, mode: mode)),
+       _rateAppFn = rateAppFn ?? (() => AppRatingService.to.openStoreListing());
+
   static SettingController get to => Get.find<SettingController>();
   static const String appId = 'doodle_pad';
 
@@ -22,11 +41,17 @@ class SettingController extends GetxController {
   final RxBool showBrushGuide = true.obs;
   final RxBool askBeforeClear = true.obs;
   final RxString language = 'en'.obs;
+  final bool _loadOnInit;
+  final CanLaunchUrlFn _canLaunchUrlFn;
+  final LaunchUrlFn _launchUrlFn;
+  final RateAppFn _rateAppFn;
 
   @override
   void onInit() {
     super.onInit();
-    _load();
+    if (_loadOnInit) {
+      _load();
+    }
   }
 
   Future<Box<dynamic>> _openSettingBox() async {
@@ -86,6 +111,64 @@ class SettingController extends GetxController {
     isFirstRun.value = false;
     final box = await _openSettingBox();
     await box.put(_kIsFirstRunKey, false);
+  }
+
+  Future<void> rateApp() async {
+    logEvent('tap_rate_app', 'settings');
+    try {
+      await _rateAppFn();
+    } catch (_) {
+      _showLinkError();
+    }
+  }
+
+  Future<void> sendFeedback() async {
+    logEvent('tap_send_feedback', 'settings');
+    final uri = Uri(
+      scheme: 'mailto',
+      path: DeveloperInfo.DEVELOPER_EMAIL,
+      queryParameters: {'subject': 'feedback_email_subject'.tr},
+    );
+    await _openExternalLink(uri, mode: LaunchMode.platformDefault);
+  }
+
+  Future<void> openMoreApps() async {
+    logEvent('tap_more_apps', 'settings');
+    await _openExternalLink(Uri.parse(AppUrls.GOOGLE_PLAY_MOREAPPS));
+  }
+
+  Future<void> openPrivacyPolicy() async {
+    logEvent('tap_privacy_policy', 'settings');
+    await _openExternalLink(Uri.parse(AppUrls.PRIVACY_POLICY));
+  }
+
+  Future<void> _openExternalLink(
+    Uri uri, {
+    LaunchMode mode = LaunchMode.externalApplication,
+  }) async {
+    try {
+      final canLaunch = await _canLaunchUrlFn(uri);
+      if (!canLaunch) {
+        _showLinkError();
+        return;
+      }
+
+      final launched = await _launchUrlFn(uri, mode);
+      if (!launched) {
+        _showLinkError();
+      }
+    } catch (_) {
+      _showLinkError();
+    }
+  }
+
+  void _showLinkError() {
+    AppToast.show(
+      AppToastMessage.error(
+        title: 'error'.tr,
+        description: 'link_open_error'.tr,
+      ),
+    );
   }
 
   void recordHomeOpen(String routeName) {

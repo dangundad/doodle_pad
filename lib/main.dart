@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:toastification/toastification.dart';
 
 import 'package:doodle_pad/app/admob/ads_helper.dart';
 import 'package:doodle_pad/app/bindings/app_binding.dart';
@@ -56,22 +57,24 @@ Future<void> main() async {
 class DoodlePadApp extends StatelessWidget {
   const DoodlePadApp({super.key});
 
-  GetMaterialApp _buildFallbackApp() {
-    return GetMaterialApp(
-      supportedLocales: Languages.supportedLocales,
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      translations: Languages(),
-      locale: const Locale('en'),
-      fallbackLocale: const Locale('en'),
-      debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.system,
-      theme: AppFlexTheme.light,
-      darkTheme: AppFlexTheme.dark,
-      home: const Scaffold(body: SizedBox.shrink()),
+  Widget _buildFallbackApp() {
+    return ToastificationWrapper(
+      child: GetMaterialApp(
+        supportedLocales: Languages.supportedLocales,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        translations: Languages(),
+        locale: const Locale('en'),
+        fallbackLocale: const Locale('en'),
+        debugShowCheckedModeBanner: false,
+        themeMode: ThemeMode.system,
+        theme: AppFlexTheme.light,
+        darkTheme: AppFlexTheme.dark,
+        home: const Scaffold(body: SizedBox.shrink()),
+      ),
     );
   }
 
@@ -86,26 +89,28 @@ class DoodlePadApp extends StatelessWidget {
           return _buildFallbackApp();
         }
 
-        return GetMaterialApp(
-          supportedLocales: Languages.supportedLocales,
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          translations: Languages(),
-          locale: Get.deviceLocale ?? const Locale('en'),
-          fallbackLocale: const Locale('en'),
-          debugShowCheckedModeBanner: false,
-          defaultTransition: Transition.fadeIn,
-          initialBinding: AppBinding(),
-          themeMode: ThemeMode.system,
-          theme: AppFlexTheme.light,
-          darkTheme: AppFlexTheme.dark,
-          scrollBehavior: ScrollBehavior().copyWith(overscroll: false),
-          navigatorKey: Get.key,
-          getPages: AppPages.routes,
-          initialRoute: AppPages.INITIAL,
+        return ToastificationWrapper(
+          child: GetMaterialApp(
+            supportedLocales: Languages.supportedLocales,
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            translations: Languages(),
+            locale: Get.deviceLocale ?? const Locale('en'),
+            fallbackLocale: const Locale('en'),
+            debugShowCheckedModeBanner: false,
+            defaultTransition: Transition.fadeIn,
+            initialBinding: AppBinding(),
+            themeMode: ThemeMode.system,
+            theme: AppFlexTheme.light,
+            darkTheme: AppFlexTheme.dark,
+            scrollBehavior: ScrollBehavior().copyWith(overscroll: false),
+            navigatorKey: Get.key,
+            getPages: AppPages.routes,
+            initialRoute: AppPages.INITIAL,
+          ),
         );
       },
     );

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/routes/app_pages.dart';
+import 'package:doodle_pad/app/utils/app_toast.dart';
 
 class SettingsPage extends GetView<SettingController> {
   const SettingsPage({super.key});
@@ -147,26 +148,43 @@ class SettingsPage extends GetView<SettingController> {
                   ),
                   _ListItem(
                     icon: Icons.feedback,
+                    key: const ValueKey('settings-send-feedback-tile'),
                     title: _loc('feedback', 'Send feedback'),
                     subtitle: _loc(
                       'feedback_desc',
                       'Share your improvement ideas',
                     ),
-                    onTap: () {
-                      _track('open_feedback', 'settings');
-                      Get.snackbar(
-                        _loc('feedback', 'Send feedback'),
-                        _loc(
-                          'feedback_tip',
-                          'Feature is planned. Thank you for waiting.',
-                        ),
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor:
-                            Get.theme.colorScheme.surfaceContainerHigh,
-                        colorText: Get.theme.colorScheme.onSurface,
-                        duration: const Duration(seconds: 2),
-                      );
-                    },
+                    onTap: controller.sendFeedback,
+                  ),
+                  _ListItem(
+                    icon: Icons.star_rate_rounded,
+                    key: const ValueKey('settings-rate-app-tile'),
+                    title: _loc('rate_app', 'Rate app'),
+                    subtitle: _loc(
+                      'rate_app_desc',
+                      'Leave a review on the store',
+                    ),
+                    onTap: controller.rateApp,
+                  ),
+                  _ListItem(
+                    icon: Icons.apps_rounded,
+                    key: const ValueKey('settings-more-apps-tile'),
+                    title: _loc('more_apps', 'More apps'),
+                    subtitle: _loc(
+                      'more_apps_desc',
+                      'Explore more apps from DangunDad',
+                    ),
+                    onTap: controller.openMoreApps,
+                  ),
+                  _ListItem(
+                    icon: Icons.privacy_tip_outlined,
+                    key: const ValueKey('settings-privacy-policy-tile'),
+                    title: _loc('privacy_policy', 'Privacy policy'),
+                    subtitle: _loc(
+                      'privacy_policy_desc',
+                      'Read how local data and permissions are handled',
+                    ),
+                    onTap: controller.openPrivacyPolicy,
                   ),
                 ],
               ),
@@ -207,13 +225,14 @@ class SettingsPage extends GetView<SettingController> {
     controller.logEvent('clear_local_data', 'settings');
     await controller.clearAppSettings();
 
-    Get.snackbar(
-      _loc('clear_data', 'Clear local data'),
-      _loc('clear_data_complete', 'Local data has been removed.'),
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Get.theme.colorScheme.surfaceContainerHigh,
-      colorText: Get.theme.colorScheme.onSurface,
-      duration: const Duration(seconds: 2),
+    AppToast.show(
+      AppToastMessage.success(
+        title: _loc('clear_data', 'Clear local data'),
+        description: _loc(
+          'clear_data_complete',
+          'Local data has been removed.',
+        ),
+      ),
     );
   }
 
@@ -350,6 +369,7 @@ class _ListItem extends StatelessWidget {
   final VoidCallback onTap;
 
   const _ListItem({
+    super.key,
     required this.icon,
     required this.title,
     required this.subtitle,

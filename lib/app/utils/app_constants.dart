@@ -16,8 +16,8 @@ abstract class AppUrls {
       'https://play.google.com/store/apps/developer?id=DangunDad';
 
   static const String PACKAGE_NAME = 'com.dangundad.doodlepad';
-
-  // static const String PRIVACY_POLICY = 'https://...';
+  static const String PRIVACY_POLICY =
+      'https://dangundad.github.io/privacy/doodle-pad';
 }
 
 /// 개발자 정보
