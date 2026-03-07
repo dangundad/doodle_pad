@@ -144,8 +144,7 @@ class PremiumPage extends GetView<PremiumController> {
                   padding: EdgeInsets.symmetric(vertical: 12.h),
                 ),
                 child: service.isLoading.value
-                    ? const SizedBox(
-                        width: 20,
+                    ? SizedBox(width: 20.w,
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
