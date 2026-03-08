@@ -5,6 +5,7 @@
 // {package} 치환 후 사용
 // 배포 전 실제 광고 ID로 교체 필요
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -18,59 +19,154 @@ class AdHelper {
 
   // 배너 광고 로드 상태
   static RxBool bannerAdLoaded = false.obs;
-
-  // 배너 타입 상수
   static const banner = 'Banner';
+  @visibleForTesting
+  static Future<void> Function() loadAndShowConsentFormIfRequired =
+      _defaultLoadAndShowConsentFormIfRequired;
+  @visibleForTesting
+  static Future<InitializationStatus> Function() mobileAdsInitializer = () =>
+      MobileAds.instance.initialize();
 
-  /// AdMob 동의 폼 초기화 (GDPR/CCPA 준수)
-  static Future<void> initializeAdConsent() async {
+  static Future<InitializationStatus>? _mobileAdsInitialization;
+  static Future<void>? _mobileAdsInitializationGuard;
+
+  static Future<bool> initializeConsentAndAds({
+    Future<void> Function()? requestTrackingAuthorizationIfNeeded,
+    Future<void> Function()? requestConsentInfoUpdate,
+    Future<void> Function()? loadAndShowConsentFormIfRequired,
+    Future<bool> Function()? canRequestAds,
+    Future<void> Function()? initializeMobileAds,
+  }) async {
     try {
-      final params = ConsentRequestParameters();
-      ConsentInformation.instance.requestConsentInfoUpdate(
-        params,
-        () async {
-          final formStatus =
-              await ConsentInformation.instance.getConsentStatus();
-          debugPrint('Ad consent status: $formStatus');
+      await (requestTrackingAuthorizationIfNeeded ??
+          _requestTrackingAuthorizationIfNeeded)();
+      await (requestConsentInfoUpdate ??
+          _requestConsentInfoUpdateWithDefaults)();
+      await (loadAndShowConsentFormIfRequired ??
+          AdHelper.loadAndShowConsentFormIfRequired)();
 
-          if (formStatus != ConsentStatus.required) return;
-          if (await ConsentInformation.instance.isConsentFormAvailable()) {
-            _showConsentForm();
-          }
-        },
-        (error) {
-          debugPrint('Consent info request error: $error');
-        },
-      );
+      final resolvedCanRequestAds = await (canRequestAds ?? _canRequestAds)();
+      if (!resolvedCanRequestAds) {
+        return false;
+      }
+
+      await _initializeMobileAdsOnce(initializeMobileAds);
+      return true;
     } catch (e) {
-      debugPrint('Ad consent initialization error: $e');
+      debugPrint('Ad consent and initialization error: $e');
+      return false;
     }
   }
 
-  static void _showConsentForm() {
-    ConsentForm.loadConsentForm(
-      (ConsentForm consentForm) async {
-        consentForm.show((formError) async {
-          if (formError != null) {
-            debugPrint(
-              'Consent form error: ${formError.errorCode} - ${formError.message}',
-            );
-          }
-        });
-      },
-      (formError) {
-        debugPrint(
-          'Consent form load error: ${formError.errorCode} - ${formError.message}',
-        );
-      },
-    );
+  static Future<bool> initializeAdConsent() async {
+    try {
+      await _requestTrackingAuthorizationIfNeeded();
+
+      final params = ConsentRequestParameters();
+      await _requestConsentInfoUpdate(params);
+
+      if (await ConsentInformation.instance.canRequestAds()) {
+        return true;
+      }
+
+      await loadAndShowConsentFormIfRequired();
+      return await ConsentInformation.instance.canRequestAds();
+    } catch (e) {
+      debugPrint('Ad consent initialization error: $e');
+      return false;
+    }
   }
 
-  // ---- 테스트 광고 ID (배포 전 실제 ID로 교체) ----
-  // Android 테스트: ca-app-pub-3940256099942544/...
-  // iOS 테스트: ca-app-pub-3940256099942544/...
+  static Future<void> _requestTrackingAuthorizationIfNeeded() async {}
 
-  /// 배너 광고 ID
+  static Future<void> _requestConsentInfoUpdateWithDefaults() {
+    return _requestConsentInfoUpdate(ConsentRequestParameters());
+  }
+
+  static Future<bool> _canRequestAds() {
+    return ConsentInformation.instance.canRequestAds();
+  }
+
+  static Future<void> _requestConsentInfoUpdate(
+    ConsentRequestParameters params,
+  ) {
+    final completer = Completer<void>();
+    ConsentInformation.instance.requestConsentInfoUpdate(
+      params,
+      () {
+        if (!completer.isCompleted) {
+          completer.complete();
+        }
+      },
+      (error) {
+        if (!completer.isCompleted) {
+          completer.completeError(error);
+        }
+      },
+    );
+    return completer.future;
+  }
+
+  static Future<void> _defaultLoadAndShowConsentFormIfRequired() {
+    final completer = Completer<void>();
+    ConsentForm.loadAndShowConsentFormIfRequired((formError) {
+      if (completer.isCompleted) {
+        return;
+      }
+      if (formError != null) {
+        completer.completeError(formError);
+        return;
+      }
+      completer.complete();
+    });
+    return completer.future;
+  }
+
+  static Future<void> _initializeMobileAdsOnce(
+    Future<void> Function()? initializeMobileAds,
+  ) async {
+    if (initializeMobileAds != null) {
+      _mobileAdsInitializationGuard ??= () async {
+        await initializeMobileAds();
+      }();
+      await _mobileAdsInitializationGuard;
+      return;
+    }
+
+    await AdHelper.initializeMobileAds();
+  }
+
+  static Future<InitializationStatus?> initializeMobileAds() async {
+    try {
+      return await (_mobileAdsInitialization ??= mobileAdsInitializer());
+    } catch (e) {
+      debugPrint('MobileAds initialization error: $e');
+      return null;
+    }
+  }
+
+  static Future<InitializationStatus?> currentInitializationStatus() async {
+    final initialization = _mobileAdsInitialization;
+    if (initialization == null) {
+      return null;
+    }
+
+    try {
+      return await initialization;
+    } catch (e) {
+      debugPrint('MobileAds status lookup error: $e');
+      return null;
+    }
+  }
+
+  @visibleForTesting
+  static void resetInitializationStateForTest() {
+    loadAndShowConsentFormIfRequired = _defaultLoadAndShowConsentFormIfRequired;
+    mobileAdsInitializer = () => MobileAds.instance.initialize();
+    _mobileAdsInitialization = null;
+    _mobileAdsInitializationGuard = null;
+  }
+
   static String get bannerAdUnitId {
     if (Platform.isAndroid) {
       return kDebugMode
