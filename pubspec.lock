@@ -461,30 +461,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.3"
-  gma_mediation_applovin:
-    dependency: "direct main"
-    description:
-      name: gma_mediation_applovin
-      sha256: da261506c474650b51d941c237e2d2825ebea71a4dc3356fbe16fa8c43cc4226
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.5.1"
   gma_mediation_pangle:
     dependency: "direct main"
     description:
       name: gma_mediation_pangle
-      sha256: "4eccea042cd9c25e2e17db4004645837311f4735572defabd00d2320490fc82e"
+      sha256: "1454d1dff61fffb21499d3c1c9403a2de3822c7da4dca9a9db7f6aed1bf740cf"
       url: "https://pub.dev"
     source: hosted
-    version: "3.5.1"
+    version: "3.5.3"
   gma_mediation_unity:
     dependency: "direct main"
     description:
       name: gma_mediation_unity
-      sha256: "8dac2daf66a4024ccf65ba63efc1dd1623406e53e79d5f086a14767c3bde587e"
+      sha256: c5ddc177d8618b51b4e4538afdce88d3ee3a94b273d4a823deb60cccfbed5f1c
       url: "https://pub.dev"
     source: hosted
-    version: "1.6.3"
+    version: "1.6.4"
   google_fonts:
     dependency: "direct main"
     description:
@@ -497,10 +489,10 @@ packages:
     dependency: "direct main"
     description:
       name: google_mobile_ads
-      sha256: a4f59019f2c32769fb6c60ed8aa321e9c21a36297e2c4f23452b3e779a3e7a26
+      sha256: f35e040875bb54e8a3455bcffed3b4ac9e9263fbf7751b9fd1ae7f30793faee8
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.0"
+    version: "7.0.0"
   graphs:
     dependency: transitive
     description:

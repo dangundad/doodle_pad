@@ -37,6 +37,9 @@ class AppRatingService extends GetxService {
     await _rateMyApp.init();
     if (_rateMyApp.shouldOpenDialog) {
       try {
+        if (!await _inAppReview.isAvailable()) {
+          return;
+        }
         await _inAppReview.requestReview();
         await _rateMyApp.callEvent(RateMyAppEventType.rateButtonPressed);
       } catch (e) {
@@ -65,3 +68,4 @@ class AppRatingService extends GetxService {
     await _rateMyApp.init();
   }
 }
+
