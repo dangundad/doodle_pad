@@ -23,6 +23,7 @@ class DrawPage extends GetView<DoodleController> {
             child: RepaintBoundary(
               key: controller.canvasKey,
               child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onPanStart: (d) {
                   if (settingCtrl.hapticEnabled.value) {
                     controller.hapticSelection();
@@ -499,6 +500,12 @@ class _BrushSizeSlider extends StatelessWidget {
       final minSize = isEraser ? 10.0 : 2.0;
       final maxSize = isEraser ? 60.0 : 30.0;
       final size = ctrl.brushSize.value.clamp(minSize, maxSize);
+      // Sync the observable if it was clamped (e.g. switching eraser -> pen)
+      if (size != ctrl.brushSize.value) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ctrl.brushSize.value = size;
+        });
+      }
       final dotSize = (size * 0.6).clamp(4.0, 24.0);
 
       return Row(
@@ -550,23 +557,13 @@ class _ColorPalette extends StatelessWidget {
     return Obx(() {
       final brushT = ctrl.brushType.value;
       final isEraser = brushT == BrushType.eraser;
-      final isWatercolor = brushT == BrushType.watercolor;
-      final isAirbrush = brushT == BrushType.airbrush;
 
-      if (isEraser || isWatercolor || isAirbrush) {
-        String modeText;
-        if (isEraser) {
-          modeText = 'eraser_mode'.tr;
-        } else if (isWatercolor) {
-          modeText = 'watercolor_mode'.tr;
-        } else {
-          modeText = 'airbrush_mode'.tr;
-        }
+      if (isEraser) {
         return SizedBox(
           height: 36.r,
           child: Center(
             child: Text(
-              modeText,
+              'eraser_mode'.tr,
               style: TextStyle(
                 fontSize: 12.sp,
                 color: cs.onSurfaceVariant,

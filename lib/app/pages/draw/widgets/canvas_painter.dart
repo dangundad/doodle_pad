@@ -12,15 +12,17 @@ class CanvasPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Fill background
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = bgColor,
-    );
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
 
-    // saveLayer required for BlendMode.clear (eraser) to work correctly
-    canvas.saveLayer(
-        Rect.fromLTWH(0, 0, size.width, size.height), Paint());
+    // Fill background
+    canvas.drawRect(rect, Paint()..color = bgColor);
+
+    // saveLayer is required for BlendMode.clear (eraser) to work correctly.
+    // Only allocate the layer when at least one eraser stroke exists.
+    final hasEraser = strokes.any((s) => s.brushType == BrushType.eraser);
+    if (hasEraser) {
+      canvas.saveLayer(rect, Paint());
+    }
 
     for (final stroke in strokes) {
       if (stroke.points.isEmpty) continue;
@@ -41,7 +43,9 @@ class CanvasPainter extends CustomPainter {
       }
     }
 
-    canvas.restore();
+    if (hasEraser) {
+      canvas.restore();
+    }
   }
 
   /// Build a smooth Bezier path through [points].
@@ -52,8 +56,12 @@ class CanvasPainter extends CustomPainter {
   /// the second-to-last raw point), removing the straight-line kink that
   /// `lineTo` produces when the finger is lifted mid-curve.
   Path _buildSmoothPath(List<Offset> points) {
-    final path = Path()
-      ..moveTo(points.first.dx, points.first.dy);
+    final path = Path()..moveTo(points.first.dx, points.first.dy);
+
+    if (points.length == 1) {
+      // Single point: just moveTo is enough; the caller draws a dot.
+      return path;
+    }
 
     if (points.length == 2) {
       // Only two points: straight line is the best we can do.
@@ -162,7 +170,29 @@ class CanvasPainter extends CustomPainter {
     final radius = stroke.width / 2;
     const dotCount = 25;
 
+    // Subsample points: skip nearby points to avoid excessive dot density
+    // on long strokes, which degrades performance noticeably.
+    final minDist = radius * 0.3;
+    final minDistSq = minDist * minDist;
+    Offset? prev;
+
     for (final point in stroke.points) {
+      if (prev != null) {
+        final ddx = point.dx - prev.dx;
+        final ddy = point.dy - prev.dy;
+        if (ddx * ddx + ddy * ddy < minDistSq) {
+          // Still advance the RNG to keep pattern stable.
+          for (int i = 0; i < dotCount; i++) {
+            random.nextDouble();
+            random.nextDouble();
+            random.nextDouble();
+            random.nextDouble();
+          }
+          continue;
+        }
+      }
+      prev = point;
+
       for (int i = 0; i < dotCount; i++) {
         // Random angle and distance within the spray radius
         final angle = random.nextDouble() * 2 * math.pi;
@@ -183,15 +213,10 @@ class CanvasPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(CanvasPainter oldDelegate) {
-    // The controller passes the same RxList reference on every rebuild, so
-    // comparing strokes.length or strokes.last.points.length between old and
-    // new delegates always yields identical values (same object).  Returning
-    // `true` unconditionally ensures the canvas is repainted whenever Obx
-    // triggers a rebuild — which is the correct, desired behaviour here.
-    // Performance is acceptable because Obx only rebuilds when an observable
-    // actually changes (strokes.refresh() / strokes.add() / strokes.remove()).
-    if (bgColor != oldDelegate.bgColor) return true;
-    // Always repaint: delegate instances are different only when Obx fires.
+    // Obx rebuilds this widget only when an observable actually changes
+    // (strokes.refresh() / strokes.add() / strokes.remove()), so returning
+    // true is safe and correct — new delegate instances only appear on
+    // real data changes.
     return true;
   }
 }

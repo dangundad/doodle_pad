@@ -234,13 +234,29 @@ class DoodleController extends GetxController {
     );
   }
 
+  // Minimum squared distance between successive points to avoid redundant
+  // repaint work for tiny sub-pixel movements.
+  static const _minPointDistSq = 4.0; // 2px threshold
+
   void continueStroke(Offset point) {
     if (_currentStroke == null) return;
-    _currentStroke!.points.add(point);
+    final pts = _currentStroke!.points;
+    if (pts.isNotEmpty) {
+      final last = pts.last;
+      final dx = point.dx - last.dx;
+      final dy = point.dy - last.dy;
+      if (dx * dx + dy * dy < _minPointDistSq) return;
+    }
+    pts.add(point);
     strokes.refresh();
   }
 
   void endStroke() {
+    // Remove strokes that have no drawable content (shouldn't happen normally
+    // but guards against edge cases like interrupted gestures).
+    if (_currentStroke != null && _currentStroke!.points.isEmpty) {
+      strokes.remove(_currentStroke);
+    }
     _currentStroke = null;
   }
 
@@ -355,6 +371,16 @@ class DoodleController extends GetxController {
 
   /// 공유 (임시 파일로 저장 후 공유)
   Future<void> shareCanvas() async {
+    if (strokes.isEmpty) {
+      AppToast.show(
+        AppToastMessage.info(
+          title: 'share'.tr,
+          description: 'gallery_empty'.tr,
+        ),
+      );
+      return;
+    }
+
     final image = await _captureCanvas();
     if (image == null) return;
     File? tmpFile;
