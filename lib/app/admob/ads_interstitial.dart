@@ -22,8 +22,16 @@ class InterstitialAdManager extends GetxController {
   }
 
   Future<void> loadAd() async {
+    final adUnitId = AdHelper.interstitialAdUnitId;
+    if (!AdHelper.hasUsableAdUnitId(adUnitId)) {
+      debugPrint('Interstitial ad skipped: release ad unit id is not configured');
+      _interstitialAd = null;
+      isAdReady.value = false;
+      return;
+    }
+
     await InterstitialAd.load(
-      adUnitId: AdHelper.interstitialAdUnitId,
+      adUnitId: adUnitId,
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {

@@ -3,10 +3,6 @@ import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
-    // START: FlutterFire Configuration
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
-    // END: FlutterFire Configuration
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
@@ -91,9 +87,6 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.7.1")
     implementation("com.google.android.gms:play-services-basement:18.4.0")
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:2.1.20"))
-    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
-    implementation("com.google.firebase:firebase-crashlytics")
-    implementation("com.google.firebase:firebase-analytics")
     implementation("androidx.multidex:multidex:2.0.1")
 
     // Android 15 SDK 35 대응 의존성 (androidx.core 1.17.0은 Kotlin 2.0+ 요구)

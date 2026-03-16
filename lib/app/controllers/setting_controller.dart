@@ -21,7 +21,6 @@ class SettingController extends GetxController {
     LaunchUrlFn? launchUrlFn,
     RateAppFn? rateAppFn,
   }) : _loadOnInit = loadOnInit,
-       _canLaunchUrlFn = canLaunchUrlFn ?? canLaunchUrl,
        _launchUrlFn =
            launchUrlFn ?? ((uri, mode) => launchUrl(uri, mode: mode)),
        _rateAppFn = rateAppFn ?? (() => AppRatingService.to.openStoreListing());
@@ -42,7 +41,6 @@ class SettingController extends GetxController {
   final RxBool askBeforeClear = true.obs;
   final RxString language = 'en'.obs;
   final bool _loadOnInit;
-  final CanLaunchUrlFn _canLaunchUrlFn;
   final LaunchUrlFn _launchUrlFn;
   final RateAppFn _rateAppFn;
 
@@ -127,7 +125,7 @@ class SettingController extends GetxController {
     final uri = Uri(
       scheme: 'mailto',
       path: DeveloperInfo.DEVELOPER_EMAIL,
-      queryParameters: {'subject': 'feedback_email_subject'.tr},
+      query: _encodeQueryParameters({'subject': 'feedback_email_subject'.tr}),
     );
     await _openExternalLink(uri, mode: LaunchMode.platformDefault);
   }
@@ -147,12 +145,6 @@ class SettingController extends GetxController {
     LaunchMode mode = LaunchMode.externalApplication,
   }) async {
     try {
-      final canLaunch = await _canLaunchUrlFn(uri);
-      if (!canLaunch) {
-        _showLinkError();
-        return;
-      }
-
       final launched = await _launchUrlFn(uri, mode);
       if (!launched) {
         _showLinkError();
@@ -208,5 +200,14 @@ class SettingController extends GetxController {
     final value = box.get(key, defaultValue: fallback);
     if (value is String) return value;
     return fallback;
+  }
+
+  String _encodeQueryParameters(Map<String, String> params) {
+    return params.entries
+        .map(
+          (entry) =>
+              '${Uri.encodeComponent(entry.key)}=${Uri.encodeComponent(entry.value)}',
+        )
+        .join('&');
   }
 }

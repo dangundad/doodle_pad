@@ -23,8 +23,16 @@ class RewardedAdManager extends GetxController {
   }
 
   Future<void> loadAd() async {
+    final adUnitId = AdHelper.rewardedAdUnitId;
+    if (!AdHelper.hasUsableAdUnitId(adUnitId)) {
+      debugPrint('Rewarded ad skipped: release ad unit id is not configured');
+      _rewardedAd = null;
+      isAdReady.value = false;
+      return;
+    }
+
     await RewardedAd.load(
-      adUnitId: AdHelper.rewardedAdUnitId,
+      adUnitId: adUnitId,
       request: const AdRequest(),
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (ad) {
@@ -38,6 +46,7 @@ class RewardedAdManager extends GetxController {
             },
             onAdDismissedFullScreenContent: (ad) {
               isAdShowing.value = false;
+              ad.dispose();
               _rewardedAd = null;
               isAdReady.value = false;
               loadAd();
@@ -45,6 +54,7 @@ class RewardedAdManager extends GetxController {
             onAdFailedToShowFullScreenContent: (ad, error) {
               debugPrint('Rewarded ad failed to show: $error');
               isAdShowing.value = false;
+              ad.dispose();
               _rewardedAd = null;
               isAdReady.value = false;
             },
@@ -77,6 +87,7 @@ class RewardedAdManager extends GetxController {
       },
       onAdDismissedFullScreenContent: (ad) {
         isAdShowing.value = false;
+        ad.dispose();
         _rewardedAd = null;
         isAdReady.value = false;
         onAdClosed?.call();
@@ -85,6 +96,7 @@ class RewardedAdManager extends GetxController {
       onAdFailedToShowFullScreenContent: (ad, error) {
         debugPrint('Rewarded ad failed to show: $error');
         isAdShowing.value = false;
+        ad.dispose();
         _rewardedAd = null;
         isAdReady.value = false;
         onAdClosed?.call();

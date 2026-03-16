@@ -6,13 +6,28 @@
 // 배포 전 실제 광고 ID로 교체 필요
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:gma_mediation_applovin/gma_mediation_applovin.dart';
+import 'package:gma_mediation_unity/gma_mediation_unity.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdHelper {
+  static const String _bannerAdUnitIdAndroidEnv = String.fromEnvironment(
+    'DOODLE_PAD_ADMOB_BANNER_ANDROID',
+  );
+  static const String _interstitialAdUnitIdAndroidEnv = String.fromEnvironment(
+    'DOODLE_PAD_ADMOB_INTERSTITIAL_ANDROID',
+  );
+  static const String _rewardedAdUnitIdAndroidEnv = String.fromEnvironment(
+    'DOODLE_PAD_ADMOB_REWARDED_ANDROID',
+  );
+
+  static final GmaMediationApplovin _appLovinMediation =
+      GmaMediationApplovin();
+  static final GmaMediationUnity _unityMediation = GmaMediationUnity();
+
   static final AdHelper _instance = AdHelper._internal();
   factory AdHelper() => _instance;
   AdHelper._internal();
@@ -29,6 +44,16 @@ class AdHelper {
 
   static Future<InitializationStatus>? _mobileAdsInitialization;
   static Future<void>? _mobileAdsInitializationGuard;
+  @visibleForTesting
+  static bool? debugModeOverride;
+  @visibleForTesting
+  static TargetPlatform? targetPlatformOverride;
+  @visibleForTesting
+  static String? releaseBannerAdUnitIdAndroidOverride;
+  @visibleForTesting
+  static String? releaseInterstitialAdUnitIdAndroidOverride;
+  @visibleForTesting
+  static String? releaseRewardedAdUnitIdAndroidOverride;
 
   static Future<bool> initializeConsentAndAds({
     Future<void> Function()? requestTrackingAuthorizationIfNeeded,
@@ -44,6 +69,7 @@ class AdHelper {
           _requestConsentInfoUpdateWithDefaults)();
       await (loadAndShowConsentFormIfRequired ??
           AdHelper.loadAndShowConsentFormIfRequired)();
+      await _syncMediationConsent();
 
       final resolvedCanRequestAds = await (canRequestAds ?? _canRequestAds)();
       if (!resolvedCanRequestAds) {
@@ -136,6 +162,22 @@ class AdHelper {
     await AdHelper.initializeMobileAds();
   }
 
+  static Future<void> _syncMediationConsent() async {
+    try {
+      final consentStatus = await ConsentInformation.instance.getConsentStatus();
+      final hasUserConsent =
+          consentStatus == ConsentStatus.obtained ||
+          consentStatus == ConsentStatus.notRequired;
+
+      await Future.wait([
+        _appLovinMediation.setHasUserConsent(hasUserConsent),
+        _unityMediation.setGDPRConsent(hasUserConsent),
+      ]);
+    } catch (e) {
+      debugPrint('Failed to sync mediation consent: $e');
+    }
+  }
+
   static Future<InitializationStatus?> initializeMobileAds() async {
     try {
       return await (_mobileAdsInitialization ??= mobileAdsInitializer());
@@ -165,45 +207,72 @@ class AdHelper {
     mobileAdsInitializer = () => MobileAds.instance.initialize();
     _mobileAdsInitialization = null;
     _mobileAdsInitializationGuard = null;
+    debugModeOverride = null;
+    targetPlatformOverride = null;
+    releaseBannerAdUnitIdAndroidOverride = null;
+    releaseInterstitialAdUnitIdAndroidOverride = null;
+    releaseRewardedAdUnitIdAndroidOverride = null;
+  }
+
+  static bool get _isDebugMode => debugModeOverride ?? kDebugMode;
+  static TargetPlatform get _targetPlatform =>
+      targetPlatformOverride ?? defaultTargetPlatform;
+
+  static bool hasUsableAdUnitId(String adUnitId) => adUnitId.trim().isNotEmpty;
+
+  static String _configuredReleaseAdUnit({
+    required String envValue,
+    String? override,
+  }) {
+    return (override ?? envValue).trim();
   }
 
   static String get bannerAdUnitId {
-    if (Platform.isAndroid) {
-      return kDebugMode
+    if (_targetPlatform == TargetPlatform.android) {
+      return _isDebugMode
           ? 'ca-app-pub-3940256099942544/6300978111' // 테스트
-          : 'ca-app-pub-9645460570589541/TODO_BANNER'; // TODO: 실제 ID
-    } else if (Platform.isIOS) {
-      return kDebugMode
+          : _configuredReleaseAdUnit(
+              envValue: _bannerAdUnitIdAndroidEnv,
+              override: releaseBannerAdUnitIdAndroidOverride,
+            );
+    } else if (_targetPlatform == TargetPlatform.iOS) {
+      return _isDebugMode
           ? 'ca-app-pub-3940256099942544/2934735716' // 테스트
-          : 'ca-app-pub-9645460570589541/TODO_BANNER'; // TODO: 실제 ID
+          : '';
     }
     return 'ca-app-pub-3940256099942544/6300978111';
   }
 
   /// 전면 광고 ID
   static String get interstitialAdUnitId {
-    if (Platform.isAndroid) {
-      return kDebugMode
+    if (_targetPlatform == TargetPlatform.android) {
+      return _isDebugMode
           ? 'ca-app-pub-3940256099942544/1033173712'
-          : 'ca-app-pub-9645460570589541/TODO_INTERSTITIAL';
-    } else if (Platform.isIOS) {
-      return kDebugMode
+          : _configuredReleaseAdUnit(
+              envValue: _interstitialAdUnitIdAndroidEnv,
+              override: releaseInterstitialAdUnitIdAndroidOverride,
+            );
+    } else if (_targetPlatform == TargetPlatform.iOS) {
+      return _isDebugMode
           ? 'ca-app-pub-3940256099942544/4411468910'
-          : 'ca-app-pub-9645460570589541/TODO_INTERSTITIAL';
+          : '';
     }
     return 'ca-app-pub-3940256099942544/1033173712';
   }
 
   /// 보상형 광고 ID
   static String get rewardedAdUnitId {
-    if (Platform.isAndroid) {
-      return kDebugMode
+    if (_targetPlatform == TargetPlatform.android) {
+      return _isDebugMode
           ? 'ca-app-pub-3940256099942544/5224354917'
-          : 'ca-app-pub-9645460570589541/TODO_REWARDED';
-    } else if (Platform.isIOS) {
-      return kDebugMode
+          : _configuredReleaseAdUnit(
+              envValue: _rewardedAdUnitIdAndroidEnv,
+              override: releaseRewardedAdUnitIdAndroidOverride,
+            );
+    } else if (_targetPlatform == TargetPlatform.iOS) {
+      return _isDebugMode
           ? 'ca-app-pub-3940256099942544/1712485313'
-          : 'ca-app-pub-9645460570589541/TODO_REWARDED';
+          : '';
     }
     return 'ca-app-pub-3940256099942544/5224354917';
   }

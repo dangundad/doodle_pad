@@ -277,7 +277,6 @@ class PurchaseService extends GetxService {
     isPremium.value = value;
     await _savePremiumStatus(value);
     await _syncAdsForPremiumStatus(value);
-    await _syncAdsForPremiumStatus(value);
   }
 
   Future<void> _syncAdsForPremiumStatus(bool isPremiumActive) async {

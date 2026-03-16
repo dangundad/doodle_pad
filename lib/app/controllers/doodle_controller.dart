@@ -355,21 +355,19 @@ class DoodleController extends GetxController {
 
   /// 공유 (임시 파일로 저장 후 공유)
   Future<void> shareCanvas() async {
-    final boundary =
-        canvasKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-    if (boundary == null) return;
+    final image = await _captureCanvas();
+    if (image == null) return;
+    File? tmpFile;
     try {
-      final image = await boundary.toImage(pixelRatio: 3);
-      final byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) return;
       final bytes = byteData.buffer.asUint8List();
       final dir = await getTemporaryDirectory();
-      final file = File(
+      tmpFile = File(
           '${dir.path}/doodle_${DateTime.now().millisecondsSinceEpoch}.png');
-      await file.writeAsBytes(bytes);
+      await tmpFile.writeAsBytes(bytes);
       await SharePlus.instance.share(
-        ShareParams(files: [XFile(file.path, mimeType: 'image/png')]),
+        ShareParams(files: [XFile(tmpFile.path, mimeType: 'image/png')]),
       );
     } catch (_) {
       AppToast.show(
@@ -378,6 +376,10 @@ class DoodleController extends GetxController {
           description: 'share_error'.tr,
         ),
       );
+    } finally {
+      try {
+        if (tmpFile != null && tmpFile.existsSync()) tmpFile.deleteSync();
+      } catch (_) {}
     }
   }
 }

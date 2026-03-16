@@ -50,6 +50,10 @@ class BannerAdState extends State<BannerAdWidget> {
     }
 
     if (!mounted) return;
+    if (!AdHelper.hasUsableAdUnitId(widget.adUnitId)) {
+      debugPrint('${widget.type} BannerAd skipped: release ad unit id is not configured');
+      return;
+    }
 
     final AnchoredAdaptiveBannerAdSize? size =
         await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(

@@ -43,6 +43,30 @@ void main() {
     expect(launchedMode, LaunchMode.platformDefault);
   });
 
+  test(
+    'sendFeedback still tries launchUrl when canLaunchUrl reports false',
+    () async {
+      Uri? launchedUri;
+      LaunchMode? launchedMode;
+
+      final controller = SettingController(
+        loadOnInit: false,
+        canLaunchUrlFn: (_) async => false,
+        launchUrlFn: (uri, mode) async {
+          launchedUri = uri;
+          launchedMode = mode;
+          return true;
+        },
+      );
+
+      await controller.sendFeedback();
+
+      expect(launchedUri?.scheme, 'mailto');
+      expect(launchedUri?.path, DeveloperInfo.DEVELOPER_EMAIL);
+      expect(launchedMode, LaunchMode.platformDefault);
+    },
+  );
+
   test('openPrivacyPolicy launches the privacy policy externally', () async {
     Uri? launchedUri;
     LaunchMode? launchedMode;

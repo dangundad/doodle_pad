@@ -1,5 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- 광고 ID 권한 -->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
@@ -10,11 +9,6 @@
 
     <!-- 진동 피드백 -->
     <uses-permission android:name="android.permission.VIBRATE"/>
-    <!-- 화면 켜짐 유지 -->
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-    <!-- 알림 권한 (Android 13+) -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:label="@string/app_name"
