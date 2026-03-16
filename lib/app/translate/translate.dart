@@ -2,7 +2,19 @@
 import 'package:get/get.dart';
 
 class Languages extends Translations {
-  static const List<Locale> supportedLocales = [Locale('en'), Locale('ko')];
+    static const List<Locale> supportedLocales = [
+    Locale('en'), // 미국 영어
+    Locale('ko'), // 대한민국 한국어
+    Locale('ja'), // 일본어
+    Locale('de'), // 독일어
+    Locale('ru'), // 러시아어
+    Locale('fr'), // 프랑스어
+    Locale('es'), // 스페인어
+    Locale('pt'), // 포르투갈어
+    Locale('id'), // 인도네시아어
+    Locale('zh'), // 중국어
+    Locale('ar'), // 아랍어
+  ];
 
   @override
   Map<String, Map<String, String>> get keys => {
@@ -10,7 +22,8 @@ class Languages extends Translations {
       'app_name': 'Doodle Pad',
       'app_subtitle': 'Draw freely and share',
       'ask_before_clear': 'Confirm before clearing',
-      'ask_before_clear_desc': 'Ask for confirmation before erasing all strokes',
+      'ask_before_clear_desc':
+          'Ask for confirmation before erasing all strokes',
       'back': 'Back',
       'brush_guide': 'Brush Guide',
       'brush_guide_desc': 'Show brush guide popup on app start',
@@ -44,7 +57,8 @@ class Languages extends Translations {
       'history_subtitle': '@screen / @route',
       'language': 'Language',
       'no_history': 'No history yet.',
-      'onboarding_message': 'Welcome to Doodle Pad!\nCheck out the key features.',
+      'onboarding_message':
+          'Welcome to Doodle Pad!\nCheck out the key features.',
       'onboarding_skip': 'Skip',
       'onboarding_start': 'Start',
       'onboarding_title': 'Welcome',
@@ -109,7 +123,8 @@ class Languages extends Translations {
       'gallery_subtitle': 'Load or share your saved drawings',
       'saved_drawings': 'Saved Drawings',
       'load_drawing': 'Load',
-      'load_drawing_message': 'Start a new drawing with this image for reference.',
+      'load_drawing_message':
+          'Start a new drawing with this image for reference.',
       'load_drawing_confirm': 'Clear the current drawing and load this one?',
       'delete_drawing': 'Delete Drawing',
       'delete_drawing_complete': 'Drawing deleted.',
@@ -119,7 +134,8 @@ class Languages extends Translations {
       'airbrush_brush': 'Airbrush',
       'watercolor_mode': 'Watercolor Mode',
       'airbrush_mode': 'Airbrush Mode',
-      'brush_unlock_message': 'Watch a short ad to permanently unlock this brush!',
+      'brush_unlock_message':
+          'Watch a short ad to permanently unlock this brush!',
       'brush_unlocked': 'Brush Unlocked!',
       'watch_ad': 'Watch Ad',
       'nav_home': 'Home',

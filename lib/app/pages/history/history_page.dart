@@ -73,7 +73,8 @@ class HistoryPage extends GetView<HistoryController> {
                       separatorBuilder: (_, _) => SizedBox(height: 10.h),
                       itemBuilder: (context, index) {
                         final item = events[index];
-                        final rawEvent = item['event']?.toString() ?? 'unknown_event';
+                        final rawEvent =
+                            item['event']?.toString() ?? 'unknown_event';
                         final event = _localizeEvent(rawEvent);
                         final screen = item['screen']?.toString() ?? '-';
                         final route = item['route']?.toString() ?? '-';
@@ -176,9 +177,7 @@ class HistoryPage extends GetView<HistoryController> {
                 height: 36.r,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: [cs.primary, cs.tertiary],
-                  ),
+                  gradient: LinearGradient(colors: [cs.primary, cs.tertiary]),
                 ),
                 child: Icon(
                   Icons.history_rounded,
@@ -200,11 +199,7 @@ class HistoryPage extends GetView<HistoryController> {
               IconButton(
                 onPressed: controller.clearAll,
                 tooltip: 'clear_all'.tr,
-                icon: Icon(
-                  Icons.delete_outline,
-                  size: 20.r,
-                  color: cs.error,
-                ),
+                icon: Icon(Icons.delete_outline, size: 20.r, color: cs.error),
               ),
             ],
           ),
@@ -212,9 +207,7 @@ class HistoryPage extends GetView<HistoryController> {
         Container(
           height: 3,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [cs.primary, cs.tertiary],
-            ),
+            gradient: LinearGradient(colors: [cs.primary, cs.tertiary]),
           ),
         ),
       ],
@@ -249,7 +242,9 @@ class HistoryPage extends GetView<HistoryController> {
     if (target.contains('stats')) {
       return Icons.bar_chart_rounded;
     }
-    if (target.contains('draw') || target.contains('stroke') || target.contains('path')) {
+    if (target.contains('draw') ||
+        target.contains('stroke') ||
+        target.contains('path')) {
       return Icons.brush;
     }
     if (target.contains('open_')) {

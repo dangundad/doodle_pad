@@ -33,10 +33,7 @@ class _MainShellPageState extends State<MainShellPage> {
     final cs = Get.theme.colorScheme;
 
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _tabs,
-      ),
+      body: IndexedStack(index: _selectedIndex, children: _tabs),
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -62,24 +59,18 @@ class _MainShellPageState extends State<MainShellPage> {
                 child: GNav(
                   gap: 6,
                   iconSize: 22.r,
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 10.h,
+                  ),
                   duration: const Duration(milliseconds: 300),
                   tabBackgroundColor: cs.primaryContainer,
                   color: cs.onSurfaceVariant,
                   activeColor: cs.primary,
                   tabs: [
-                    GButton(
-                      icon: LucideIcons.house,
-                      text: 'nav_home'.tr,
-                    ),
-                    GButton(
-                      icon: LucideIcons.image,
-                      text: 'nav_gallery'.tr,
-                    ),
-                    GButton(
-                      icon: LucideIcons.history,
-                      text: 'nav_history'.tr,
-                    ),
+                    GButton(icon: LucideIcons.house, text: 'nav_home'.tr),
+                    GButton(icon: LucideIcons.image, text: 'nav_gallery'.tr),
+                    GButton(icon: LucideIcons.history, text: 'nav_history'.tr),
                     GButton(
                       icon: LucideIcons.chartBarBig,
                       text: 'nav_stats'.tr,

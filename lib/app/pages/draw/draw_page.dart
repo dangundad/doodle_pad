@@ -35,7 +35,7 @@ class DrawPage extends GetView<DoodleController> {
                 child: Obx(() {
                   return CustomPaint(
                     painter: CanvasPainter(
-                      strokes: controller.strokes,
+                      strokes: controller.strokes.toList(),
                       bgColor: Colors.white,
                     ),
                     child: const SizedBox.expand(),
@@ -57,10 +57,7 @@ class DrawPage extends GetView<DoodleController> {
               builder: (ctx, v, child) {
                 return Transform.translate(
                   offset: Offset(0, -60 * (1 - v)),
-                  child: Opacity(
-                    opacity: v.clamp(0.0, 1.0),
-                    child: child,
-                  ),
+                  child: Opacity(opacity: v.clamp(0.0, 1.0), child: child),
                 );
               },
               child: SafeArea(child: _TopToolbar(ctrl: controller)),
@@ -79,10 +76,7 @@ class DrawPage extends GetView<DoodleController> {
               builder: (ctx, v, child) {
                 return Transform.translate(
                   offset: Offset(0, 60 * (1 - v)),
-                  child: Opacity(
-                    opacity: v.clamp(0.0, 1.0),
-                    child: child,
-                  ),
+                  child: Opacity(opacity: v.clamp(0.0, 1.0), child: child),
                 );
               },
               child: SafeArea(child: _BottomToolbar(ctrl: controller)),
@@ -169,25 +163,27 @@ class _TopToolbar extends StatelessWidget {
               tooltip: 'clear_canvas'.tr,
             ),
             // 저장 버튼
-            Obx(() => IconButton(
-              icon: ctrl.isSaving.value
-                  ? SizedBox(
-                      width: 20.r,
-                      height: 20.r,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: cs.primary,
-                      ),
-                    )
-                  : Icon(Icons.save_rounded, color: cs.primary),
-              onPressed: ctrl.isSaving.value
-                  ? null
-                  : () {
-                      _maybeHaptic(settingCtrl);
-                      ctrl.saveCanvas();
-                    },
-              tooltip: 'save_canvas'.tr,
-            )),
+            Obx(
+              () => IconButton(
+                icon: ctrl.isSaving.value
+                    ? SizedBox(
+                        width: 20.r,
+                        height: 20.r,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: cs.primary,
+                        ),
+                      )
+                    : Icon(Icons.save_rounded, color: cs.primary),
+                onPressed: ctrl.isSaving.value
+                    ? null
+                    : () {
+                        _maybeHaptic(settingCtrl);
+                        ctrl.saveCanvas();
+                      },
+                tooltip: 'save_canvas'.tr,
+              ),
+            ),
             IconButton(
               icon: const Icon(Icons.share_rounded),
               onPressed: () {
@@ -226,7 +222,9 @@ class _TopToolbar extends StatelessWidget {
 
     Get.dialog(
       Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28.r)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28.r),
+        ),
         clipBehavior: Clip.antiAlias,
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -257,12 +255,18 @@ class _TopToolbar extends StatelessWidget {
                 children: [
                   Text(
                     'clear_canvas'.tr,
-                    style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700),
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   SizedBox(height: 8.h),
                   Text(
                     'clear_canvas_confirm'.tr,
-                    style: TextStyle(fontSize: 14.sp, color: cs.onSurfaceVariant),
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: cs.onSurfaceVariant,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -358,8 +362,7 @@ class _BottomToolbar extends StatelessWidget {
         children: [
           Row(
             children: [
-              _BrushTypeSelector(ctrl: ctrl),
-              const Spacer(),
+              Expanded(child: _BrushTypeSelector(ctrl: ctrl)),
               _BrushSizeSlider(ctrl: ctrl),
             ],
           ),
@@ -369,10 +372,7 @@ class _BottomToolbar extends StatelessWidget {
           if (settingCtrl.showBrushGuide.value)
             Text(
               'brush_guide_desc'.tr,
-              style: TextStyle(
-                fontSize: 11.sp,
-                color: cs.onSurfaceVariant,
-              ),
+              style: TextStyle(fontSize: 11.sp, color: cs.onSurfaceVariant),
               textAlign: TextAlign.center,
             ),
         ],
@@ -400,7 +400,8 @@ class _BrushTypeSelector extends StatelessWidget {
             final selected = ctrl.brushType.value == type;
             final isSpecial =
                 type == BrushType.watercolor || type == BrushType.airbrush;
-            final isLocked = isSpecial &&
+            final isLocked =
+                isSpecial &&
                 (type == BrushType.watercolor
                     ? !ctrl.isWatercolorUnlocked.value
                     : !ctrl.isAirbrushUnlocked.value);
@@ -425,15 +426,15 @@ class _BrushTypeSelector extends StatelessWidget {
                   color: selected
                       ? cs.primaryContainer
                       : isLocked
-                          ? cs.surfaceContainerLow
-                          : cs.surfaceContainerHigh,
+                      ? cs.surfaceContainerLow
+                      : cs.surfaceContainerHigh,
                   borderRadius: BorderRadius.circular(12.r),
                   border: Border.all(
                     color: selected
                         ? cs.primary
                         : isSpecial
-                            ? cs.tertiary.withValues(alpha: 0.5)
-                            : Colors.transparent,
+                        ? cs.tertiary.withValues(alpha: 0.5)
+                        : Colors.transparent,
                     width: 2,
                   ),
                 ),
@@ -446,8 +447,8 @@ class _BrushTypeSelector extends StatelessWidget {
                       color: selected
                           ? cs.primary
                           : isLocked
-                              ? cs.onSurface.withValues(alpha: 0.35)
-                              : cs.onSurfaceVariant,
+                          ? cs.onSurface.withValues(alpha: 0.35)
+                          : cs.onSurfaceVariant,
                     ),
                     if (isLocked)
                       Positioned(
@@ -521,9 +522,7 @@ class _BrushSizeSlider extends StatelessWidget {
                 width: dotSize.r,
                 height: dotSize.r,
                 decoration: BoxDecoration(
-                  color: isEraser
-                      ? cs.outline
-                      : Color(ctrl.brushColor.value),
+                  color: isEraser ? cs.outline : Color(ctrl.brushColor.value),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -564,10 +563,7 @@ class _ColorPalette extends StatelessWidget {
           child: Center(
             child: Text(
               'eraser_mode'.tr,
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: cs.onSurfaceVariant,
-              ),
+              style: TextStyle(fontSize: 12.sp, color: cs.onSurfaceVariant),
             ),
           ),
         );
@@ -609,7 +605,7 @@ class _ColorPalette extends StatelessWidget {
                             color: Color(c).withValues(alpha: 0.5),
                             blurRadius: 6,
                             spreadRadius: 1,
-                          )
+                          ),
                         ]
                       : null,
                 ),

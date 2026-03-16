@@ -56,7 +56,9 @@ class _HomeContentPageState extends State<HomeContentPage>
 
     Get.dialog(
       Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28.r)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28.r),
+        ),
         clipBehavior: Clip.antiAlias,
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -66,7 +68,10 @@ class _HomeContentPageState extends State<HomeContentPage>
               padding: EdgeInsets.symmetric(vertical: 20.h),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [cs.primaryContainer, cs.primary.withValues(alpha: 0.3)],
+                  colors: [
+                    cs.primaryContainer,
+                    cs.primary.withValues(alpha: 0.3),
+                  ],
                 ),
               ),
               child: Center(
@@ -77,7 +82,11 @@ class _HomeContentPageState extends State<HomeContentPage>
                     shape: BoxShape.circle,
                     color: cs.primary.withValues(alpha: 0.15),
                   ),
-                  child: Icon(LucideIcons.paintbrush, size: 26.r, color: cs.primary),
+                  child: Icon(
+                    LucideIcons.paintbrush,
+                    size: 26.r,
+                    color: cs.primary,
+                  ),
                 ),
               ),
             ),
@@ -88,17 +97,26 @@ class _HomeContentPageState extends State<HomeContentPage>
                 children: [
                   Text(
                     'onboarding_title'.tr,
-                    style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700),
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   SizedBox(height: 8.h),
                   Text(
                     'onboarding_message'.tr,
-                    style: TextStyle(fontSize: 14.sp, color: cs.onSurfaceVariant),
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: cs.onSurfaceVariant,
+                    ),
                   ),
                   SizedBox(height: 14.h),
                   _FeatureChip(icon: Icons.gesture, label: 'brush_guide'.tr),
                   SizedBox(height: 10.h),
-                  _FeatureChip(icon: Icons.undo_rounded, label: 'feature_undo'.tr),
+                  _FeatureChip(
+                    icon: Icons.undo_rounded,
+                    label: 'feature_undo'.tr,
+                  ),
                   SizedBox(height: 10.h),
                   _FeatureChip(icon: Icons.ios_share, label: 'share'.tr),
                 ],
@@ -122,7 +140,9 @@ class _HomeContentPageState extends State<HomeContentPage>
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [cs.primary, cs.tertiary]),
+                        gradient: LinearGradient(
+                          colors: [cs.primary, cs.tertiary],
+                        ),
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Material(
