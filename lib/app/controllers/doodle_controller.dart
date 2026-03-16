@@ -56,6 +56,7 @@ class DoodleController extends GetxController {
   // Gallery state
   final savedDrawings = <String>[].obs;
   final isSaving = false.obs;
+  final referenceImagePath = RxnString();
 
   // Special brush unlock state
   static const _watercolorUnlockedKey = 'watercolor_unlocked';
@@ -273,8 +274,22 @@ class DoodleController extends GetxController {
   }
 
   void clearCanvas() {
+    clearReferenceDrawing();
+    clearStrokes();
+  }
+
+  void clearStrokes() {
     strokes.clear();
     _undoStack.clear();
+  }
+
+  void loadReferenceDrawing(String path) {
+    referenceImagePath.value = path;
+    clearStrokes();
+  }
+
+  void clearReferenceDrawing() {
+    referenceImagePath.value = null;
   }
 
   /// 캔버스를 PNG로 캡처하여 반환

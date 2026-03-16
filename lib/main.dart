@@ -99,7 +99,7 @@ class DoodlePadApp extends StatelessWidget {
               GlobalCupertinoLocalizations.delegate,
             ],
             translations: Languages(),
-            locale: Get.deviceLocale ?? const Locale('en'),
+            locale: Get.locale ?? Get.deviceLocale ?? const Locale('en'),
             fallbackLocale: const Locale('en'),
             debugShowCheckedModeBanner: false,
             defaultTransition: Transition.fadeIn,

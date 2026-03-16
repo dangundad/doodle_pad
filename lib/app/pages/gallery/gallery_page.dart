@@ -40,7 +40,10 @@ class GalleryPage extends GetView<DoodleController> {
           IconButton(
             icon: Icon(Icons.add_rounded, size: 24.r, color: cs.primary),
             tooltip: 'start_drawing'.tr,
-            onPressed: () => Get.toNamed(Routes.DRAW),
+            onPressed: () {
+              controller.clearReferenceDrawing();
+              Get.toNamed(Routes.DRAW);
+            },
           ),
         ],
         bottom: PreferredSize(
@@ -118,8 +121,12 @@ class GalleryPage extends GetView<DoodleController> {
             // 불러오기 버튼
             ListTile(
               leading: Icon(Icons.edit_rounded, color: cs.primary),
-              title: Text('load_drawing'.tr,
-                  style: TextStyle(fontSize: 15.sp)),
+              title: Text(
+                'load_drawing'.tr,
+                style: TextStyle(fontSize: 15.sp),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
               onTap: () {
                 Get.back();
                 _confirmLoad(context, cs, path, settingCtrl);
@@ -128,8 +135,12 @@ class GalleryPage extends GetView<DoodleController> {
             // 공유 버튼
             ListTile(
               leading: Icon(Icons.share_rounded, color: cs.secondary),
-              title: Text('share'.tr,
-                  style: TextStyle(fontSize: 15.sp)),
+              title: Text(
+                'share'.tr,
+                style: TextStyle(fontSize: 15.sp),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
               onTap: () {
                 Get.back();
                 _shareDrawing(path);
@@ -138,8 +149,12 @@ class GalleryPage extends GetView<DoodleController> {
             // 삭제 버튼
             ListTile(
               leading: Icon(Icons.delete_outline_rounded, color: cs.error),
-              title: Text('delete_drawing'.tr,
-                  style: TextStyle(fontSize: 15.sp, color: cs.error)),
+              title: Text(
+                'delete_drawing'.tr,
+                style: TextStyle(fontSize: 15.sp, color: cs.error),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
               onTap: () {
                 Get.back();
                 _confirmDelete(context, cs, path);
@@ -189,7 +204,7 @@ class GalleryPage extends GetView<DoodleController> {
   void _openDrawWithFile(String path, SettingController settingCtrl) {
     // 현재 캔버스 초기화 후 이 파일을 배경으로 드로우 페이지 이동
     // (현재 구조상 Stroke 복원은 불가이므로 이미지를 참고용 배경으로 활용)
-    controller.clearCanvas();
+    controller.loadReferenceDrawing(path);
     if (settingCtrl.hapticEnabled.value) controller.hapticLight();
     Get.toNamed(Routes.DRAW);
     AppToast.show(
@@ -265,6 +280,8 @@ class _EmptyGallery extends StatelessWidget {
               color: cs.onSurfaceVariant,
               fontWeight: FontWeight.w500,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           SizedBox(height: 8.h),
           Text(
@@ -274,10 +291,15 @@ class _EmptyGallery extends StatelessWidget {
               color: cs.onSurfaceVariant.withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
           SizedBox(height: 24.h),
           FilledButton.icon(
-            onPressed: () => Get.toNamed(Routes.DRAW),
+            onPressed: () {
+              Get.find<DoodleController>().clearReferenceDrawing();
+              Get.toNamed(Routes.DRAW);
+            },
             icon: const Icon(Icons.brush_rounded),
             label: Text('start_drawing'.tr),
           ),

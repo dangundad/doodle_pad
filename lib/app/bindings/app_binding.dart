@@ -32,6 +32,7 @@ class AppBinding implements Bindings {
       }
     }
 
+    await SettingController.ensureBoxOpen();
     _ensureDependencyServices();
   }
 

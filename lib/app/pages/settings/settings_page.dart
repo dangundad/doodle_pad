@@ -18,7 +18,11 @@ class SettingsPage extends GetView<SettingController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_loc('settings', 'Settings')),
+        title: Text(
+          _loc('settings', 'Settings'),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(3),
           child: Container(
@@ -204,6 +208,8 @@ class SettingsPage extends GetView<SettingController> {
             'clear_data_confirm',
             'This will reset local preferences and usage logs. Continue?',
           ),
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
         ),
         actions: [
           TextButton(
@@ -262,7 +268,11 @@ class _BuildLanguageTile extends StatelessWidget {
 
     return ListTile(
       leading: Icon(Icons.language, color: cs.primary),
-      title: Text(_loc('language', 'Language')),
+      title: Text(
+        _loc('language', 'Language'),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
       subtitle: Padding(
         padding: EdgeInsets.only(top: 8.h),
         child: Wrap(
@@ -270,7 +280,11 @@ class _BuildLanguageTile extends StatelessWidget {
           children: options.entries
               .map(
                 (entry) => ChoiceChip(
-                  label: Text(entry.value),
+                  label: Text(
+                    entry.value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   selected: value == entry.key,
                   onSelected: (selected) {
                     if (selected) {
@@ -309,8 +323,12 @@ class _BuildSwitchTile extends StatelessWidget {
       value: value,
       onChanged: onChanged,
       secondary: Icon(icon, color: cs.primary),
-      title: Text(title),
-      subtitle: Text(subtitle),
+      title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
+      subtitle: Text(
+        subtitle,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
     );
   }
 }
@@ -350,6 +368,8 @@ class _SettingsSection extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     fontSize: 15.sp,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -382,8 +402,12 @@ class _ListItem extends StatelessWidget {
 
     return ListTile(
       leading: Icon(icon, color: cs.primary),
-      title: Text(title),
-      subtitle: Text(subtitle),
+      title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
+      subtitle: Text(
+        subtitle,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
       trailing: const Icon(Icons.chevron_right),
       onTap: onTap,
     );

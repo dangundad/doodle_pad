@@ -13,6 +13,7 @@ import 'package:doodle_pad/app/utils/app_toast.dart';
 typedef CanLaunchUrlFn = Future<bool> Function(Uri uri);
 typedef LaunchUrlFn = Future<bool> Function(Uri uri, LaunchMode mode);
 typedef RateAppFn = Future<void> Function();
+typedef UpdateLocaleFn = Future<void> Function(Locale locale);
 
 class SettingController extends GetxController {
   SettingController({
@@ -20,10 +21,12 @@ class SettingController extends GetxController {
     CanLaunchUrlFn? canLaunchUrlFn,
     LaunchUrlFn? launchUrlFn,
     RateAppFn? rateAppFn,
+    UpdateLocaleFn? updateLocaleFn,
   }) : _loadOnInit = loadOnInit,
        _launchUrlFn =
            launchUrlFn ?? ((uri, mode) => launchUrl(uri, mode: mode)),
-       _rateAppFn = rateAppFn ?? (() => AppRatingService.to.openStoreListing());
+       _rateAppFn = rateAppFn ?? (() => AppRatingService.to.openStoreListing()),
+       _updateLocaleFn = updateLocaleFn ?? Get.updateLocale;
 
   static SettingController get to => Get.find<SettingController>();
   static const String appId = 'doodle_pad';
@@ -43,31 +46,50 @@ class SettingController extends GetxController {
   final bool _loadOnInit;
   final LaunchUrlFn _launchUrlFn;
   final RateAppFn _rateAppFn;
+  final UpdateLocaleFn _updateLocaleFn;
+
+  static Future<void> ensureBoxOpen() async {
+    if (!Hive.isBoxOpen(_kSettingBox)) {
+      await Hive.openBox(_kSettingBox);
+    }
+  }
 
   @override
   void onInit() {
     super.onInit();
     if (_loadOnInit) {
-      _load();
+      _loadSync();
     }
+  }
+
+  Box<dynamic>? _settingBoxOrNull() {
+    if (!Hive.isBoxOpen(_kSettingBox)) {
+      return null;
+    }
+    return Hive.box(_kSettingBox);
   }
 
   Future<Box<dynamic>> _openSettingBox() async {
-    if (Hive.isBoxOpen(_kSettingBox)) {
-      return Hive.box(_kSettingBox);
-    }
-    return await Hive.openBox(_kSettingBox);
+    await ensureBoxOpen();
+    return Hive.box(_kSettingBox);
   }
 
-  Future<void> _load() async {
-    final box = await _openSettingBox();
+  void _loadSync() {
+    final box = _settingBoxOrNull();
+    if (box == null) {
+      return;
+    }
+
     isFirstRun.value = _readBool(box, _kIsFirstRunKey, true);
     hapticEnabled.value = _readBool(box, _kHapticKey, true);
     showBrushGuide.value = _readBool(box, _kShowBrushGuideKey, true);
     askBeforeClear.value = _readBool(box, _kAskBeforeClearKey, true);
     language.value = _readString(box, _kLanguageKey, 'en');
-    Get.updateLocale(language.value == 'ko' ? const Locale('ko') : const Locale('en'));
+    unawaited(_updateLocaleFn(currentLocale));
   }
+
+  Locale get currentLocale =>
+      language.value == 'ko' ? const Locale('ko') : const Locale('en');
 
   Future<void> setHapticEnabled(bool value) async {
     hapticEnabled.value = value;
@@ -91,7 +113,7 @@ class SettingController extends GetxController {
     language.value = value;
     final box = await _openSettingBox();
     await box.put(_kLanguageKey, value);
-    Get.updateLocale(value == 'ko' ? const Locale('ko') : const Locale('en'));
+    await _updateLocaleFn(currentLocale);
   }
 
   Future<void> clearAppSettings() async {
@@ -102,7 +124,11 @@ class SettingController extends GetxController {
     showBrushGuide.value = true;
     askBeforeClear.value = true;
     language.value = 'en';
-    Get.updateLocale(const Locale('en'));
+    await _updateLocaleFn(const Locale('en'));
+
+    if (Get.isRegistered<ActivityLogService>()) {
+      await ActivityLogService.to.clearEvents(appId: appId);
+    }
   }
 
   Future<void> finishFirstRun() async {

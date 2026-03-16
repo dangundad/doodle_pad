@@ -50,6 +50,7 @@ class _HomeContentPageState extends State<HomeContentPage>
   void _maybeShowWelcome() {
     if (_didShowWelcome) return;
     if (!_settingController.isFirstRun.value) return;
+    if (!_settingController.showBrushGuide.value) return;
     _didShowWelcome = true;
 
     final cs = Get.theme.colorScheme;
@@ -101,6 +102,8 @@ class _HomeContentPageState extends State<HomeContentPage>
                       fontSize: 18.sp,
                       fontWeight: FontWeight.w700,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 8.h),
                   Text(
@@ -109,6 +112,8 @@ class _HomeContentPageState extends State<HomeContentPage>
                       fontSize: 14.sp,
                       color: cs.onSurfaceVariant,
                     ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 14.h),
                   _FeatureChip(icon: Icons.gesture, label: 'brush_guide'.tr),
@@ -202,6 +207,8 @@ class _HomeContentPageState extends State<HomeContentPage>
             fontWeight: FontWeight.w800,
             color: cs.onSurface,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         actions: [
           IconButton(
@@ -291,6 +298,8 @@ class _HomeContentPageState extends State<HomeContentPage>
                           color: cs.onSurface,
                         ),
                         textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       SizedBox(height: 8.h),
                       Text(
@@ -300,6 +309,8 @@ class _HomeContentPageState extends State<HomeContentPage>
                           color: cs.onSurfaceVariant,
                         ),
                         textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       SizedBox(height: 34.h),
                       Container(
@@ -388,6 +399,7 @@ class _HomeContentPageState extends State<HomeContentPage>
                                 if (_settingController.hapticEnabled.value) {
                                   DoodleController.to.hapticSelection();
                                 }
+                                DoodleController.to.clearReferenceDrawing();
                                 await Get.toNamed(Routes.DRAW);
                                 if (_settingController.showBrushGuide.value) {
                                   DoodleController.to.hapticMedium();
@@ -411,6 +423,8 @@ class _HomeContentPageState extends State<HomeContentPage>
                                         fontWeight: FontWeight.w700,
                                         color: cs.onPrimary,
                                       ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
                                 ),
@@ -492,6 +506,8 @@ class _SavedDrawingsCard extends StatelessWidget {
                         fontSize: 12.sp,
                         color: cs.onPrimaryContainer.withValues(alpha: 0.7),
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 2.h),
                     Text(
@@ -501,6 +517,8 @@ class _SavedDrawingsCard extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                         color: cs.onPrimaryContainer,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -557,6 +575,8 @@ class _FeatureChip extends StatelessWidget {
               color: cs.onSurfaceVariant,
               fontWeight: FontWeight.w500,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

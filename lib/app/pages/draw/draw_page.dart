@@ -2,6 +2,7 @@
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'dart:io';
 
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
@@ -33,12 +34,30 @@ class DrawPage extends GetView<DoodleController> {
                 onPanUpdate: (d) => controller.continueStroke(d.localPosition),
                 onPanEnd: (_) => controller.endStroke(),
                 child: Obx(() {
-                  return CustomPaint(
-                    painter: CanvasPainter(
-                      strokes: controller.strokes.toList(),
-                      bgColor: Colors.white,
-                    ),
-                    child: const SizedBox.expand(),
+                  final referencePath = controller.referenceImagePath.value;
+                  return Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      const ColoredBox(color: Colors.white),
+                      if (referencePath != null)
+                        IgnorePointer(
+                          child: Image.file(
+                            File(referencePath),
+                            key: const ValueKey('draw-reference-image'),
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const SizedBox.shrink();
+                            },
+                          ),
+                        ),
+                      CustomPaint(
+                        painter: CanvasPainter(
+                          strokes: controller.strokes.toList(),
+                          bgColor: Colors.transparent,
+                        ),
+                        child: const SizedBox.expand(),
+                      ),
+                    ],
                   );
                 }),
               ),
@@ -259,6 +278,8 @@ class _TopToolbar extends StatelessWidget {
                       fontSize: 18.sp,
                       fontWeight: FontWeight.w700,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 8.h),
                   Text(
@@ -268,6 +289,8 @@ class _TopToolbar extends StatelessWidget {
                       color: cs.onSurfaceVariant,
                     ),
                     textAlign: TextAlign.center,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -374,6 +397,8 @@ class _BottomToolbar extends StatelessWidget {
               'brush_guide_desc'.tr,
               style: TextStyle(fontSize: 11.sp, color: cs.onSurfaceVariant),
               textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
         ],
       ),
@@ -564,6 +589,8 @@ class _ColorPalette extends StatelessWidget {
             child: Text(
               'eraser_mode'.tr,
               style: TextStyle(fontSize: 12.sp, color: cs.onSurfaceVariant),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         );

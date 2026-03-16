@@ -1,11 +1,77 @@
+import 'dart:io';
+
+import 'package:get/get.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
+import 'package:doodle_pad/app/services/activity_log_service.dart';
 import 'package:doodle_pad/app/utils/app_constants.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  late Directory tempDir;
+
+  setUp(() async {
+    Get.testMode = true;
+    tempDir = await Directory.systemTemp.createTemp(
+      'doodle_pad_setting_controller_test_',
+    );
+    Hive.init(tempDir.path);
+  });
+
+  tearDown(() async {
+    Get.reset();
+    await Hive.close();
+    if (tempDir.existsSync()) {
+      await tempDir.delete(recursive: true);
+    }
+  });
+
+  test('loads persisted options immediately during init for restart safety', () async {
+      final box = await Hive.openBox('doodle_settings_v1');
+      await box.put('is_first_run', false);
+      await box.put('haptic_enabled', false);
+      await box.put('show_brush_guide', false);
+      await box.put('ask_before_clear', false);
+      await box.put('language', 'ko');
+
+      final controller = SettingController(
+        updateLocaleFn: (_) async {},
+      );
+
+      controller.onInit();
+
+      expect(controller.isFirstRun.value, false);
+      expect(controller.hapticEnabled.value, false);
+      expect(controller.showBrushGuide.value, false);
+      expect(controller.askBeforeClear.value, false);
+      expect(controller.language.value, 'ko');
+  });
+
+  test('clearAppSettings also clears persisted activity history', () async {
+
+    final activityLogService = Get.put(ActivityLogService(), permanent: true);
+    final controller = SettingController(
+      loadOnInit: false,
+      updateLocaleFn: (_) async {},
+    );
+
+    await activityLogService.logEvent(
+      appId: SettingController.appId,
+      eventName: 'settings_open',
+      screen: 'settings',
+    );
+
+    await controller.clearAppSettings();
+
+    final events = await activityLogService.getEvents(
+      appId: SettingController.appId,
+    );
+    expect(events, isEmpty);
+  });
 
   test('rateApp delegates to the app rating action', () async {
     var invoked = 0;
