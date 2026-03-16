@@ -122,6 +122,10 @@ class Languages extends Translations {
       'brush_unlock_message': 'Watch a short ad to permanently unlock this brush!',
       'brush_unlocked': 'Brush Unlocked!',
       'watch_ad': 'Watch Ad',
+      'nav_home': 'Home',
+      'nav_gallery': 'Gallery',
+      'nav_history': 'History',
+      'nav_stats': 'Stats',
     },
     'ko': {
       'app_name': '두들 패드',
@@ -239,6 +243,10 @@ class Languages extends Translations {
       'brush_unlock_message': '짧은 광고를 보면 이 브러시를 계속 쓸 수 있어요!',
       'brush_unlocked': '브러시 잠금 해제!',
       'watch_ad': '광고 보기',
+      'nav_home': '홈',
+      'nav_gallery': '갤러리',
+      'nav_history': '기록',
+      'nav_stats': '통계',
     },
   };
 }
