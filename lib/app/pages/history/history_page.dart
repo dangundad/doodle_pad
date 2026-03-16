@@ -20,9 +20,9 @@ class HistoryPage extends GetView<HistoryController> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
+                cs.primary.withValues(alpha: 0.10),
                 cs.surface,
-                cs.surfaceContainerLowest.withValues(alpha: 0.95),
-                cs.surfaceContainerLow.withValues(alpha: 0.9),
+                cs.secondaryContainer.withValues(alpha: 0.15),
               ],
             ),
           ),
@@ -73,7 +73,8 @@ class HistoryPage extends GetView<HistoryController> {
                       separatorBuilder: (_, _) => SizedBox(height: 10.h),
                       itemBuilder: (context, index) {
                         final item = events[index];
-                        final event = item['event']?.toString() ?? 'unknown_event'.tr;
+                        final rawEvent = item['event']?.toString() ?? 'unknown_event';
+                        final event = _localizeEvent(rawEvent);
                         final screen = item['screen']?.toString() ?? '-';
                         final route = item['route']?.toString() ?? '-';
                         final at = _formatTime(item['at']);
@@ -101,12 +102,12 @@ class HistoryPage extends GetView<HistoryController> {
                                 width: 40.r,
                                 height: 40.r,
                                 decoration: BoxDecoration(
-                                  color: cs.primaryContainer.withValues(alpha: 0.45),
+                                  color: _eventColor(rawEvent, cs),
                                   borderRadius: BorderRadius.circular(12.r),
                                 ),
                                 child: Icon(
-                                  _eventIcon(event),
-                                  color: cs.primary,
+                                  _eventIcon(rawEvent),
+                                  color: _eventIconColor(rawEvent, cs),
                                   size: 20.r,
                                 ),
                               ),
@@ -170,11 +171,27 @@ class HistoryPage extends GetView<HistoryController> {
           padding: EdgeInsets.fromLTRB(20.w, 8.h, 14.w, 10.h),
           child: Row(
             children: [
+              Container(
+                width: 36.r,
+                height: 36.r,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [cs.primary, cs.tertiary],
+                  ),
+                ),
+                child: Icon(
+                  Icons.history_rounded,
+                  size: 18.r,
+                  color: cs.onPrimary,
+                ),
+              ),
+              SizedBox(width: 10.w),
               Expanded(
                 child: Text(
                   'history'.tr,
                   style: TextStyle(
-                    fontSize: 28.sp,
+                    fontSize: 24.sp,
                     fontWeight: FontWeight.w800,
                     color: cs.onSurface,
                   ),
@@ -214,6 +231,15 @@ class HistoryPage extends GetView<HistoryController> {
     return '-';
   }
 
+  String _localizeEvent(String raw) {
+    if (raw == 'unknown_event') return 'unknown_event'.tr;
+    return raw
+        .replaceAll('_', ' ')
+        .split(' ')
+        .map((w) => w.isEmpty ? '' : '${w[0].toUpperCase()}${w.substring(1)}')
+        .join(' ');
+  }
+
   IconData _eventIcon(String eventName) {
     final target = eventName.toLowerCase();
 
@@ -231,5 +257,25 @@ class HistoryPage extends GetView<HistoryController> {
     }
 
     return Icons.history;
+  }
+
+  Color _eventColor(String eventName, ColorScheme cs) {
+    final t = eventName.toLowerCase();
+    if (t.contains('premium')) return cs.tertiaryContainer;
+    if (t.contains('stats')) return cs.secondaryContainer;
+    if (t.contains('draw') || t.contains('stroke') || t.contains('path')) {
+      return cs.primaryContainer;
+    }
+    return cs.surfaceContainerHigh;
+  }
+
+  Color _eventIconColor(String eventName, ColorScheme cs) {
+    final t = eventName.toLowerCase();
+    if (t.contains('premium')) return cs.tertiary;
+    if (t.contains('stats')) return cs.secondary;
+    if (t.contains('draw') || t.contains('stroke') || t.contains('path')) {
+      return cs.primary;
+    }
+    return cs.onSurfaceVariant;
   }
 }
