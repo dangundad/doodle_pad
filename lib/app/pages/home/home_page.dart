@@ -1,22 +1,20 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
-import 'package:doodle_pad/app/admob/ads_banner.dart';
-import 'package:doodle_pad/app/admob/ads_helper.dart';
 import 'package:doodle_pad/app/routes/app_pages.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class HomeContentPage extends StatefulWidget {
+  const HomeContentPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomeContentPage> createState() => _HomeContentPageState();
 }
 
-class _HomePageState extends State<HomePage>
+class _HomeContentPageState extends State<HomeContentPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _pulseCtrl;
   late Animation<double> _pulseAnim;
@@ -174,6 +172,34 @@ class _HomePageState extends State<HomePage>
     final cs = Get.theme.colorScheme;
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: cs.surface.withValues(alpha: 0.85),
+        title: Text(
+          'app_name'.tr,
+          style: TextStyle(
+            fontSize: 20.sp,
+            fontWeight: FontWeight.w800,
+            color: cs.onSurface,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(LucideIcons.settings, size: 20.r, color: cs.onSurface),
+            tooltip: 'settings'.tr,
+            onPressed: () => Get.toNamed(Routes.SETTINGS),
+          ),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(3),
+          child: Container(
+            height: 3,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [cs.primary, cs.tertiary]),
+            ),
+          ),
+        ),
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -189,7 +215,6 @@ class _HomePageState extends State<HomePage>
         child: SafeArea(
           child: Column(
             children: [
-              _HomeTopActions(),
               Expanded(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.symmetric(
@@ -259,10 +284,13 @@ class _HomePageState extends State<HomePage>
                       SizedBox(height: 34.h),
                       Container(
                         width: double.infinity,
-                        padding: EdgeInsets.all(16.r),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 10.h,
+                        ),
                         decoration: BoxDecoration(
                           color: cs.surfaceContainerLow,
-                          borderRadius: BorderRadius.circular(20.r),
+                          borderRadius: BorderRadius.circular(16.r),
                           border: Border.all(
                             color: cs.outline.withValues(alpha: 0.15),
                           ),
@@ -275,8 +303,8 @@ class _HomePageState extends State<HomePage>
                           ],
                         ),
                         child: Wrap(
-                          spacing: 8.w,
-                          runSpacing: 8.h,
+                          spacing: 6.w,
+                          runSpacing: 6.h,
                           alignment: WrapAlignment.center,
                           children: _features.asMap().entries.map((entry) {
                             final idx = entry.key;
@@ -341,8 +369,7 @@ class _HomePageState extends State<HomePage>
                                   DoodleController.to.hapticSelection();
                                 }
                                 await Get.toNamed(Routes.DRAW);
-                                if (_settingController
-                                    .showBrushGuide.value) {
+                                if (_settingController.showBrushGuide.value) {
                                   DoodleController.to.hapticMedium();
                                 }
                               },
@@ -372,167 +399,11 @@ class _HomePageState extends State<HomePage>
                           ),
                         ),
                       ),
-                      SizedBox(height: 16.h),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: cs.surfaceContainerLow,
-                          borderRadius: BorderRadius.circular(14.r),
-                          border: Border.all(
-                            color: cs.outline.withValues(alpha: 0.15),
-                          ),
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(14.r),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(14.r),
-                            onTap: () {
-                              _settingController.recordSettingsOpen(
-                                from: 'home_button',
-                              );
-                              Get.toNamed(Routes.SETTINGS);
-                            },
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 20.w,
-                                vertical: 14.h,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    LucideIcons.settings,
-                                    size: 18.r,
-                                    color: cs.onSurfaceVariant,
-                                  ),
-                                  SizedBox(width: 8.w),
-                                  Text(
-                                    'settings'.tr,
-                                    style: TextStyle(
-                                      fontSize: 14.sp,
-                                      color: cs.onSurfaceVariant,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
               ),
-              Container(
-                color: cs.surface.withValues(alpha: 0.9),
-                child: SafeArea(
-                  top: false,
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      left: 12.w,
-                      right: 12.w,
-                      top: 8.h,
-                      bottom: 10.h,
-                    ),
-                    child: BannerAdWidget(
-                      adUnitId: AdHelper.bannerAdUnitId,
-                      type: AdHelper.banner,
-                    ),
-                  ),
-                ),
-              ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _HomeTopActions extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          color: cs.surface.withValues(alpha: 0.85),
-          padding: EdgeInsets.fromLTRB(12.w, 10.h, 8.w, 4.h),
-          child: Row(
-            children: [
-              _HeaderIconButton(
-                icon: LucideIcons.image,
-                color: cs.primary,
-                tooltip: 'gallery'.tr,
-                onTap: () => Get.toNamed(Routes.GALLERY),
-              ),
-              SizedBox(width: 4.w),
-              _HeaderIconButton(
-                icon: LucideIcons.history,
-                color: cs.onSurface,
-                tooltip: 'open_history'.tr,
-                onTap: () => Get.toNamed(Routes.HISTORY),
-              ),
-              SizedBox(width: 4.w),
-              _HeaderIconButton(
-                icon: LucideIcons.chartBarBig,
-                color: cs.onSurface,
-                tooltip: 'open_stats'.tr,
-                onTap: () => Get.toNamed(Routes.STATS),
-              ),
-              const Spacer(),
-              _HeaderIconButton(
-                icon: LucideIcons.settings,
-                color: cs.onSurface,
-                tooltip: 'settings'.tr,
-                onTap: () => Get.toNamed(Routes.SETTINGS),
-              ),
-            ],
-          ),
-        ),
-        // Gradient accent line (AppBar bottom pattern)
-        Container(
-          height: 3,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [cs.primary, cs.tertiary],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _HeaderIconButton extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final String tooltip;
-  final VoidCallback onTap;
-
-  const _HeaderIconButton({
-    required this.icon,
-    required this.color,
-    required this.tooltip,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(12.r),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12.r),
-          onTap: onTap,
-          child: Padding(
-            padding: EdgeInsets.all(10.r),
-            child: Icon(icon, size: 22.r, color: color),
           ),
         ),
       ),
@@ -554,7 +425,7 @@ class _SavedDrawingsCard extends StatelessWidget {
         onTap: () => Get.toNamed(Routes.GALLERY),
         child: Container(
           width: double.infinity,
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -576,8 +447,8 @@ class _SavedDrawingsCard extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 48.r,
-                height: 48.r,
+                width: 40.r,
+                height: 40.r,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: cs.onPrimaryContainer.withValues(alpha: 0.12),
@@ -585,7 +456,7 @@ class _SavedDrawingsCard extends StatelessWidget {
                 child: Center(
                   child: Icon(
                     Icons.photo_library_rounded,
-                    size: 24.r,
+                    size: 20.r,
                     color: cs.onPrimaryContainer,
                   ),
                 ),
@@ -606,7 +477,7 @@ class _SavedDrawingsCard extends StatelessWidget {
                     Text(
                       '$count',
                       style: TextStyle(
-                        fontSize: 22.sp,
+                        fontSize: 18.sp,
                         fontWeight: FontWeight.w800,
                         color: cs.onPrimaryContainer,
                       ),
@@ -636,7 +507,7 @@ class _FeatureChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 7.h),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
       decoration: BoxDecoration(
         color: cs.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(20.r),
