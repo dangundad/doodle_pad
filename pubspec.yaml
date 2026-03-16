@@ -21,6 +21,7 @@ dependencies:
   gma_mediation_unity: ^1.6.5
   google_fonts: ^8.0.2
   google_mobile_ads: ^7.0.0
+  google_nav_bar: ^5.0.7
   hive_ce: ^2.19.3
   hive_ce_flutter: ^2.3.4
   in_app_purchase: ^3.2.3
