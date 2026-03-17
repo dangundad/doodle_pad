@@ -30,9 +30,8 @@ void main() {
     }
   });
 
-  test('loads persisted options immediately during init for restart safety', () async {
+  test('loads persisted settings immediately during init for restart safety', () async {
       final box = await Hive.openBox('doodle_settings_v1');
-      await box.put('is_first_run', false);
       await box.put('haptic_enabled', false);
       await box.put('show_brush_guide', false);
       await box.put('ask_before_clear', false);
@@ -44,7 +43,6 @@ void main() {
 
       controller.onInit();
 
-      expect(controller.isFirstRun.value, false);
       expect(controller.hapticEnabled.value, false);
       expect(controller.showBrushGuide.value, false);
       expect(controller.askBeforeClear.value, false);

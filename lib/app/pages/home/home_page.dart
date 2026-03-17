@@ -20,7 +20,6 @@ class _HomeContentPageState extends State<HomeContentPage>
   late Animation<double> _pulseAnim;
 
   final SettingController _settingController = Get.find<SettingController>();
-  bool _didShowWelcome = false;
 
   @override
   void initState() {
@@ -37,7 +36,6 @@ class _HomeContentPageState extends State<HomeContentPage>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       SettingController.to.recordHomeOpen(Get.currentRoute);
-      _maybeShowWelcome();
     });
   }
 
@@ -45,142 +43,6 @@ class _HomeContentPageState extends State<HomeContentPage>
   void dispose() {
     _pulseCtrl.dispose();
     super.dispose();
-  }
-
-  void _maybeShowWelcome() {
-    if (_didShowWelcome) return;
-    if (!_settingController.isFirstRun.value) return;
-    if (!_settingController.showBrushGuide.value) return;
-    _didShowWelcome = true;
-
-    final cs = Get.theme.colorScheme;
-
-    Get.dialog(
-      Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28.r),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(vertical: 20.h),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    cs.primaryContainer,
-                    cs.primary.withValues(alpha: 0.3),
-                  ],
-                ),
-              ),
-              child: Center(
-                child: Container(
-                  width: 52.r,
-                  height: 52.r,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: cs.primary.withValues(alpha: 0.15),
-                  ),
-                  child: Icon(
-                    LucideIcons.paintbrush,
-                    size: 26.r,
-                    color: cs.primary,
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 8.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'onboarding_title'.tr,
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    'onboarding_message'.tr,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: cs.onSurfaceVariant,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 14.h),
-                  _FeatureChip(icon: Icons.gesture, label: 'brush_guide'.tr),
-                  SizedBox(height: 10.h),
-                  _FeatureChip(
-                    icon: Icons.undo_rounded,
-                    label: 'feature_undo'.tr,
-                  ),
-                  SizedBox(height: 10.h),
-                  _FeatureChip(icon: Icons.ios_share, label: 'share'.tr),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () async {
-                        await _settingController.setShowBrushGuide(false);
-                        await _settingController.finishFirstRun();
-                        Get.back();
-                      },
-                      child: Text('onboarding_skip'.tr),
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [cs.primary, cs.tertiary],
-                        ),
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12.r),
-                          onTap: () async {
-                            await _settingController.finishFirstRun();
-                            Get.back();
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 12.h),
-                            child: Center(
-                              child: Text(
-                                'onboarding_start'.tr,
-                                style: TextStyle(
-                                  color: cs.onPrimary,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   static const _features = [
@@ -401,9 +263,6 @@ class _HomeContentPageState extends State<HomeContentPage>
                                 }
                                 DoodleController.to.clearReferenceDrawing();
                                 await Get.toNamed(Routes.DRAW);
-                                if (_settingController.showBrushGuide.value) {
-                                  DoodleController.to.hapticMedium();
-                                }
                               },
                               child: Padding(
                                 padding: EdgeInsets.symmetric(vertical: 16.h),

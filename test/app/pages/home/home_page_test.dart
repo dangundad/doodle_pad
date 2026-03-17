@@ -60,30 +60,25 @@ void main() {
     }
   });
 
-  testWidgets(
-    'does not show onboarding dialog when brush guide setting is disabled',
-    (tester) async {
-      tester.view.physicalSize = const Size(1080, 2400);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.reset);
+  testWidgets('does not show onboarding dialog on home entry', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
 
-      final controller = _FakeSettingController()
-        ..isFirstRun.value = true
-        ..showBrushGuide.value = false;
-      Get.put<SettingController>(controller);
+    final controller = _FakeSettingController()..showBrushGuide.value = true;
+    Get.put<SettingController>(controller);
 
-      await tester.pumpWidget(
-        const _AppShell(
-          locale: Locale('en'),
-          home: HomeContentPage(),
-        ),
-      );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 200));
+    await tester.pumpWidget(
+      const _AppShell(
+        locale: Locale('en'),
+        home: HomeContentPage(),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
 
-      expect(find.text('Welcome'), findsNothing);
-    },
-  );
+    expect(find.text('Welcome'), findsNothing);
+  });
 }
 
 class _AppShell extends StatelessWidget {
@@ -113,5 +108,7 @@ class _AppShell extends StatelessWidget {
 }
 
 class _FakeSettingController extends SettingController {
-  _FakeSettingController() : super(loadOnInit: false);
+  _FakeSettingController() : super(loadOnInit: false, updateLocaleFn: _noop);
+
+  static Future<void> _noop(Locale _) async {}
 }

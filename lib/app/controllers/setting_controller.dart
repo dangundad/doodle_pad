@@ -32,13 +32,11 @@ class SettingController extends GetxController {
   static const String appId = 'doodle_pad';
 
   static const String _kSettingBox = 'doodle_settings_v1';
-  static const String _kIsFirstRunKey = 'is_first_run';
   static const String _kHapticKey = 'haptic_enabled';
   static const String _kShowBrushGuideKey = 'show_brush_guide';
   static const String _kAskBeforeClearKey = 'ask_before_clear';
   static const String _kLanguageKey = 'language';
 
-  final RxBool isFirstRun = true.obs;
   final RxBool hapticEnabled = true.obs;
   final RxBool showBrushGuide = true.obs;
   final RxBool askBeforeClear = true.obs;
@@ -80,7 +78,6 @@ class SettingController extends GetxController {
       return;
     }
 
-    isFirstRun.value = _readBool(box, _kIsFirstRunKey, true);
     hapticEnabled.value = _readBool(box, _kHapticKey, true);
     showBrushGuide.value = _readBool(box, _kShowBrushGuideKey, true);
     askBeforeClear.value = _readBool(box, _kAskBeforeClearKey, true);
@@ -119,7 +116,6 @@ class SettingController extends GetxController {
   Future<void> clearAppSettings() async {
     final box = await _openSettingBox();
     await box.clear();
-    isFirstRun.value = true;
     hapticEnabled.value = true;
     showBrushGuide.value = true;
     askBeforeClear.value = true;
@@ -130,13 +126,6 @@ class SettingController extends GetxController {
       await ActivityLogService.to.clearEvents(appId: appId);
     }
   }
-
-  Future<void> finishFirstRun() async {
-    isFirstRun.value = false;
-    final box = await _openSettingBox();
-    await box.put(_kIsFirstRunKey, false);
-  }
-
   Future<void> rateApp() async {
     logEvent('tap_rate_app', 'settings');
     try {

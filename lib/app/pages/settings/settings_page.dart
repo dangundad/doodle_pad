@@ -105,7 +105,7 @@ class SettingsPage extends GetView<SettingController> {
                     title: _loc('show_brush_guide', 'Show brush guide'),
                     subtitle: _loc(
                       'show_brush_guide_desc',
-                      'Show first-launch guide popup on app startup',
+                      'Show the brush hint below the drawing toolbar',
                     ),
                     icon: Icons.tips_and_updates,
                     onChanged: controller.setShowBrushGuide,
