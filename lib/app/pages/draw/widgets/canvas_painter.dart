@@ -108,15 +108,26 @@ class CanvasPainter extends CustomPainter {
           stroke.isEraser ? BlendMode.clear : BlendMode.srcOver;
 
     if (stroke.points.length == 1) {
-      canvas.drawCircle(
-        stroke.points.first,
-        stroke.width / 2,
-        Paint()
-          ..color = stroke.isEraser ? Colors.transparent : stroke.color
-          ..style = PaintingStyle.fill
-          ..blendMode =
-              stroke.isEraser ? BlendMode.clear : BlendMode.srcOver,
-      );
+      final dotPaint = Paint()
+        ..color = stroke.isEraser ? Colors.transparent : stroke.color
+        ..style = PaintingStyle.fill
+        ..blendMode =
+            stroke.isEraser ? BlendMode.clear : BlendMode.srcOver;
+
+      if (stroke.cap == StrokeCap.square) {
+        // Marker: 사각형 점 그리기
+        final half = stroke.width / 2;
+        canvas.drawRect(
+          Rect.fromCenter(
+            center: stroke.points.first,
+            width: half * 2,
+            height: half * 2,
+          ),
+          dotPaint,
+        );
+      } else {
+        canvas.drawCircle(stroke.points.first, stroke.width / 2, dotPaint);
+      }
     } else {
       canvas.drawPath(_buildSmoothPath(stroke.points), paint);
     }

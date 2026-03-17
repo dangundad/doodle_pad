@@ -448,7 +448,7 @@ class DoodleController extends GetxController {
           description: 'share_error'.tr,
         ),
       );
-    } finally {
+      // 공유 실패 시에만 임시 파일 정리 (성공 시에는 OS가 관리하므로 삭제하지 않음)
       try {
         if (tmpFile != null && tmpFile.existsSync()) tmpFile.deleteSync();
       } catch (_) {}
