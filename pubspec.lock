@@ -502,7 +502,7 @@ packages:
     source: hosted
     version: "3.2.3"
   in_app_purchase_android:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: in_app_purchase_android
       sha256: abb254ae159a5a9d4f867795ecb076864faeba59ce015ab81d4cca380f23df45
@@ -510,7 +510,7 @@ packages:
     source: hosted
     version: "0.4.0+8"
   in_app_purchase_platform_interface:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: in_app_purchase_platform_interface
       sha256: "1d353d38251da5b9fea6635c0ebfc6bb17a2d28d0e86ea5e083bf64244f1fb4c"
@@ -758,7 +758,7 @@ packages:
     source: hosted
     version: "3.1.6"
   plugin_platform_interface:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: plugin_platform_interface
       sha256: "4820fbfdb9478b1ebae27888254d445073732dae3d6ea81f0b7e06d5dedc3f02"

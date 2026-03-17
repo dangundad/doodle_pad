@@ -425,11 +425,7 @@ class _BrushTypeSelector extends StatelessWidget {
             final selected = ctrl.brushType.value == type;
             final isSpecial =
                 type == BrushType.watercolor || type == BrushType.airbrush;
-            final isLocked =
-                isSpecial &&
-                (type == BrushType.watercolor
-                    ? !ctrl.isWatercolorUnlocked.value
-                    : !ctrl.isAirbrushUnlocked.value);
+            final isLocked = isSpecial && !ctrl.isBrushUnlocked(type);
 
             return GestureDetector(
               onTap: () {

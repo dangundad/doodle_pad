@@ -10,6 +10,7 @@ import 'package:doodle_pad/app/pages/gallery/gallery_page.dart';
 import 'package:doodle_pad/app/pages/history/history_page.dart';
 import 'package:doodle_pad/app/pages/home/home_page.dart';
 import 'package:doodle_pad/app/pages/stats/stats_page.dart';
+import 'package:doodle_pad/app/services/purchase_service.dart';
 
 class MainShellPage extends StatefulWidget {
   const MainShellPage({super.key});
@@ -37,9 +38,13 @@ class _MainShellPageState extends State<MainShellPage> {
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          BannerAdWidget(
-            adUnitId: AdHelper.bannerAdUnitId,
-            type: AdHelper.banner,
+          Obx(
+            () => PurchaseService.isPremiumActive
+                ? const SizedBox.shrink()
+                : BannerAdWidget(
+                    adUnitId: AdHelper.bannerAdUnitId,
+                    type: AdHelper.banner,
+                  ),
           ),
           Container(
             decoration: BoxDecoration(

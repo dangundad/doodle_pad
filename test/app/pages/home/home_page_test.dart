@@ -9,11 +9,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:hive_ce/hive.dart';
 
+import 'package:doodle_pad/app/admob/ads_banner.dart';
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
+import 'package:doodle_pad/app/controllers/history_controller.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
+import 'package:doodle_pad/app/controllers/stats_controller.dart';
+import 'package:doodle_pad/app/pages/home/main_shell_page.dart';
 import 'package:doodle_pad/app/pages/home/home_page.dart';
+import 'package:doodle_pad/app/services/activity_log_service.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
+import 'package:doodle_pad/app/services/purchase_service.dart';
 import 'package:doodle_pad/app/translate/translate.dart';
+
+import '../../helpers/fake_purchase_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -79,6 +87,31 @@ void main() {
 
     expect(find.text('Welcome'), findsNothing);
   });
+
+  testWidgets('hides banner ad widget when premium is active', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    final settingController = _FakeSettingController();
+    final purchaseService = FakePurchaseService()..isPremium.value = true;
+
+    Get.put<SettingController>(settingController, permanent: true);
+    Get.put<ActivityLogService>(ActivityLogService(), permanent: true);
+    Get.put<HistoryController>(HistoryController());
+    Get.put<StatsController>(StatsController());
+    Get.put<PurchaseService>(purchaseService, permanent: true);
+
+    await tester.pumpWidget(
+      const _AppShell(
+        locale: Locale('en'),
+        home: MainShellPage(),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(BannerAdWidget), findsNothing);
+  });
 }
 
 class _AppShell extends StatelessWidget {
@@ -112,3 +145,4 @@ class _FakeSettingController extends SettingController {
 
   static Future<void> _noop(Locale _) async {}
 }
+

@@ -10,6 +10,7 @@ import 'package:share_plus/share_plus.dart';
 
 import 'package:doodle_pad/app/admob/ads_rewarded.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
+import 'package:doodle_pad/app/services/purchase_service.dart';
 import 'package:doodle_pad/app/utils/app_toast.dart';
 import 'package:vibration/vibration.dart';
 
@@ -91,6 +92,7 @@ class DoodleController extends GetxController {
 
   bool get canUndo => strokes.isNotEmpty;
   bool get canRedo => _undoStack.isNotEmpty;
+  bool get hasPremiumBrushAccess => PurchaseService.isPremiumActive;
 
   @override
   void onInit() {
@@ -184,6 +186,11 @@ class DoodleController extends GetxController {
 
   // Special brush unlock via rewarded ad
   void unlockBrush(BrushType type) {
+    if (hasPremiumBrushAccess) {
+      brushType.value = type;
+      return;
+    }
+
     if (!Get.isRegistered<RewardedAdManager>()) return;
 
     final alreadyUnlocked = type == BrushType.watercolor
@@ -210,6 +217,20 @@ class DoodleController extends GetxController {
         _watchRewardedAdForBrush(type);
       },
     );
+  }
+
+  bool isBrushUnlocked(BrushType type) {
+    if (type != BrushType.watercolor && type != BrushType.airbrush) {
+      return true;
+    }
+
+    if (hasPremiumBrushAccess) {
+      return true;
+    }
+
+    return type == BrushType.watercolor
+        ? isWatercolorUnlocked.value
+        : isAirbrushUnlocked.value;
   }
 
   void _watchRewardedAdForBrush(BrushType type) {
@@ -372,16 +393,26 @@ class DoodleController extends GetxController {
   Future<void> deleteDrawing(String path) async {
     try {
       final file = File(path);
-      if (file.existsSync()) file.deleteSync();
-    } catch (_) {}
-    savedDrawings.remove(path);
-    await HiveService.to.setSetting(_savedPathsKey, savedDrawings.toList());
-    AppToast.show(
-      AppToastMessage.success(
-        title: 'delete_drawing'.tr,
-        description: 'delete_drawing_complete'.tr,
-      ),
-    );
+      if (file.existsSync()) {
+        file.deleteSync();
+      }
+
+      savedDrawings.remove(path);
+      await HiveService.to.setSetting(_savedPathsKey, savedDrawings.toList());
+      AppToast.show(
+        AppToastMessage.success(
+          title: 'delete_drawing'.tr,
+          description: 'delete_drawing_complete'.tr,
+        ),
+      );
+    } catch (_) {
+      AppToast.show(
+        AppToastMessage.error(
+          title: 'error'.tr,
+          description: 'delete_error'.tr,
+        ),
+      );
+    }
   }
 
   /// 공유 (임시 파일로 저장 후 공유)

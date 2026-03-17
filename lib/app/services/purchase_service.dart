@@ -7,13 +7,27 @@ import 'package:get/get.dart';
 import 'package:doodle_pad/app/admob/ads_interstitial.dart';
 import 'package:doodle_pad/app/admob/ads_rewarded.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
 import 'package:doodle_pad/app/utils/app_constants.dart';
 
 class PurchaseService extends GetxService {
+  PurchaseService({
+    InAppPurchase? inAppPurchase,
+    Future<List<PurchaseDetails>> Function()? pastPurchasesLoader,
+    bool Function()? isAndroidPlatform,
+  }) : _inAppPurchase = inAppPurchase ?? InAppPurchase.instance,
+       _pastPurchasesLoader = pastPurchasesLoader,
+       _isAndroidPlatform = isAndroidPlatform ?? (() => Platform.isAndroid);
+
   static PurchaseService get to => Get.find();
 
-  final InAppPurchase _inAppPurchase = InAppPurchase.instance;
+  static bool get isPremiumActive =>
+      Get.isRegistered<PurchaseService>() && PurchaseService.to.hasActivePremium;
+
+  final InAppPurchase _inAppPurchase;
+  final Future<List<PurchaseDetails>> Function()? _pastPurchasesLoader;
+  final bool Function() _isAndroidPlatform;
 
   final RxBool available = false.obs;
   final RxBool isPremium = false.obs;
@@ -26,8 +40,8 @@ class PurchaseService extends GetxService {
   StreamSubscription<List<PurchaseDetails>>? _purchaseSubscription;
   bool _initialized = false;
 
-  static Set<String> get productIds {
-    if (Platform.isAndroid) {
+  Set<String> get productIds {
+    if (_isAndroidPlatform()) {
       return PurchaseConstants.ANDROID_PRODUCT_IDS.toSet();
     }
 
@@ -37,7 +51,7 @@ class PurchaseService extends GetxService {
   @override
   void onInit() {
     super.onInit();
-    initialize();
+    unawaited(initialize());
   }
 
   @override
@@ -46,8 +60,8 @@ class PurchaseService extends GetxService {
     super.onClose();
   }
 
-  Future<void> initialize() async {
-    if (_initialized) return;
+  Future<void> initialize({bool forceRefresh = false}) async {
+    if (_initialized && !forceRefresh) return;
     _initialized = true;
 
     await _loadPremiumFromStorage();
@@ -68,6 +82,7 @@ class PurchaseService extends GetxService {
     }
 
     await loadProducts();
+    await _refreshPremiumStatusFromStore();
   }
 
   Future<void> loadProducts() async {
@@ -117,10 +132,16 @@ class PurchaseService extends GetxService {
   }
 
   Future<void> purchaseProduct(int index) async {
-    final product = getProductByIndex(index);
+    ProductDetails? product = getProductByIndex(index);
     if (!available.value || product == null) {
       if (!available.value) {
-        await initialize();
+        await initialize(forceRefresh: true);
+        product = getProductByIndex(index);
+      }
+
+      if (available.value && product == null) {
+        await loadProducts();
+        product = getProductByIndex(index);
       }
 
       if (!available.value || product == null) {
@@ -152,13 +173,14 @@ class PurchaseService extends GetxService {
 
   Future<void> restorePurchases() async {
     if (!available.value) {
-      await initialize();
+      await initialize(forceRefresh: true);
     }
     if (!available.value) return;
 
     isLoading.value = true;
     try {
       await _inAppPurchase.restorePurchases();
+      await _refreshPremiumStatusFromStore();
     } catch (e) {
       statusMessage.value = 'restore_error'.tr;
       errorMessage.value = e.toString();
@@ -246,6 +268,39 @@ class PurchaseService extends GetxService {
       isPremium.value = false;
       errorMessage.value = e.toString();
     }
+  }
+
+  Future<void> _refreshPremiumStatusFromStore() async {
+    if (!_isAndroidPlatform()) {
+      return;
+    }
+
+    try {
+      final purchases =
+          await (_pastPurchasesLoader ?? _loadPastPurchasesFromAndroidStore)();
+      final hasActivePurchase = purchases.any(
+        (purchase) =>
+            productIds.contains(purchase.productID) &&
+            (purchase.status == PurchaseStatus.purchased ||
+                purchase.status == PurchaseStatus.restored),
+      );
+
+      isPremium.value = hasActivePurchase;
+      await _savePremiumStatus(hasActivePurchase);
+      await _syncAdsForPremiumStatus(hasActivePurchase);
+    } catch (e) {
+      errorMessage.value = e.toString();
+    }
+  }
+
+  Future<List<PurchaseDetails>> _loadPastPurchasesFromAndroidStore() async {
+    final addition =
+        _inAppPurchase.getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+    final response = await addition.queryPastPurchases();
+    if (response.error != null) {
+      throw response.error!;
+    }
+    return response.pastPurchases;
   }
 
   Future<void> _savePremiumStatus(bool value) async {
