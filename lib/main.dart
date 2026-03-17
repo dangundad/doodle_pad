@@ -2,6 +2,8 @@
 // DangunDad Flutter App - main.dart Template
 // ================================================
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,21 +32,6 @@ Future<void> main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  try {
-    final canRequestAds = await AdHelper.initializeConsentAndAds();
-    if (canRequestAds) {
-      final status = await AdHelper.currentInitializationStatus();
-      status?.adapterStatuses.forEach((key, value) {
-        debugPrint('Adapter status for $key: ${value.description}');
-      });
-      debugPrint('AdMob initialized successfully');
-    } else {
-      debugPrint('AdMob initialization skipped until consent is available');
-    }
-  } catch (e) {
-    debugPrint('AdMob initialization failed: $e');
-  }
-
   await AppBinding.initializeServices();
 
   await SystemChrome.setEnabledSystemUIMode(
@@ -55,8 +42,27 @@ Future<void> main() async {
   runApp(const DoodlePadApp());
 }
 
-class DoodlePadApp extends StatelessWidget {
+class DoodlePadApp extends StatefulWidget {
   const DoodlePadApp({super.key});
+
+  @override
+  State<DoodlePadApp> createState() => _DoodlePadAppState();
+}
+
+class _DoodlePadAppState extends State<DoodlePadApp> {
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_initializeAds());
+  }
+
+  Future<void> _initializeAds() async {
+    try {
+      await AdHelper.initializeConsentAndAds();
+    } catch (e) {
+      debugPrint('AdMob initialization failed: $e');
+    }
+  }
 
   Widget _buildFallbackApp() {
     return ToastificationWrapper(
