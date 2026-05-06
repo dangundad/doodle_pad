@@ -50,7 +50,7 @@ android {
     defaultConfig {
         applicationId = "com.dangundad.doodlepad"
         minSdk = maxOf(flutterMinSdkVersion.toInt(), 24)
-        targetSdk = flutterTargetSdkVersion.toInt()
+        targetSdk = maxOf(flutterTargetSdkVersion.toInt(), 36)
         versionCode = flutterVersionCode.toInt()
         versionName = flutterVersionName.toString()
 

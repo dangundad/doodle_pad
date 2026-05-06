@@ -177,18 +177,32 @@ class _TopToolbar extends StatelessWidget {
               tooltip: 'redo'.tr,
             ),
             IconButton(
-              icon: Icon(Icons.delete_outline_rounded, color: cs.error),
-              onPressed: () => _confirmClear(context, cs, settingCtrl),
+              icon: Icon(
+                Icons.delete_outline_rounded,
+                color: ctrl.hasDrawableContent
+                    ? cs.error
+                    : cs.error.withValues(alpha: 0.3),
+              ),
+              onPressed: ctrl.hasDrawableContent
+                  ? () => _confirmClear(context, cs, settingCtrl)
+                  : null,
               tooltip: 'clear_canvas'.tr,
             ),
             IconButton(
-              icon: const Icon(Icons.share_rounded),
-              onPressed: () {
-                if (settingCtrl.hapticEnabled.value) {
-                  ctrl.hapticMedium();
-                }
-                ctrl.shareCanvas();
-              },
+              icon: Icon(
+                Icons.share_rounded,
+                color: ctrl.hasDrawableContent
+                    ? cs.onSurface
+                    : cs.onSurface.withValues(alpha: 0.3),
+              ),
+              onPressed: ctrl.hasDrawableContent
+                  ? () {
+                      if (settingCtrl.hapticEnabled.value) {
+                        ctrl.hapticMedium();
+                      }
+                      ctrl.shareCanvas();
+                    }
+                  : null,
               tooltip: 'share'.tr,
             ),
           ],

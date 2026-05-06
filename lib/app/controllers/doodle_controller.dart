@@ -333,16 +333,17 @@ class DoodleController extends GetxController {
       AppToast.show(
         AppToastMessage.info(
           title: 'share'.tr,
-          description: 'gallery_empty'.tr,
+          description: 'canvas_empty'.tr,
         ),
       );
       return;
     }
 
-    final image = await _captureCanvas();
-    if (image == null) return;
+    ui.Image? image;
     File? tmpFile;
     try {
+      image = await _captureCanvas();
+      if (image == null) return;
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) return;
       final bytes = byteData.buffer.asUint8List();
@@ -365,7 +366,7 @@ class DoodleController extends GetxController {
         if (tmpFile != null && tmpFile.existsSync()) tmpFile.deleteSync();
       } catch (_) {}
     } finally {
-      image.dispose();
+      image?.dispose();
     }
   }
 }
