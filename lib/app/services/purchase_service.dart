@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -23,7 +23,8 @@ class PurchaseService extends GetxService {
   static PurchaseService get to => Get.find();
 
   static bool get isPremiumActive =>
-      Get.isRegistered<PurchaseService>() && PurchaseService.to.hasActivePremium;
+      Get.isRegistered<PurchaseService>() &&
+      PurchaseService.to.hasActivePremium;
 
   final InAppPurchase _inAppPurchase;
   final Future<List<PurchaseDetails>> Function()? _pastPurchasesLoader;
@@ -294,8 +295,8 @@ class PurchaseService extends GetxService {
   }
 
   Future<List<PurchaseDetails>> _loadPastPurchasesFromAndroidStore() async {
-    final addition =
-        _inAppPurchase.getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+    final addition = _inAppPurchase
+        .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
     final response = await addition.queryPastPurchases();
     if (response.error != null) {
       throw response.error!;
@@ -314,10 +315,12 @@ class PurchaseService extends GetxService {
   bool get hasActivePremium => isPremium.value || isDevPremium.value;
 
   String get premiumPriceWithFallback {
-    final price = products.firstWhereOrNull(
-      (p) => p.id == PurchaseConstants.ANDROID_PRODUCT_IDS[0],
-    )?.price;
-    return price ?? r'$2.99';
+    final price = products
+        .firstWhereOrNull(
+          (p) => p.id == PurchaseConstants.PREMIUM_MEDIUM_ANDROID,
+        )
+        ?.price;
+    return price ?? r'$5.99';
   }
 
   void toggleDevPremium() {

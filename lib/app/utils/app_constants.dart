@@ -1,4 +1,4 @@
-﻿// ================================================
+// ================================================
 // DangunDad Flutter App - app_constants.dart Template
 // ================================================
 
@@ -10,7 +10,7 @@ abstract class HiveKeys {
   static const String IS_PREMIUM = 'is_premium';
 }
 
-/// ??愿??URL
+/// 관련 URL
 abstract class AppUrls {
   static const String GOOGLE_PLAY_MOREAPPS =
       'https://play.google.com/store/apps/developer?id=DangunDad';
@@ -30,7 +30,7 @@ abstract class HiveBoxNames {
   static const String APP_DATA = 'app_data';
 }
 
-/// ?좊땲硫붿씠??吏???쒓컙
+/// 애니메이션 지속 시간
 abstract class AnimationDurations {
   static const Duration FADE_IN = Duration(milliseconds: 300);
   static const Duration PAGE_TRANSITION = Duration(milliseconds: 500);
@@ -38,17 +38,14 @@ abstract class AnimationDurations {
 
 /// IAP 상품 ID
 abstract class PurchaseConstants {
-  static const String PREMIUM_WEEKLY_ANDROID =
-      '${AppUrls.PACKAGE_NAME}.premium_weekly';
-  static const String PREMIUM_MONTHLY_ANDROID =
-      '${AppUrls.PACKAGE_NAME}.premium_monthly';
-  static const String PREMIUM_YEARLY_ANDROID =
-      '${AppUrls.PACKAGE_NAME}.premium_yearly';
+  static const String PREMIUM_SMALL_ANDROID = 'doodle_pad_premium_small';
+  static const String PREMIUM_MEDIUM_ANDROID = 'doodle_pad_premium_medium';
+  static const String PREMIUM_LARGE_ANDROID = 'doodle_pad_premium_large';
 
   static const List<String> ANDROID_PRODUCT_IDS = [
-    PREMIUM_WEEKLY_ANDROID,
-    PREMIUM_MONTHLY_ANDROID,
-    PREMIUM_YEARLY_ANDROID,
+    PREMIUM_SMALL_ANDROID,
+    PREMIUM_MEDIUM_ANDROID,
+    PREMIUM_LARGE_ANDROID,
   ];
 }
 

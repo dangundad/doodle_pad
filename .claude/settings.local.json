@@ -63,6 +63,6 @@
     "deny": [],
     "ask": [],
     "defaultMode": "bypassPermissions",
-    "additionalDirectories": []
+    "additionalDirectories": ["C:\\Github_WorkSpace\\power_button"]
   }
 }

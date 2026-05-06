@@ -15,7 +15,7 @@ import 'package:doodle_pad/app/services/app_rating_service.dart';
 import 'package:doodle_pad/app/controllers/premium_controller.dart';
 
 class AppBinding implements Bindings {
-  static Future<void> initializeServices() async {
+  static Future<void> initializeCoreServices() async {
     if (!Get.isRegistered<HiveService>()) {
       await HiveService.init();
       Get.put(HiveService(), permanent: true);
@@ -33,6 +33,10 @@ class AppBinding implements Bindings {
     }
 
     await SettingController.ensureBoxOpen();
+  }
+
+  static Future<void> initializeServices() async {
+    await initializeCoreServices();
     _ensureDependencyServices();
   }
 

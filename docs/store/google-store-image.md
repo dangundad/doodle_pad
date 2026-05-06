@@ -1,73 +1,208 @@
-# Doodle Pad - Google Play 스크린샷 가이드
+# Google Play 스크린샷 가이드
 
-## 1. 권장 스크린샷 구성 (8장)
+## 스크린샷 개요
+- 짧은 제목 + 바로 이해되는 기능 문구로 구성
+- 1장: 홈 화면과 빠른 시작
+- 2장: 풀스크린 드로잉 캔버스
+- 3장: 브러시와 색상 팔레트
+- 4장: 저장, 갤러리, 다시 불러오기
+- 5장: 기록, 통계, 설정
+- 6장: 후원형 Premium
 
-1) 홈 화면 (초기 상태)
-- 제목(KO): `손가락으로 그리는 나만의 드로잉 스튜디오`
-- 부제(KO): `바로 시작하세요`
-- Title(EN): `Your Personal Drawing Studio`
-- Subtitle(EN): `Start Drawing Instantly`
+---
 
-2) 드로잉 화면 (캔버스 전체)
-- 제목(KO): `풀스크린 캔버스로 집중해서 그려요`
-- 부제(KO): `반투명 플로팅 툴바`
-- Title(EN): `Full-Screen Canvas — No Distractions`
-- Subtitle(EN): `Floating Semi-Transparent Toolbar`
+## 스크린샷 구성 (6장)
 
-3) 드로잉 진행 중 (다양한 색상)
-- 제목(KO): `16가지 색상으로 자유롭게 표현하세요`
-- 부제(KO): `원색·파스텔·무채색 팔레트`
-- Title(EN): `16 Colors — Express Yourself Freely`
-- Subtitle(EN): `Primary, Pastel, Neutral Palette`
+### 1장: 홈 화면과 빠른 시작
+- **제목(KO)**: **바로 그리기**
+- **부제목(KO)**: **깨끗한 드로잉 시작**
+- **Title(EN)**: **Start Drawing**
+- **Subtitle(EN)**: **Clean canvas**
 
-4) 브러시 크기 조절
-- 제목(KO): `브러시 크기를 자유롭게 조절하세요`
-- 부제(KO): `슬라이더로 세밀하게`
-- Title(EN): `Adjust Brush Size Perfectly`
-- Subtitle(EN): `Fine Control with Slider`
+**캡처 화면**: 홈 화면에서 앱 이름, 핵심 기능 카드, `Start Drawing` 버튼이 보이는 상태
+- **포함 요소**:
+  - 홈 주요 CTA
+  - 펜 / 마커 / 지우개 / 색상 / 공유 기능 요약
+  - 하단 내비게이션
+  - 무료 버전이면 하단 배너 광고 영역
 
-5) 마커 브러시 그림
-- 제목(KO): `마커 브러시로 강렬하게 표현해요`
-- 부제(KO): `굵고 선명한 선`
-- Title(EN): `Bold Marker Strokes for Vivid Art`
-- Subtitle(EN): `Thick, Vivid Lines`
+---
 
-6) 지우개 사용
-- 제목(KO): `실수해도 괜찮아요! 지우개로 수정하세요`
-- 부제(KO): `원하는 부분만 지우기`
-- Title(EN): `Made a Mistake? Just Erase It!`
-- Subtitle(EN): `Erase Only What You Need`
+### 2장: 풀스크린 드로잉 캔버스
+- **제목(KO)**: **넓은 캔버스**
+- **부제목(KO)**: **방해 없이 그리기**
+- **Title(EN)**: **Full Canvas**
+- **Subtitle(EN)**: **Draw with focus**
 
-7) 실행 취소 기능
-- 제목(KO): `20단계 되돌리기로 자유롭게 실험하세요`
-- 부제(KO): `Undo / Redo 지원`
-- Title(EN): `20-Step Undo — Experiment Without Fear`
-- Subtitle(EN): `Undo and Redo Supported`
+**캡처 화면**: 실제 선이 그려진 드로잉 화면
+- **포함 요소**:
+  - 넓은 흰색 캔버스
+  - 저장 / 공유 / 실행 취소 / 다시 실행 버튼
+  - 브러시 툴바
+  - 화면에 실제 그림이 그려져 있는 상태
 
-8) 공유 기능
-- 제목(KO): `완성한 그림을 친구에게 바로 공유!`
-- 부제(KO): `SNS·메신저로 한 번에`
-- Title(EN): `Share Your Artwork in One Tap!`
-- Subtitle(EN): `Share to SNS or Messaging Apps`
+---
 
-## 2. 캡처 체크포인트
+### 3장: 브러시와 색상 팔레트
+- **제목(KO)**: **브러시 선택**
+- **부제목(KO)**: **펜·마커·수채화·에어브러시**
+- **Title(EN)**: **Brush Tools**
+- **Subtitle(EN)**: **Pen, marker, watercolor**
 
-- 실제 데이터가 보이는 화면을 우선 사용
-- 상태/결과 텍스트가 읽히도록 폰트 크기 확인
-- 핵심 가치(자유로운 드로잉, 색상 팔레트, 공유)가 순서대로 전달되게 배치
-- 동일한 테마/톤으로 세트 통일 (핑크 테마 권장)
+**캡처 화면**: 브러시 선택 영역과 색상 팔레트가 함께 보이는 화면
+- **포함 요소**:
+  - 펜, 마커, 지우개, 수채화, 에어브러시 버튼
+  - 16색 팔레트
+  - 브러시 크기 슬라이더
+  - 보상형 광고 또는 Premium으로 특수 브러시를 해금할 수 있는 맥락
 
-## 3. 이미지 사양
+---
 
-- 권장 해상도: `1080 x 1920` (9:16)
-- 형식: PNG 또는 JPG
-- 권장 장수: 8장
-- 파일 용량: 이미지당 8MB 이하
+### 4장: 저장, 갤러리, 다시 불러오기
+- **제목(KO)**: **저장하고 이어 그리기**
+- **부제목(KO)**: **갤러리에서 다시 열기**
+- **Title(EN)**: **Save and Reuse**
+- **Subtitle(EN)**: **Gallery ready**
 
-## 4. 제출 전 체크리스트
+**캡처 화면**: 갤러리 화면에서 저장된 그림 목록과 메뉴가 보이는 상태
+- **포함 요소**:
+  - 저장된 그림 썸네일 또는 파일 카드
+  - 불러오기 / 공유 / 삭제 동작
+  - 저장한 그림을 새 그림의 참고 이미지로 사용하는 흐름
 
-- [ ] 홈/드로잉 캔버스/색상 팔레트/브러시/지우개/Undo/공유 화면 포함
-- [ ] 최소 3개 이상 핵심 기능이 화면에 명확히 드러남
-- [ ] 텍스트 잘림/번역 깨짐 없음
-- [ ] 실제 최신 UI 상태와 일치
-- [ ] 드로잉 화면에 다채로운 색상의 그림이 실제로 그려진 상태
+---
+
+### 5장: 기록, 통계, 설정
+- **제목(KO)**: **사용 기록 확인**
+- **부제목(KO)**: **기록·통계·설정**
+- **Title(EN)**: **Track Activity**
+- **Subtitle(EN)**: **History and stats**
+
+**캡처 화면**: 기록 또는 통계 화면
+- **포함 요소**:
+  - 오늘 / 이번 주 / 총 활동 수
+  - 최근 활동 기록
+  - 언어, 진동, 브러시 가이드, 로컬 데이터 관리 설정과 이어지는 맥락
+
+---
+
+### 6장: 후원형 Premium
+- **제목(KO)**: **광고 없이 그리기**
+- **부제목(KO)**: **한 번 후원으로 깔끔하게**
+- **Title(EN)**: **Ad-Free Drawing**
+- **Subtitle(EN)**: **One-time support**
+
+**캡처 화면**: Premium 화면
+- **포함 요소**:
+  - Small / Medium / Large 3개 후원 옵션
+  - Medium 기본 선택 또는 인기 배지
+  - 광고 제거 / 무제한 그리기 / 상세 통계 혜택 영역
+  - 구매 복원 버튼
+  - 하단 고정 구매 CTA
+
+---
+
+## 캡처 팁
+
+### 일반 가이드라인
+- **해상도**: 최소 `1080 x 1920`
+- **형식**: PNG 권장
+- **비율**: 9:16 우선
+- **기기**: 실제 Android 기기 캡처 권장
+- **상태**: 빈 화면보다 실제 그림이 있는 화면을 우선 사용
+- **테마**: 밝은 테마 우선, 색상 팔레트가 잘 보이게 촬영
+
+### 강조할 요소
+- 앱을 열고 바로 그릴 수 있는 흐름
+- 5종 브러시와 16색 팔레트
+- Undo / Redo로 실험하기 쉬운 구조
+- PNG 저장, 갤러리 관리, 공유
+- 11개 언어와 라이트/다크 테마
+- 후원형 Premium의 3개 옵션과 광고 제거
+
+### 스크린샷 배치 순서
+1. 홈 화면과 빠른 시작
+2. 풀스크린 드로잉 캔버스
+3. 브러시와 색상 팔레트
+4. 저장, 갤러리, 다시 불러오기
+5. 기록, 통계, 설정
+6. 후원형 Premium
+
+---
+
+## 구글 스토어 검색어 추천
+
+### English
+- Primary:
+  - Doodle Pad
+  - Drawing App
+  - Sketch Pad
+  - Paint App
+  - Doodle Drawing
+
+- Secondary:
+  - Quick Sketch
+  - Drawing Canvas
+  - Save Drawing
+  - Share Artwork
+  - Watercolor Brush
+  - Airbrush Drawing
+
+- Long-tail:
+  - simple drawing app for quick sketches
+  - doodle pad with save and share
+  - drawing canvas with pen marker eraser
+  - sketch app with watercolor brush
+  - quick drawing notes app
+
+### 한국어
+- 핵심:
+  - 두들 패드
+  - 드로잉 앱
+  - 그림판
+  - 낙서 앱
+  - 스케치 앱
+
+- 보조:
+  - 그림 저장
+  - 그림 공유
+  - 수채화 브러시
+  - 에어브러시
+  - 간단한 그림 메모
+
+- 롱테일:
+  - 바로 그리는 드로잉 앱
+  - 저장하고 공유하는 그림판
+  - 펜 마커 지우개가 있는 낙서 앱
+  - 수채화 브러시가 있는 스케치 앱
+  - 간단한 아이디어 그림 메모
+
+### 사용 팁
+- 핵심 키워드는 앱 제목과 짧은 설명에 자연스럽게 포함
+- 보조 키워드는 전체 설명과 스크린샷 문구에 분산
+- `drawing`, `sketch`, `doodle`, `paint`, `canvas`, `share` 조합을 우선 사용
+
+---
+
+## 추가 권장사항
+
+### 타겟 사용자
+- 간단히 그림을 그리고 저장하고 싶은 사용자
+- 아이디어를 그림으로 빠르게 남기고 싶은 사용자
+- 손가락으로 낙서하거나 색칠하고 싶은 사용자
+- 메신저나 SNS로 그림을 바로 공유하고 싶은 사용자
+- 광고 없는 깔끔한 캔버스를 원하는 사용자
+
+### 핵심 가치 제안
+- 앱 실행 후 바로 그리기
+- 펜 / 마커 / 지우개 / 수채화 / 에어브러시 제공
+- 16색 팔레트와 브러시 크기 조절
+- 저장, 갤러리, 다시 불러오기, 공유까지 한 흐름
+- 1회 후원으로 광고 제거와 Premium 브러시 접근
+
+### 차별화 요소
+- 드로잉에 필요한 기능만 간결하게 제공
+- 저장된 그림을 다시 불러와 참고 이미지로 활용 가능
+- 보상형 광고 또는 Premium으로 특수 브러시 접근 가능
+- 11개 언어 지원
+- 후원형 3단계 구매 구조로 혜택은 동일하게 유지

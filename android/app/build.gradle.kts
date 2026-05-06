@@ -3,6 +3,10 @@ import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
+    // START: FlutterFire Configuration
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
+    // END: FlutterFire Configuration
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
@@ -13,6 +17,7 @@ val keystorePropertiesFile = rootProject.file("key.properties")
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
+val hasReleaseKeystore = keystorePropertiesFile.exists()
 
 val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties")
@@ -30,7 +35,7 @@ val flutterVersionName = localProperties.getProperty("flutter.versionName") ?: "
 android {
     namespace = "com.dangundad.doodlepad"
     compileSdk = Math.max(flutter.compileSdkVersion, 36)
-    ndkVersion = "27.0.12077973"
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true 
@@ -44,7 +49,7 @@ android {
 
     defaultConfig {
         applicationId = "com.dangundad.doodlepad"
-        minSdk = flutterMinSdkVersion.toInt()
+        minSdk = maxOf(flutterMinSdkVersion.toInt(), 24)
         targetSdk = flutterTargetSdkVersion.toInt()
         versionCode = flutterVersionCode.toInt()
         versionName = flutterVersionName.toString()
@@ -53,16 +58,21 @@ android {
     }
 
     signingConfigs {
-        create("config") {
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-            storeFile = file(keystoreProperties["storeFile"] as String)
-            storePassword = keystoreProperties["storePassword"] as String
+        if (keystorePropertiesFile.exists()) {
+            create("config") {
+                keyAlias = keystoreProperties["keyAlias"] as? String ?: ""
+                keyPassword = keystoreProperties["keyPassword"] as? String ?: ""
+                storeFile = (keystoreProperties["storeFile"] as? String)?.let { file(it) }
+                storePassword = keystoreProperties["storePassword"] as? String ?: ""
+            }
         }
     }
 
     buildTypes {
         getByName("release") {
+            if (!hasReleaseKeystore) {
+                throw GradleException("Release signing requires android/key.properties. Refusing to sign release with the debug key.")
+            }
             isMinifyEnabled = true
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("config")
@@ -84,9 +94,13 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    testImplementation("junit:junit:4.13.2")
     implementation("androidx.work:work-runtime-ktx:2.7.1")
     implementation("com.google.android.gms:play-services-basement:18.4.0")
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:2.1.20"))
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-analytics")
     implementation("androidx.multidex:multidex:2.0.1")
 
     // Android 15 SDK 35 대응 의존성 (androidx.core 1.17.0은 Kotlin 2.0+ 요구)

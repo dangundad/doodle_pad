@@ -1,19 +1,28 @@
-﻿import 'package:get/get.dart';
+import 'package:get/get.dart';
+
 import 'package:doodle_pad/app/services/purchase_service.dart';
+import 'package:doodle_pad/app/utils/app_constants.dart';
 
 class PremiumPlan {
   const PremiumPlan({
+    required this.productId,
+    required this.emoji,
     required this.titleKey,
     required this.descKey,
     required this.fallbackPrice,
+    this.badgeKey,
   });
 
+  final String productId;
+  final String emoji;
   final String titleKey;
   final String descKey;
   final String fallbackPrice;
+  final String? badgeKey;
 
   String get title => titleKey.tr;
   String get description => descKey.tr;
+  String? get badge => badgeKey?.tr;
 }
 
 class PremiumController extends GetxController {
@@ -23,18 +32,25 @@ class PremiumController extends GetxController {
 
   final List<PremiumPlan> plans = const [
     PremiumPlan(
-      titleKey: 'premium_plan_weekly',
-      descKey: 'premium_plan_weekly_desc',
-      fallbackPrice: '￦1,900',
+      productId: PurchaseConstants.PREMIUM_SMALL_ANDROID,
+      emoji: '☕',
+      titleKey: 'premium_support_small_title',
+      descKey: 'premium_support_small_desc',
+      fallbackPrice: '￦2,900',
     ),
     PremiumPlan(
-      titleKey: 'premium_plan_monthly',
-      descKey: 'premium_plan_monthly_desc',
+      productId: PurchaseConstants.PREMIUM_MEDIUM_ANDROID,
+      emoji: '🍔',
+      titleKey: 'premium_support_medium_title',
+      descKey: 'premium_support_medium_desc',
       fallbackPrice: '￦5,900',
+      badgeKey: 'premium_support_medium_badge',
     ),
     PremiumPlan(
-      titleKey: 'premium_plan_yearly',
-      descKey: 'premium_plan_yearly_desc',
+      productId: PurchaseConstants.PREMIUM_LARGE_ANDROID,
+      emoji: '🍽️',
+      titleKey: 'premium_support_large_title',
+      descKey: 'premium_support_large_desc',
       fallbackPrice: '￦9,900',
     ),
   ];

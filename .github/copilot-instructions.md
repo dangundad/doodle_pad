@@ -1,109 +1,71 @@
-# CLAUDE.md
+# Doodle Pad (Drawing) 개발 가이드
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+> 문서: `CLAUDE.md`
+> This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+> 최종 업데이트: 2026-03-08
+> 기준: 현재 앱 저장소 스캔 + `C:\Flutter_WorkSpace\Flutter_Plan\AGENTS.md` 포트폴리오 상태표
 
-## 프로젝트 개요
+## 프로젝트 요약
+- 앱 번호: 40
+- Phase: 4
+- 상태: ✅ 기능구현
+- 난이도: ★★☆
+- 광고 등급: 중상
+- 프로젝트 폴더: `doodle_pad`
+- `pubspec` 이름: `doodle_pad`
+- Android 패키지: `com.dangundad.doodlepad`
+- 버전: `1.0.0+1`
+- 핵심 기능: 자유 드로잉, 펜/마커/지우개, 실행취소, 베지어 스무딩, 공유
 
-자유 드로잉 캔버스 앱. 펜/마커/지우개/Undo/Redo/공유 지원. Android 전용.
+## 공통 작업 원칙
+- 모든 텍스트 파일은 UTF-8로 유지하고, PowerShell에서 파일을 쓸 때는 `-Encoding UTF8`을 명시합니다.
+- AI/코드 어시스턴트의 설명, 진행 업데이트, 최종 답변은 기본적으로 한국어로 작성합니다.
+- Android 우선 프로젝트이며, 별도 요청 없이 iOS 전용 코드는 추가하지 않습니다.
+- 릴리스 빌드는 실행하지 않습니다. 일반 작업에서는 `flutter build apk`/`flutter build ios`를 사용하지 않습니다.
+- 코드 변경 후에는 반드시 `flutter analyze`와 `flutter test`를 실행해 결과를 확인합니다.
+- Hive `@HiveType` 모델을 추가하거나 수정했다면 `dart run build_runner build --delete-conflicting-outputs`를 실행합니다.
+- 상태 관리는 GetX, 로컬 저장은 Hive_CE 패턴을 유지하고 기존 네비게이션/영속성 구조를 임의로 바꾸지 않습니다.
+- Windows 표준 경로를 사용하고 WSL 경로(`/mnt/c/...`)는 사용하지 않습니다.
+- `2>nul`, `>nul` 리다이렉션은 사용하지 않으며, `nul` 파일이 생기면 정리합니다.
 
-- 패키지명: `com.dangundad.doodlepad`
-- 개발사: DangunDad (`dangundad@gmail.com`)
-- 설계 크기: 375×812 (ScreenUtil 기준)
-- 테마: `FlexScheme.blueWhale` (라이트/다크 모두)
-
-## 빌드 명령어
-
+## 빠른 명령어
 ```bash
-# 의존성 설치
+cd C:\Flutter_WorkSpace\doodle_pad
 flutter pub get
-
-# Hive 어댑터 재생성 (모델 변경 시)
 dart run build_runner build --delete-conflicting-outputs
-
-# 정적 분석 (변경 후 항상 실행)
 flutter analyze
-
-# 앱 실행
+flutter test
 flutter run
 ```
 
-## 아키텍처
+## 현재 의존성 하이라이트
+- 기반: `get` ^4.7.3, `hive_ce` ^2.19.3, `hive_ce_flutter` ^2.3.4, `path_provider` ^2.1.5, `intl` ^0.20.2, `uuid` ^4.5.3
+- UI/UX: `flutter_screenutil` ^5.9.3, `flex_color_scheme` ^8.4.0, `google_fonts` ^8.0.2, `lucide_icons_flutter` ^3.1.10, `flutter_animate` ^4.5.2
+- 수익화/운영: `google_mobile_ads` ^6.0.0, `gma_mediation_applovin` ^2.5.1, `gma_mediation_pangle` ^3.5.0, `gma_mediation_unity` ^1.6.2, `in_app_purchase` ^3.2.3, `in_app_review` ^2.0.11, `rate_my_app` ^2.3.2, `firebase_core` ^4.4.0, `firebase_analytics` ^12.1.2, `firebase_crashlytics` ^5.0.7, `device_info_plus` ^12.3.0, `package_info_plus` ^9.0.0, `permission_handler` ^12.0.1, `share_plus` ^12.0.1, `url_launcher` ^6.3.2, `wakelock_plus` ^1.4.0, `vibration` ^3.1.8
+- 기타: `flutter_localization` ^0.3.3, `toastification` ^3.0.3
 
-### 서비스 초기화 흐름
+## 현재 코드 구조
+- `lib/app` 디렉터리: `admob`, `bindings`, `controllers`, `data`, `pages`, `routes`, `services`, `theme`, `translate`, `utils`, `widgets`
+- `bindings`: `app_binding.dart`
+- `routes`: `app_pages.dart`, `app_routes.dart`
+- `controllers`: `doodle_controller.dart`, `history_controller.dart`, `home_controller.dart`, `premium_controller.dart`, `setting_controller.dart`, `stats_controller.dart`
+- 기능 중심 컨트롤러: `doodle_controller`
+- `services`: `activity_log_service.dart`, `app_rating_service.dart`, `hive_service.dart`, `purchase_service.dart`
+- 기능 중심 서비스: 없음
+- `pages`: `draw`, `gallery`, `history`, `home`, `premium`, `settings`, `stats`
+- `widgets`: 없음
+- `mixins`: 없음
+- `utils`: `app_constants.dart`, `app_toast.dart`
+- `translate`: `translate.dart`
+- `theme`: `app_flex_theme.dart`
+- `data/models`: 없음
+- `data/enums`: 없음
+- `data/constants`: 없음
+- `data` 루트 파일: 없음
+- `assets`: `fonts`, `images`
+- `tests`: 4개: `test/app/controllers/setting_controller_test.dart`, `test/app/pages/settings/settings_page_test.dart`, `test/app/utils/app_toast_test.dart`, `test/widget_test.dart`
 
-`main()` → AdMob 동의 폼 초기화 → `AppBinding.initializeServices()` (Hive 초기화 + 서비스 등록) → `runApp()`
-
-`AppBinding`은 두 가지 역할을 겸함:
-1. `initializeServices()` (static) — `main()`에서 앱 시작 시 영구 서비스 등록
-2. `dependencies()` — GetX 라우팅 시 HomePage에서 호출
-
-### GetX 의존성 트리
-
-**영구 서비스 (permanent: true)**
-- `HiveService` — Hive 박스 관리 (`settings`, `app_data` 박스)
-- `ActivityLogService` — 이벤트 로그 (`phase1_activity_log` 박스, 최대 300개)
-- `PurchaseService` — IAP 관리, 프리미엄 상태에 따라 광고 매니저 동적 등록/해제
-- `DoodleController` — 캔버스 상태 (스트로크 목록, 브러시 설정, Undo 스택)
-- `SettingController` — 앱 설정 (`doodle_settings_v1` 박스)
-- `InterstitialAdManager` — 전면 광고 (비프리미엄 시)
-- `RewardedAdManager` — 보상형 광고 (비프리미엄 시)
-
-**LazyPut (필요 시 생성)**
-- `HistoryController` — ActivityLogService 이벤트 조회/필터
-- `StatsController` — 이벤트 통계 집계
-- `PremiumController` — 프리미엄 UI 상태
-
-### 라우팅
-
-| 경로        | 페이지         | 바인딩           |
-| ----------- | -------------- | ---------------- |
-| `/home`     | `HomePage`     | `AppBinding`     |
-| `/draw`     | `DrawPage`     | —                |
-| `/settings` | `SettingsPage` | —                |
-| `/history`  | `HistoryPage`  | —                |
-| `/stats`    | `StatsPage`    | —                |
-| `/premium`  | `PremiumPage`  | `PremiumBinding` |
-
-### 드로잉 핵심 구조
-
-`DoodleController`가 `List<DrawingStroke>.obs`를 관리 (Hive 미저장, 인메모리).
-
-`CanvasPainter`의 핵심 패턴:
-- 지우개는 `BlendMode.clear`로 구현 → **반드시 `canvas.saveLayer()`로 감싸야 동작**
-- 단일 점 입력 시 `drawCircle`, 복수 점은 quadratic bezier 곡선으로 부드럽게 처리
-- `shouldRepaint`는 스트로크 수 또는 마지막 스트로크의 점 수 변화만 감지
-
-브러시 타입별 동작:
-- `pen`: `StrokeCap.round`, 기본 너비
-- `marker`: `StrokeCap.square`, 너비 2.5배
-- `eraser`: `BlendMode.clear`, 너비 4.0배
-
-### 스토리지 구조
-
-| Hive 박스             | 용도                               | 담당 서비스          |
-| --------------------- | ---------------------------------- | -------------------- |
-| `settings`            | 범용 설정 (key-value)              | `HiveService`        |
-| `app_data`            | 범용 앱 데이터                     | `HiveService`        |
-| `doodle_settings_v1`  | 앱 전용 설정 (haptic, language 등) | `SettingController`  |
-| `phase1_activity_log` | 이벤트 로그                        | `ActivityLogService` |
-
-`SettingController`와 `HiveService`는 별도 박스를 사용함에 주의. `HiveKeys.IS_PREMIUM`은 `settingsBox`에 저장됨.
-
-### 광고 / 프리미엄
-
-- `PurchaseService._syncAdsForPremiumStatus(true)` 호출 시 광고 매니저를 `Get.delete()`로 제거
-- 프리미엄 해제 시 다시 `Get.put()`으로 등록
-- 실제 AdMob ID는 `ads_helper.dart`의 TODO 항목으로 교체 필요 (현재 테스트 ID 사용 중)
-- IAP 상품 ID 형식: `com.dangundad.doodlepad.premium_{weekly|monthly|yearly}`
-
-### 다국어
-
-현재 `ko` 키만 정의. 새 문자열은 `lib/app/translate/translate.dart`에 `ko` 섹션에만 추가.
-
-## 주요 상수 위치
-
-- `AppUrls.PACKAGE_NAME` — 패키지명
-- `HiveKeys` — Hive 저장 키 상수
-- `PurchaseConstants.ANDROID_PRODUCT_IDS` — IAP 상품 ID 목록
-- `DoodleController.colorPalette` — 16색 팔레트 (ARGB int 배열)
-- `DoodleController._maxUndo` — Undo 최대 20단계
+## 문서 유지 규칙
+- 새 페이지나 바인딩을 추가하면 이 문서의 `pages`/`bindings` 요약도 함께 갱신합니다.
+- 의존성 추가/제거, Android 패키지명 변경, 테스트 확장은 이 문서에 바로 반영합니다.
+- 포트폴리오 상태가 바뀌면 메타 레포 `AGENTS.md`, `CLAUDE.md`, 관련 `docs/*.md`와 함께 동기화합니다.

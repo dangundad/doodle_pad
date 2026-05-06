@@ -20,6 +20,7 @@ import 'package:doodle_pad/app/services/activity_log_service.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
 import 'package:doodle_pad/app/services/purchase_service.dart';
 import 'package:doodle_pad/app/translate/translate.dart';
+import 'package:doodle_pad/app/widgets/exit_bottom_sheet.dart';
 
 import '../../helpers/fake_purchase_service.dart';
 
@@ -77,10 +78,7 @@ void main() {
     Get.put<SettingController>(controller);
 
     await tester.pumpWidget(
-      const _AppShell(
-        locale: Locale('en'),
-        home: HomeContentPage(),
-      ),
+      const _AppShell(locale: Locale('en'), home: HomeContentPage()),
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 200));
@@ -103,22 +101,49 @@ void main() {
     Get.put<PurchaseService>(purchaseService, permanent: true);
 
     await tester.pumpWidget(
-      const _AppShell(
-        locale: Locale('en'),
-        home: MainShellPage(),
-      ),
+      const _AppShell(locale: Locale('en'), home: MainShellPage()),
     );
     await tester.pump();
 
     expect(find.byType(BannerAdWidget), findsNothing);
   });
+
+  testWidgets('shows exit bottom sheet when system back is pressed on shell', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    final settingController = _FakeSettingController();
+    final purchaseService = FakePurchaseService()..isPremium.value = true;
+
+    Get.put<SettingController>(settingController, permanent: true);
+    Get.put<ActivityLogService>(ActivityLogService(), permanent: true);
+    Get.put<HistoryController>(HistoryController());
+    Get.put<StatsController>(StatsController());
+    Get.put<PurchaseService>(purchaseService, permanent: true);
+
+    await tester.pumpWidget(
+      const _AppShell(locale: Locale('en'), home: MainShellPage()),
+    );
+    await tester.pump();
+
+    await tester.binding.handlePopRoute();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+
+    expect(find.byType(ExitBottomSheet), findsOneWidget);
+    expect(find.text('Exit the app?'), findsOneWidget);
+
+    Get.back();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 250));
+  });
 }
 
 class _AppShell extends StatelessWidget {
-  const _AppShell({
-    required this.home,
-    required this.locale,
-  });
+  const _AppShell({required this.home, required this.locale});
 
   final Widget home;
   final Locale locale;
@@ -145,4 +170,3 @@ class _FakeSettingController extends SettingController {
 
   static Future<void> _noop(Locale _) async {}
 }
-

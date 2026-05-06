@@ -34,7 +34,10 @@ void main() {
     await Hive.openBox(HiveService.APP_DATA_BOX);
 
     Get.put<HiveService>(HiveService(), permanent: true);
-    Get.put<InterstitialAdManager>(_FakeInterstitialAdManager(), permanent: true);
+    Get.put<InterstitialAdManager>(
+      _FakeInterstitialAdManager(),
+      permanent: true,
+    );
     Get.put<RewardedAdManager>(_FakeRewardedAdManager(), permanent: true);
 
     fakePlatform = _FakeInAppPurchasePlatform(
@@ -52,6 +55,21 @@ void main() {
         await tempDir.delete(recursive: true);
       } catch (_) {}
     }
+  });
+
+  test('productIds expose the three support tiers in store order', () {
+    final service = PurchaseService(isAndroidPlatform: () => true);
+
+    expect(PurchaseConstants.ANDROID_PRODUCT_IDS, [
+      PurchaseConstants.PREMIUM_SMALL_ANDROID,
+      PurchaseConstants.PREMIUM_MEDIUM_ANDROID,
+      PurchaseConstants.PREMIUM_LARGE_ANDROID,
+    ]);
+    expect(service.productIds, {
+      PurchaseConstants.PREMIUM_SMALL_ANDROID,
+      PurchaseConstants.PREMIUM_MEDIUM_ANDROID,
+      PurchaseConstants.PREMIUM_LARGE_ANDROID,
+    });
   });
 
   test(
@@ -89,7 +107,10 @@ void main() {
 
       expect(service.isPremium.value, isFalse);
       expect(
-        HiveService.to.getSetting<bool>(HiveKeys.IS_PREMIUM, defaultValue: true),
+        HiveService.to.getSetting<bool>(
+          HiveKeys.IS_PREMIUM,
+          defaultValue: true,
+        ),
         isFalse,
       );
     },
@@ -104,7 +125,9 @@ void main() {
       InAppPurchasePlatform.instance = fakePlatform;
 
       final service = PurchaseService(
-        pastPurchasesLoader: () async => <PurchaseDetails>[_activePremiumPurchase],
+        pastPurchasesLoader: () async => <PurchaseDetails>[
+          _activePremiumPurchase,
+        ],
         isAndroidPlatform: () => true,
       );
 
@@ -112,7 +135,10 @@ void main() {
 
       expect(service.isPremium.value, isTrue);
       expect(
-        HiveService.to.getSetting<bool>(HiveKeys.IS_PREMIUM, defaultValue: false),
+        HiveService.to.getSetting<bool>(
+          HiveKeys.IS_PREMIUM,
+          defaultValue: false,
+        ),
         isTrue,
       );
     },
@@ -120,7 +146,7 @@ void main() {
 }
 
 final PurchaseDetails _activePremiumPurchase = PurchaseDetails(
-  productID: PurchaseConstants.PREMIUM_MONTHLY_ANDROID,
+  productID: PurchaseConstants.PREMIUM_MEDIUM_ANDROID,
   verificationData: PurchaseVerificationData(
     localVerificationData: 'local',
     serverVerificationData: 'server',
@@ -147,7 +173,8 @@ class _FakeInAppPurchasePlatform extends Fake
     required List<bool> availabilityQueue,
     Stream<List<PurchaseDetails>>? purchaseStream,
   }) : _availabilityQueue = availabilityQueue,
-       _purchaseStream = purchaseStream ?? const Stream<List<PurchaseDetails>>.empty();
+       _purchaseStream =
+           purchaseStream ?? const Stream<List<PurchaseDetails>>.empty();
 
   final List<bool> _availabilityQueue;
   final Stream<List<PurchaseDetails>> _purchaseStream;

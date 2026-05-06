@@ -1,7 +1,7 @@
 # Doodle Pad (Drawing) 개발 가이드
 
-> 문서: `AGENTS.md`
-> This file provides guidance to coding agents working with this repository.
+> 문서: `CLAUDE.md`
+> This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 > 최종 업데이트: 2026-03-08
 > 기준: 현재 앱 저장소 스캔 + `C:\Flutter_WorkSpace\Flutter_Plan\AGENTS.md` 포트폴리오 상태표
 
