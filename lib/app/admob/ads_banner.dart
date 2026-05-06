@@ -14,11 +14,7 @@ class BannerAdWidget extends StatefulWidget {
   final String type;
   final String adUnitId;
 
-  const BannerAdWidget({
-    super.key,
-    required this.adUnitId,
-    required this.type,
-  });
+  const BannerAdWidget({super.key, required this.adUnitId, required this.type});
 
   @override
   BannerAdState createState() => BannerAdState();
@@ -51,12 +47,14 @@ class BannerAdState extends State<BannerAdWidget> {
 
     if (!mounted) return;
     if (!AdHelper.hasUsableAdUnitId(widget.adUnitId)) {
-      debugPrint('${widget.type} BannerAd skipped: release ad unit id is not configured');
+      debugPrint(
+        '${widget.type} BannerAd skipped: release ad unit id is not configured',
+      );
       return;
     }
 
     final AnchoredAdaptiveBannerAdSize? size =
-        await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+        await AdSize.getLargeAnchoredAdaptiveBannerAdSize(
           MediaQuery.of(context).size.width.truncate(),
         );
 

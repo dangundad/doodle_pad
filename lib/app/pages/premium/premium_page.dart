@@ -49,91 +49,7 @@ class PremiumPage extends GetView<PremiumController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'premium_title'.tr,
-            style: TextStyle(
-              fontSize: 30.sp,
-              fontWeight: FontWeight.w800,
-              color: cs.onSurface,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          SizedBox(height: 6.h),
-          Text(
-            'premium_subtitle'.tr,
-            style: TextStyle(
-              color: cs.onSurfaceVariant,
-              height: 1.35,
-              fontSize: 13.sp,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          SizedBox(height: 18.h),
-          Container(
-            padding: EdgeInsets.all(16.w),
-            decoration: BoxDecoration(
-              color: cs.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(18.r),
-              border: Border.all(color: cs.outline.withValues(alpha: 0.3)),
-              boxShadow: [
-                BoxShadow(
-                  color: cs.shadow.withValues(alpha: 0.08),
-                  blurRadius: 14,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 52.r,
-                  height: 52.r,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16.r),
-                    gradient: LinearGradient(
-                      colors: [cs.primary, cs.primary.withValues(alpha: 0.64)],
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.workspace_premium,
-                    size: 26.r,
-                    color: cs.onPrimary,
-                  ),
-                ),
-                SizedBox(width: 14.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'premium_title'.tr,
-                        style: TextStyle(
-                          fontSize: 17.sp,
-                          fontWeight: FontWeight.w800,
-                          color: cs.onSurface,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 4.h),
-                      Text(
-                        'premium_subtitle'.tr,
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          color: cs.onSurfaceVariant,
-                          height: 1.35,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+          _PremiumIntroCard(cs: cs),
           SizedBox(height: 18.h),
           _BenefitsCard(cs: cs),
           SizedBox(height: 14.h),
@@ -152,9 +68,10 @@ class PremiumPage extends GetView<PremiumController> {
                   padding: EdgeInsets.symmetric(vertical: 12.h),
                 ),
                 child: service.isLoading.value
-                    ? SizedBox(width: 20.w,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                    ? SizedBox(
+                        width: 20.w,
+                        height: 20.w,
+                        child: const CircularProgressIndicator(strokeWidth: 2),
                       )
                     : Text('premium_purchase'.tr),
               ),
@@ -228,6 +145,72 @@ class PremiumPage extends GetView<PremiumController> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _PremiumIntroCard extends StatelessWidget {
+  const _PremiumIntroCard({required this.cs});
+
+  final ColorScheme cs;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(20.w),
+      decoration: BoxDecoration(
+        color: cs.primaryContainer.withValues(alpha: 0.42),
+        borderRadius: BorderRadius.circular(22.r),
+        border: Border.all(color: cs.primary.withValues(alpha: 0.18)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 56.r,
+            height: 56.r,
+            decoration: BoxDecoration(
+              color: cs.primary,
+              borderRadius: BorderRadius.circular(18.r),
+            ),
+            child: Icon(
+              Icons.workspace_premium,
+              size: 28.r,
+              color: cs.onPrimary,
+            ),
+          ),
+          SizedBox(width: 14.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'premium_title'.tr,
+                  style: TextStyle(
+                    fontSize: 22.sp,
+                    fontWeight: FontWeight.w900,
+                    color: cs.onPrimaryContainer,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 6.h),
+                Text(
+                  'premium_subtitle'.tr,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: cs.onSurfaceVariant,
+                    height: 1.4,
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -43,6 +43,15 @@ class SettingsPage extends GetView<SettingController> {
           () => ListView(
             padding: EdgeInsets.all(16.w),
             children: [
+              Card(
+                key: const ValueKey('release_settings_intro'),
+                child: ListTile(
+                  leading: const Icon(Icons.tune_rounded),
+                  title: Text('settings'.tr),
+                  subtitle: Text('app_name'.tr),
+                ),
+              ),
+              SizedBox(height: 12.h),
               _SettingsSection(
                 title: _loc('quick_actions', 'Quick actions'),
                 icon: Icons.dashboard_customize,
@@ -324,11 +333,7 @@ class _BuildSwitchTile extends StatelessWidget {
       onChanged: onChanged,
       secondary: Icon(icon, color: cs.primary),
       title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
-      subtitle: Text(
-        subtitle,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-      ),
+      subtitle: Text(subtitle, maxLines: 2, overflow: TextOverflow.ellipsis),
     );
   }
 }
@@ -403,11 +408,7 @@ class _ListItem extends StatelessWidget {
     return ListTile(
       leading: Icon(icon, color: cs.primary),
       title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
-      subtitle: Text(
-        subtitle,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-      ),
+      subtitle: Text(subtitle, maxLines: 2, overflow: TextOverflow.ellipsis),
       trailing: const Icon(Icons.chevron_right),
       onTap: onTap,
     );
