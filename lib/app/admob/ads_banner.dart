@@ -1,8 +1,3 @@
-// ================================================
-// DangunDad Flutter App - ads_banner.dart Template
-// ================================================
-// Adaptive 배너 광고 위젯 (mbti_pro 패턴)
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';

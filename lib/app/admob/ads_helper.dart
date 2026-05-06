@@ -1,10 +1,3 @@
-// ================================================
-// DangunDad Flutter App - ads_helper.dart Template
-// ================================================
-// 광고 ID 및 GDPR 동의 폼 관리
-// {package} 치환 후 사용
-// 배포 전 실제 광고 ID로 교체 필요
-
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -24,8 +17,7 @@ class AdHelper {
     'DOODLE_PAD_ADMOB_REWARDED_ANDROID',
   );
 
-  static final GmaMediationApplovin _appLovinMediation =
-      GmaMediationApplovin();
+  static final GmaMediationApplovin _appLovinMediation = GmaMediationApplovin();
   static final GmaMediationUnity _unityMediation = GmaMediationUnity();
 
   static final AdHelper _instance = AdHelper._internal();
@@ -168,7 +160,8 @@ class AdHelper {
 
   static Future<void> _syncMediationConsent() async {
     try {
-      final consentStatus = await ConsentInformation.instance.getConsentStatus();
+      final consentStatus = await ConsentInformation.instance
+          .getConsentStatus();
       final hasUserConsent =
           consentStatus == ConsentStatus.obtained ||
           consentStatus == ConsentStatus.notRequired;
@@ -258,9 +251,7 @@ class AdHelper {
               override: releaseInterstitialAdUnitIdAndroidOverride,
             );
     } else if (_targetPlatform == TargetPlatform.iOS) {
-      return _isDebugMode
-          ? 'ca-app-pub-3940256099942544/4411468910'
-          : '';
+      return _isDebugMode ? 'ca-app-pub-3940256099942544/4411468910' : '';
     }
     return 'ca-app-pub-3940256099942544/1033173712';
   }
@@ -275,9 +266,7 @@ class AdHelper {
               override: releaseRewardedAdUnitIdAndroidOverride,
             );
     } else if (_targetPlatform == TargetPlatform.iOS) {
-      return _isDebugMode
-          ? 'ca-app-pub-3940256099942544/1712485313'
-          : '';
+      return _isDebugMode ? 'ca-app-pub-3940256099942544/1712485313' : '';
     }
     return 'ca-app-pub-3940256099942544/5224354917';
   }

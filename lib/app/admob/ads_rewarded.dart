@@ -1,8 +1,3 @@
-// ================================================
-// DangunDad Flutter App - ads_rewarded.dart Template
-// ================================================
-// 보상형 광고 매니저 (GetxController 기반, mbti_pro 패턴)
-
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:get/get.dart';

@@ -1,8 +1,3 @@
-// ================================================
-// DangunDad Flutter App - ads_interstitial.dart Template
-// ================================================
-// 전면 광고 매니저 (GetxController 기반, mbti_pro 패턴)
-
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:get/get.dart';
@@ -43,7 +38,9 @@ class InterstitialAdManager extends GetxController {
     }
     final adUnitId = AdHelper.interstitialAdUnitId;
     if (!AdHelper.hasUsableAdUnitId(adUnitId)) {
-      debugPrint('Interstitial ad skipped: release ad unit id is not configured');
+      debugPrint(
+        'Interstitial ad skipped: release ad unit id is not configured',
+      );
       _interstitialAd = null;
       isAdReady.value = false;
       return;

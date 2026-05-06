@@ -1,7 +1,3 @@
-// ================================================
-// DangunDad Flutter App - main.dart Template
-// ================================================
-
 import 'dart:async';
 
 import 'package:firebase_core/firebase_core.dart';

@@ -1,9 +1,3 @@
-// ================================================
-// DangunDad Flutter App - hive_service.dart Template
-// ================================================
-// doodle_pad 치환 후 사용
-// mbti_pro 프로덕션 패턴 기반
-
 // ignore_for_file: constant_identifier_names
 
 import 'package:get/get.dart';
