@@ -1,20 +1,21 @@
-﻿import 'package:hive_ce/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:get/get.dart';
 
 import 'package:doodle_pad/app/admob/ads_interstitial.dart';
 import 'package:doodle_pad/app/admob/ads_rewarded.dart';
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
-import 'package:doodle_pad/app/services/activity_log_service.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
-import 'package:doodle_pad/app/controllers/history_controller.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
-import 'package:doodle_pad/app/controllers/stats_controller.dart';
 
 import 'package:doodle_pad/app/services/purchase_service.dart';
 import 'package:doodle_pad/app/services/app_rating_service.dart';
 import 'package:doodle_pad/app/controllers/premium_controller.dart';
 
 class AppBinding implements Bindings {
+  static const List<String> _legacyBoxNames = ['phase1_activity_log'];
+  static const String _legacyPurgeFlagKey = 'legacy_boxes_purged_v1';
+  static const String _settingsBoxName = 'doodle_settings_v1';
+
   static Future<void> initializeCoreServices() async {
     if (!Get.isRegistered<HiveService>()) {
       await HiveService.init();
@@ -33,6 +34,24 @@ class AppBinding implements Bindings {
     }
 
     await SettingController.ensureBoxOpen();
+    await _purgeLegacyHiveBoxes();
+  }
+
+  static Future<void> _purgeLegacyHiveBoxes() async {
+    final settingsBox = Hive.box(_settingsBoxName);
+    if (settingsBox.get(_legacyPurgeFlagKey) == true) return;
+
+    for (final name in _legacyBoxNames) {
+      try {
+        if (Hive.isBoxOpen(name)) {
+          await Hive.box(name).close();
+        }
+        await Hive.deleteBoxFromDisk(name);
+      } catch (e) {
+        Get.log('[AppBinding] legacy box purge failed ($name): $e');
+      }
+    }
+    await settingsBox.put(_legacyPurgeFlagKey, true);
   }
 
   static Future<void> initializeServices() async {
@@ -60,18 +79,6 @@ class AppBinding implements Bindings {
 
     if (!Get.isRegistered<SettingController>()) {
       Get.put(SettingController(), permanent: true);
-    }
-
-    if (!Get.isRegistered<ActivityLogService>()) {
-      Get.put(ActivityLogService(), permanent: true);
-    }
-
-    if (!Get.isRegistered<HistoryController>()) {
-      Get.lazyPut(() => HistoryController());
-    }
-
-    if (!Get.isRegistered<StatsController>()) {
-      Get.lazyPut(() => StatsController());
     }
 
     if (!Get.isRegistered<InterstitialAdManager>()) {

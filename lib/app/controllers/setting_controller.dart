@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -6,7 +6,6 @@ import 'package:hive_ce/hive.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:doodle_pad/app/services/app_rating_service.dart';
-import 'package:doodle_pad/app/services/activity_log_service.dart';
 import 'package:doodle_pad/app/utils/app_constants.dart';
 import 'package:doodle_pad/app/utils/app_toast.dart';
 
@@ -121,13 +120,9 @@ class SettingController extends GetxController {
     askBeforeClear.value = true;
     language.value = 'en';
     await _updateLocaleFn(const Locale('en'));
-
-    if (Get.isRegistered<ActivityLogService>()) {
-      await ActivityLogService.to.clearEvents(appId: appId);
-    }
   }
+
   Future<void> rateApp() async {
-    logEvent('tap_rate_app', 'settings');
     try {
       await _rateAppFn();
     } catch (_) {
@@ -136,7 +131,6 @@ class SettingController extends GetxController {
   }
 
   Future<void> sendFeedback() async {
-    logEvent('tap_send_feedback', 'settings');
     final uri = Uri(
       scheme: 'mailto',
       path: DeveloperInfo.DEVELOPER_EMAIL,
@@ -146,12 +140,10 @@ class SettingController extends GetxController {
   }
 
   Future<void> openMoreApps() async {
-    logEvent('tap_more_apps', 'settings');
     await _openExternalLink(Uri.parse(AppUrls.GOOGLE_PLAY_MOREAPPS));
   }
 
   Future<void> openPrivacyPolicy() async {
-    logEvent('tap_privacy_policy', 'settings');
     await _openExternalLink(Uri.parse(AppUrls.PRIVACY_POLICY));
   }
 
@@ -174,33 +166,6 @@ class SettingController extends GetxController {
       AppToastMessage.error(
         title: 'error'.tr,
         description: 'link_open_error'.tr,
-      ),
-    );
-  }
-
-  void recordHomeOpen(String routeName) {
-    logEvent('home_open', 'home', metadata: {'route': routeName});
-  }
-
-  void recordSettingsOpen({String from = 'menu'}) {
-    logEvent('settings_open', 'settings', metadata: {'from': from});
-  }
-
-  void logEvent(
-    String eventName,
-    String screen, {
-    Map<String, dynamic> metadata = const {},
-  }) {
-    if (!Get.isRegistered<ActivityLogService>()) {
-      return;
-    }
-    unawaited(
-      ActivityLogService.to.logEvent(
-        appId: appId,
-        eventName: eventName,
-        screen: screen,
-        route: Get.currentRoute,
-        metadata: metadata,
       ),
     );
   }

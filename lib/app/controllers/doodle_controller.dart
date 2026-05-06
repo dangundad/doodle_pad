@@ -43,7 +43,6 @@ class DoodleController extends GetxController {
   static DoodleController get to => Get.find();
 
   static const _maxUndo = 20;
-  static const _savedPathsKey = 'saved_drawing_paths';
 
   // Drawing state
   final strokes = <DrawingStroke>[].obs;
@@ -55,9 +54,7 @@ class DoodleController extends GetxController {
   final brushColor = 0xFF000000.obs;
   final brushSize = 6.0.obs;
 
-  // Gallery state
-  final savedDrawings = <String>[].obs;
-  final isSaving = false.obs;
+  // Reference image (used by share preview overlay only).
   final referenceImagePath = RxnString();
 
   // Special brush unlock state
@@ -109,7 +106,6 @@ class DoodleController extends GetxController {
   void onInit() {
     super.onInit();
     Vibration.hasVibrator().then((v) => _hasVibrator = v);
-    _loadSavedPaths();
     _loadBrushUnlockState();
   }
 
@@ -135,23 +131,6 @@ class DoodleController extends GetxController {
         hive.getSetting<bool>(_watercolorUnlockedKey) ?? false;
     isAirbrushUnlocked.value =
         hive.getSetting<bool>(_airbrushUnlockedKey) ?? false;
-  }
-
-  void _loadSavedPaths() {
-    final hive = HiveService.to;
-    final paths = hive.getSetting<List>(_savedPathsKey);
-    if (paths != null) {
-      // 존재하는 파일만 필터링
-      final valid = paths
-          .map((e) => e.toString())
-          .where((p) => File(p).existsSync())
-          .toList();
-      savedDrawings.assignAll(valid);
-      // 삭제된 파일 제거 후 저장
-      if (valid.length != paths.length) {
-        hive.setSetting(_savedPathsKey, valid);
-      }
-    }
   }
 
   void startStroke(Offset point) {
@@ -346,105 +325,6 @@ class DoodleController extends GetxController {
         : _maxCapturePixelRatio;
     // 너무 작아지면 1.0 까지 내림.
     return ratio < 1.0 ? 1.0 : ratio;
-  }
-
-  /// 그림을 앱 문서 디렉토리에 PNG로 저장하고 경로 반환
-  Future<String?> _savePng({String? suffix}) async {
-    final image = await _captureCanvas();
-    if (image == null) return null;
-    try {
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      if (byteData == null) return null;
-      final bytes = byteData.buffer.asUint8List();
-
-      final dir = await getApplicationDocumentsDirectory();
-      final drawingsDir = Directory('${dir.path}/drawings');
-      if (!drawingsDir.existsSync()) {
-        drawingsDir.createSync(recursive: true);
-      }
-      final fileName =
-          'doodle_${suffix ?? DateTime.now().millisecondsSinceEpoch}.png';
-      final file = File('${drawingsDir.path}/$fileName');
-      await file.writeAsBytes(bytes);
-      return file.path;
-    } finally {
-      image.dispose();
-    }
-  }
-
-  /// 그림 저장 (갤러리에 추가)
-  Future<void> saveCanvas() async {
-    if (!hasDrawableContent) {
-      AppToast.show(
-        AppToastMessage.info(
-          title: 'save_canvas'.tr,
-          description: 'gallery_empty'.tr,
-        ),
-      );
-      return;
-    }
-
-    isSaving.value = true;
-    try {
-      final path = await _savePng();
-      if (path == null) {
-        AppToast.show(
-          AppToastMessage.error(
-            title: 'error'.tr,
-            description: 'save_error'.tr,
-          ),
-        );
-        return;
-      }
-
-      // 최신 항목이 앞에 오도록 insert
-      savedDrawings.insert(0, path);
-
-      // Hive에 경로 목록 저장
-      await HiveService.to.setSetting(_savedPathsKey, savedDrawings.toList());
-
-      AppToast.show(
-        AppToastMessage.success(
-          title: 'save_canvas'.tr,
-          description: 'save_success'.tr,
-        ),
-      );
-    } catch (_) {
-      AppToast.show(
-        AppToastMessage.error(
-          title: 'error'.tr,
-          description: 'save_error'.tr,
-        ),
-      );
-    } finally {
-      isSaving.value = false;
-    }
-  }
-
-  /// 저장된 그림 삭제
-  Future<void> deleteDrawing(String path) async {
-    try {
-      final file = File(path);
-      if (file.existsSync()) {
-        file.deleteSync();
-      }
-
-      savedDrawings.remove(path);
-      await HiveService.to.setSetting(_savedPathsKey, savedDrawings.toList());
-      AppToast.show(
-        AppToastMessage.success(
-          title: 'delete_drawing'.tr,
-          description: 'delete_drawing_complete'.tr,
-        ),
-      );
-    } catch (_) {
-      AppToast.show(
-        AppToastMessage.error(
-          title: 'error'.tr,
-          description: 'delete_error'.tr,
-        ),
-      );
-    }
   }
 
   /// 공유 (임시 파일로 저장 후 공유)

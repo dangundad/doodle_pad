@@ -181,28 +181,6 @@ class _TopToolbar extends StatelessWidget {
               onPressed: () => _confirmClear(context, cs, settingCtrl),
               tooltip: 'clear_canvas'.tr,
             ),
-            // 저장 버튼
-            Obx(
-              () => IconButton(
-                icon: ctrl.isSaving.value
-                    ? SizedBox(
-                        width: 20.r,
-                        height: 20.r,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: cs.primary,
-                        ),
-                      )
-                    : Icon(Icons.save_rounded, color: cs.primary),
-                onPressed: ctrl.isSaving.value
-                    ? null
-                    : () {
-                        _maybeHaptic(settingCtrl);
-                        ctrl.saveCanvas();
-                      },
-                tooltip: 'save_canvas'.tr,
-              ),
-            ),
             IconButton(
               icon: const Icon(Icons.share_rounded),
               onPressed: () {
@@ -230,11 +208,6 @@ class _TopToolbar extends StatelessWidget {
     SettingController settingCtrl,
   ) {
     if (!settingCtrl.askBeforeClear.value) {
-      settingCtrl.logEvent(
-        'clear_canvas_direct',
-        'draw',
-        metadata: {'source': 'toolbar', 'confirm': false},
-      );
       ctrl.clearCanvas();
       return;
     }
@@ -319,11 +292,6 @@ class _TopToolbar extends StatelessWidget {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(12.r),
                           onTap: () {
-                            settingCtrl.logEvent(
-                              'clear_canvas',
-                              'draw',
-                              metadata: {'source': 'toolbar', 'confirm': true},
-                            );
                             ctrl.clearCanvas();
                             if (settingCtrl.hapticEnabled.value) {
                               ctrl.hapticHeavy();

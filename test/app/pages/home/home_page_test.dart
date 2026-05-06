@@ -1,22 +1,17 @@
-// ignore_for_file: must_call_super
-
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:hive_ce/hive.dart';
 
 import 'package:doodle_pad/app/admob/ads_banner.dart';
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
-import 'package:doodle_pad/app/controllers/history_controller.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
-import 'package:doodle_pad/app/controllers/stats_controller.dart';
-import 'package:doodle_pad/app/pages/home/main_shell_page.dart';
 import 'package:doodle_pad/app/pages/home/home_page.dart';
-import 'package:doodle_pad/app/services/activity_log_service.dart';
+import 'package:doodle_pad/app/routes/app_pages.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
 import 'package:doodle_pad/app/services/purchase_service.dart';
 import 'package:doodle_pad/app/translate/translate.dart';
@@ -34,9 +29,7 @@ void main() {
   setUp(() async {
     Get.testMode = true;
 
-    tempDir = await Directory.systemTemp.createTemp(
-      'doodle_pad_home_page_test_',
-    );
+    tempDir = await Directory.systemTemp.createTemp('doodle_pad_home_page_test_');
     Hive.init(tempDir.path);
     await Hive.openBox(HiveService.SETTINGS_BOX);
     await Hive.openBox(HiveService.APP_DATA_BOX);
@@ -55,6 +48,10 @@ void main() {
 
     Get.put<HiveService>(HiveService(), permanent: true);
     Get.put<DoodleController>(DoodleController(), permanent: true);
+    Get.put<SettingController>(
+      _FakeSettingController(),
+      permanent: true,
+    );
   });
 
   tearDown(() async {
@@ -69,64 +66,103 @@ void main() {
     }
   });
 
-  testWidgets('does not show onboarding dialog on home entry', (tester) async {
+  testWidgets('hides banner ad when premium is active', (tester) async {
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
-    final controller = _FakeSettingController()..showBrushGuide.value = true;
-    Get.put<SettingController>(controller);
-
-    await tester.pumpWidget(
-      const _AppShell(locale: Locale('en'), home: HomeContentPage()),
+    Get.put<PurchaseService>(
+      FakePurchaseService()..isPremium.value = true,
+      permanent: true,
     );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 200));
 
-    expect(find.text('Welcome'), findsNothing);
-  });
-
-  testWidgets('hides banner ad widget when premium is active', (tester) async {
-    tester.view.physicalSize = const Size(1080, 2400);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.reset);
-
-    final settingController = _FakeSettingController();
-    final purchaseService = FakePurchaseService()..isPremium.value = true;
-
-    Get.put<SettingController>(settingController, permanent: true);
-    Get.put<ActivityLogService>(ActivityLogService(), permanent: true);
-    Get.put<HistoryController>(HistoryController());
-    Get.put<StatsController>(StatsController());
-    Get.put<PurchaseService>(purchaseService, permanent: true);
-
-    await tester.pumpWidget(
-      const _AppShell(locale: Locale('en'), home: MainShellPage()),
-    );
+    await tester.pumpWidget(_buildApp(initialRoute: Routes.HOME));
     await tester.pump();
 
     expect(find.byType(BannerAdWidget), findsNothing);
   });
 
-  testWidgets('shows exit bottom sheet when system back is pressed on shell', (
+  testWidgets('shows banner ad when premium is inactive', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    Get.put<PurchaseService>(
+      FakePurchaseService(),
+      permanent: true,
+    );
+
+    await tester.pumpWidget(_buildApp(initialRoute: Routes.HOME));
+    await tester.pump();
+
+    expect(find.byType(BannerAdWidget), findsOneWidget);
+  });
+
+  testWidgets('settings icon navigates to /settings', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    Get.put<PurchaseService>(FakePurchaseService(), permanent: true);
+
+    await tester.pumpWidget(_buildApp(initialRoute: Routes.HOME));
+    await tester.pump();
+
+    await tester.tap(find.byTooltip('Settings'));
+    await tester.pumpAndSettle();
+
+    expect(Get.currentRoute, Routes.SETTINGS);
+  });
+
+  testWidgets('premium icon navigates to /premium', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    Get.put<PurchaseService>(FakePurchaseService(), permanent: true);
+
+    await tester.pumpWidget(_buildApp(initialRoute: Routes.HOME));
+    await tester.pump();
+
+    await tester.tap(find.byTooltip('Premium'));
+    await tester.pumpAndSettle();
+
+    expect(Get.currentRoute, Routes.PREMIUM);
+  });
+
+  testWidgets('start drawing CTA clears canvas and navigates to /draw', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
-    final settingController = _FakeSettingController();
-    final purchaseService = FakePurchaseService()..isPremium.value = true;
+    Get.put<PurchaseService>(FakePurchaseService(), permanent: true);
 
-    Get.put<SettingController>(settingController, permanent: true);
-    Get.put<ActivityLogService>(ActivityLogService(), permanent: true);
-    Get.put<HistoryController>(HistoryController());
-    Get.put<StatsController>(StatsController());
-    Get.put<PurchaseService>(purchaseService, permanent: true);
+    final doodle = DoodleController.to;
+    doodle.referenceImagePath.value = 'C:\\temp\\reference.png';
 
-    await tester.pumpWidget(
-      const _AppShell(locale: Locale('en'), home: MainShellPage()),
+    await tester.pumpWidget(_buildApp(initialRoute: Routes.HOME));
+    await tester.pump();
+
+    await tester.tap(find.text('Start Drawing'));
+    await tester.pumpAndSettle();
+
+    expect(Get.currentRoute, Routes.DRAW);
+    expect(doodle.referenceImagePath.value, isNull);
+  });
+
+  testWidgets('system back gesture opens ExitBottomSheet', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    Get.put<PurchaseService>(
+      FakePurchaseService()..isPremium.value = true,
+      permanent: true,
     );
+
+    await tester.pumpWidget(_buildApp(initialRoute: Routes.HOME));
     await tester.pump();
 
     await tester.binding.handlePopRoute();
@@ -134,7 +170,6 @@ void main() {
     await tester.pump(const Duration(milliseconds: 350));
 
     expect(find.byType(ExitBottomSheet), findsOneWidget);
-    expect(find.text('Exit the app?'), findsOneWidget);
 
     Get.back();
     await tester.pump();
@@ -142,26 +177,35 @@ void main() {
   });
 }
 
-class _AppShell extends StatelessWidget {
-  const _AppShell({required this.home, required this.locale});
+Widget _buildApp({required String initialRoute}) {
+  return ScreenUtilInit(
+    designSize: const Size(390, 844),
+    minTextAdapt: true,
+    splitScreenMode: true,
+    builder: (context, child) {
+      return GetMaterialApp(
+        translations: Languages(),
+        locale: const Locale('en'),
+        fallbackLocale: const Locale('en'),
+        initialRoute: initialRoute,
+        getPages: [
+          GetPage(name: Routes.HOME, page: () => const HomePage()),
+          GetPage(name: Routes.SETTINGS, page: () => const _StubPage('settings')),
+          GetPage(name: Routes.PREMIUM, page: () => const _StubPage('premium')),
+          GetPage(name: Routes.DRAW, page: () => const _StubPage('draw')),
+        ],
+      );
+    },
+  );
+}
 
-  final Widget home;
-  final Locale locale;
+class _StubPage extends StatelessWidget {
+  final String label;
+  const _StubPage(this.label);
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(390, 844),
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (context, child) {
-        return GetMaterialApp(
-          translations: Languages(),
-          locale: locale,
-          home: home,
-        );
-      },
-    );
+    return Scaffold(body: Center(child: Text('stub-$label')));
   }
 }
 

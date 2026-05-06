@@ -52,47 +52,16 @@ class SettingsPage extends GetView<SettingController> {
                 ),
               ),
               SizedBox(height: 12.h),
-              _SettingsSection(
-                title: _loc('quick_actions', 'Quick actions'),
-                icon: Icons.dashboard_customize,
-                children: [
-                  _ListItem(
-                    icon: Icons.history,
-                    title: _loc('open_history', 'Open history'),
-                    subtitle: _loc(
-                      'open_history_desc',
-                      'Check previous drawings and activity',
-                    ),
-                    onTap: () {
-                      _track('open_history', 'settings');
-                      Get.toNamed(Routes.HISTORY);
-                    },
+              Card(
+                child: _ListItem(
+                  icon: Icons.auto_awesome,
+                  title: _loc('premium_title', 'Premium'),
+                  subtitle: _loc(
+                    'premium_subtitle',
+                    'Unlock premium features',
                   ),
-                  _ListItem(
-                    icon: Icons.bar_chart,
-                    title: _loc('open_stats', 'Open stats'),
-                    subtitle: _loc(
-                      'open_stats_desc',
-                      'Review drawing usage and totals',
-                    ),
-                    onTap: () {
-                      _track('open_stats', 'settings');
-                      Get.toNamed(Routes.STATS);
-                    },
-                  ),
-                  _ListItem(
-                    icon: Icons.auto_awesome,
-                    title: _loc('premium_title', 'Premium'),
-                    subtitle: _loc(
-                      'premium_subtitle',
-                      'Unlock premium features',
-                    ),
-                    onTap: () {
-                      _track('open_premium', 'settings');
-                      Get.toNamed(Routes.PREMIUM);
-                    },
-                  ),
-                ],
+                  onTap: () => Get.toNamed(Routes.PREMIUM),
+                ),
               ),
               SizedBox(height: 14.h),
               _SettingsSection(
@@ -135,11 +104,6 @@ class SettingsPage extends GetView<SettingController> {
                     onChanged: (value) {
                       if (value != null) {
                         controller.setLanguage(value);
-                        _track(
-                          'change_language',
-                          'settings',
-                          metadata: {'language': value},
-                        );
                       }
                     },
                   ),
@@ -237,7 +201,6 @@ class SettingsPage extends GetView<SettingController> {
       return;
     }
 
-    controller.logEvent('clear_local_data', 'settings');
     await controller.clearAppSettings();
 
     AppToast.show(
@@ -251,13 +214,6 @@ class SettingsPage extends GetView<SettingController> {
     );
   }
 
-  void _track(
-    String eventName,
-    String screen, {
-    Map<String, dynamic>? metadata,
-  }) {
-    controller.logEvent(eventName, screen, metadata: metadata ?? const {});
-  }
 }
 
 class _BuildLanguageTile extends StatelessWidget {

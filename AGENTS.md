@@ -48,11 +48,11 @@ flutter run
 - `lib/app` 디렉터리: `admob`, `bindings`, `controllers`, `data`, `pages`, `routes`, `services`, `theme`, `translate`, `utils`, `widgets`
 - `bindings`: `app_binding.dart`
 - `routes`: `app_pages.dart`, `app_routes.dart`
-- `controllers`: `doodle_controller.dart`, `history_controller.dart`, `home_controller.dart`, `premium_controller.dart`, `setting_controller.dart`, `stats_controller.dart`
+- `controllers`: `doodle_controller.dart`, `premium_controller.dart`, `setting_controller.dart`
 - 기능 중심 컨트롤러: `doodle_controller`
-- `services`: `activity_log_service.dart`, `app_rating_service.dart`, `hive_service.dart`, `purchase_service.dart`
+- `services`: `app_rating_service.dart`, `hive_service.dart`, `purchase_service.dart`
 - 기능 중심 서비스: 없음
-- `pages`: `draw`, `gallery`, `history`, `home`, `premium`, `settings`, `stats`
+- `pages`: `draw`, `home`, `premium`, `settings`
 - `widgets`: 없음
 - `mixins`: 없음
 - `utils`: `app_constants.dart`, `app_toast.dart`
@@ -63,7 +63,7 @@ flutter run
 - `data/constants`: 없음
 - `data` 루트 파일: 없음
 - `assets`: `fonts`, `images`
-- `tests`: 4개: `test/app/controllers/setting_controller_test.dart`, `test/app/pages/settings/settings_page_test.dart`, `test/app/utils/app_toast_test.dart`, `test/widget_test.dart`
+- `tests`: `test/app/controllers/{setting,doodle,premium}_controller_test.dart`, `test/app/services/purchase_service_test.dart`, `test/app/admob/{ads_helper,ads_loading}_test.dart`, `test/app/pages/{home,settings}/*_page_test.dart`, `test/app/theme/app_theme_test.dart`, `test/app/utils/app_toast_test.dart`, `test/widget_test.dart`
 
 ## 문서 유지 규칙
 - 새 페이지나 바인딩을 추가하면 이 문서의 `pages`/`bindings` 요약도 함께 갱신합니다.

@@ -6,7 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
-import 'package:doodle_pad/app/services/activity_log_service.dart';
 import 'package:doodle_pad/app/utils/app_constants.dart';
 
 void main() {
@@ -47,28 +46,6 @@ void main() {
       expect(controller.showBrushGuide.value, false);
       expect(controller.askBeforeClear.value, false);
       expect(controller.language.value, 'ko');
-  });
-
-  test('clearAppSettings also clears persisted activity history', () async {
-
-    final activityLogService = Get.put(ActivityLogService(), permanent: true);
-    final controller = SettingController(
-      loadOnInit: false,
-      updateLocaleFn: (_) async {},
-    );
-
-    await activityLogService.logEvent(
-      appId: SettingController.appId,
-      eventName: 'settings_open',
-      screen: 'settings',
-    );
-
-    await controller.clearAppSettings();
-
-    final events = await activityLogService.getEvents(
-      appId: SettingController.appId,
-    );
-    expect(events, isEmpty);
   });
 
   test('rateApp delegates to the app rating action', () async {
