@@ -59,6 +59,36 @@ void main() {
     }
   });
 
+  test('hasDrawableContent is true when only a reference image is loaded', () {
+    final controller = DoodleController();
+    expect(controller.hasDrawableContent, isFalse);
+
+    controller.loadReferenceDrawing('C:\\temp\\reference.png');
+    expect(controller.strokes, isEmpty);
+    expect(controller.hasDrawableContent, isTrue);
+
+    controller.clearReferenceDrawing();
+    expect(controller.hasDrawableContent, isFalse);
+  });
+
+  test('clearCanvas resets both strokes and reference image', () {
+    final controller = DoodleController();
+    controller.strokes.add(
+      DrawingStroke(
+        points: const [Offset(1, 1)],
+        color: Colors.black,
+        width: 4,
+      ),
+    );
+    controller.referenceImagePath.value = 'C:\\temp\\reference.png';
+
+    controller.clearCanvas();
+
+    expect(controller.strokes, isEmpty);
+    expect(controller.referenceImagePath.value, isNull);
+    expect(controller.hasDrawableContent, isFalse);
+  });
+
   test('loadReferenceDrawing keeps the selected image and resets strokes', () {
     final controller = DoodleController();
     controller.strokes.add(

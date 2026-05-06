@@ -15,14 +15,31 @@ class RewardedAdManager extends GetxController {
   RewardedAd? _rewardedAd;
   final RxBool isAdReady = false.obs;
   final RxBool isAdShowing = false.obs;
+  Worker? _consentWorker;
 
   @override
   void onInit() {
     super.onInit();
-    loadAd();
+    if (AdHelper.canRequestAds.value) {
+      loadAd();
+    } else {
+      _consentWorker = ever<bool>(AdHelper.canRequestAds, (canRequest) {
+        if (canRequest) {
+          _consentWorker?.dispose();
+          _consentWorker = null;
+          loadAd();
+        }
+      });
+    }
   }
 
   Future<void> loadAd() async {
+    if (!AdHelper.canRequestAds.value) {
+      debugPrint('Rewarded ad skipped: consent/init not ready');
+      _rewardedAd = null;
+      isAdReady.value = false;
+      return;
+    }
     final adUnitId = AdHelper.rewardedAdUnitId;
     if (!AdHelper.hasUsableAdUnitId(adUnitId)) {
       debugPrint('Rewarded ad skipped: release ad unit id is not configured');
@@ -113,6 +130,8 @@ class RewardedAdManager extends GetxController {
 
   @override
   void onClose() {
+    _consentWorker?.dispose();
+    _consentWorker = null;
     _rewardedAd?.dispose();
     super.onClose();
   }

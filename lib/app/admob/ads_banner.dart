@@ -6,6 +6,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'ads_helper.dart';
@@ -23,17 +24,35 @@ class BannerAdWidget extends StatefulWidget {
 class BannerAdState extends State<BannerAdWidget> {
   BannerAd? _bannerAd;
   bool _isLoaded = false;
+  Worker? _consentWorker;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _loadBanner();
+    _scheduleLoadWhenConsentReady();
   }
 
   @override
   void dispose() {
+    _consentWorker?.dispose();
+    _consentWorker = null;
     _bannerAd?.dispose();
     super.dispose();
+  }
+
+  void _scheduleLoadWhenConsentReady() {
+    if (AdHelper.canRequestAds.value) {
+      _loadBanner();
+      return;
+    }
+    _consentWorker?.dispose();
+    _consentWorker = ever<bool>(AdHelper.canRequestAds, (canRequest) {
+      if (canRequest && mounted) {
+        _consentWorker?.dispose();
+        _consentWorker = null;
+        _loadBanner();
+      }
+    });
   }
 
   Future<void> _loadBanner() async {
@@ -46,6 +65,10 @@ class BannerAdState extends State<BannerAdWidget> {
     }
 
     if (!mounted) return;
+    if (!AdHelper.canRequestAds.value) {
+      debugPrint('${widget.type} BannerAd skipped: consent/init not ready');
+      return;
+    }
     if (!AdHelper.hasUsableAdUnitId(widget.adUnitId)) {
       debugPrint(
         '${widget.type} BannerAd skipped: release ad unit id is not configured',

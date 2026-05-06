@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -93,6 +94,16 @@ class DoodleController extends GetxController {
   bool get canUndo => strokes.isNotEmpty;
   bool get canRedo => _undoStack.isNotEmpty;
   bool get hasPremiumBrushAccess => PurchaseService.isPremiumActive;
+
+  /// 저장/공유가 가능한 컨텐츠가 있는지 여부.
+  /// 사용자가 새 stroke를 그렸거나, 갤러리에서 불러온 참조 이미지가 있는 경우 true.
+  bool get hasDrawableContent =>
+      strokes.isNotEmpty || referenceImagePath.value != null;
+
+  /// 캔버스 캡처 시 사용할 pixel ratio 상한.
+  /// 가로 X 세로 X ratio^2 픽셀 수가 이 값을 넘지 않도록 동적으로 낮춘다.
+  static const _maxCapturePixels = 8 * 1000 * 1000; // ~8MP
+  static const _maxCapturePixelRatio = 3.0;
 
   @override
   void onInit() {
@@ -313,36 +324,57 @@ class DoodleController extends GetxController {
     referenceImagePath.value = null;
   }
 
-  /// 캔버스를 PNG로 캡처하여 반환
+  /// 캔버스를 PNG로 캡처하여 반환.
+  /// pixelRatio는 캔버스 크기에 따라 동적으로 낮춰 OOM을 방지한다.
   Future<ui.Image?> _captureCanvas() async {
     final boundary =
         canvasKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
     if (boundary == null) return null;
-    return boundary.toImage(pixelRatio: 3);
+    final size = boundary.size;
+    final ratio = _resolveCapturePixelRatio(size);
+    return boundary.toImage(pixelRatio: ratio);
+  }
+
+  double _resolveCapturePixelRatio(Size size) {
+    final w = size.width;
+    final h = size.height;
+    if (w <= 0 || h <= 0) return _maxCapturePixelRatio;
+    final maxRatioByPixelBudget =
+        math.sqrt(_maxCapturePixels / (w * h));
+    final ratio = maxRatioByPixelBudget < _maxCapturePixelRatio
+        ? maxRatioByPixelBudget
+        : _maxCapturePixelRatio;
+    // 너무 작아지면 1.0 까지 내림.
+    return ratio < 1.0 ? 1.0 : ratio;
   }
 
   /// 그림을 앱 문서 디렉토리에 PNG로 저장하고 경로 반환
   Future<String?> _savePng({String? suffix}) async {
     final image = await _captureCanvas();
     if (image == null) return null;
-    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    if (byteData == null) return null;
-    final bytes = byteData.buffer.asUint8List();
+    try {
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) return null;
+      final bytes = byteData.buffer.asUint8List();
 
-    final dir = await getApplicationDocumentsDirectory();
-    final drawingsDir = Directory('${dir.path}/drawings');
-    if (!drawingsDir.existsSync()) {
-      drawingsDir.createSync(recursive: true);
+      final dir = await getApplicationDocumentsDirectory();
+      final drawingsDir = Directory('${dir.path}/drawings');
+      if (!drawingsDir.existsSync()) {
+        drawingsDir.createSync(recursive: true);
+      }
+      final fileName =
+          'doodle_${suffix ?? DateTime.now().millisecondsSinceEpoch}.png';
+      final file = File('${drawingsDir.path}/$fileName');
+      await file.writeAsBytes(bytes);
+      return file.path;
+    } finally {
+      image.dispose();
     }
-    final fileName = 'doodle_${suffix ?? DateTime.now().millisecondsSinceEpoch}.png';
-    final file = File('${drawingsDir.path}/$fileName');
-    await file.writeAsBytes(bytes);
-    return file.path;
   }
 
   /// 그림 저장 (갤러리에 추가)
   Future<void> saveCanvas() async {
-    if (strokes.isEmpty) {
+    if (!hasDrawableContent) {
       AppToast.show(
         AppToastMessage.info(
           title: 'save_canvas'.tr,
@@ -417,7 +449,7 @@ class DoodleController extends GetxController {
 
   /// 공유 (임시 파일로 저장 후 공유)
   Future<void> shareCanvas() async {
-    if (strokes.isEmpty) {
+    if (!hasDrawableContent) {
       AppToast.show(
         AppToastMessage.info(
           title: 'share'.tr,
@@ -452,6 +484,8 @@ class DoodleController extends GetxController {
       try {
         if (tmpFile != null && tmpFile.existsSync()) tmpFile.deleteSync();
       } catch (_) {}
+    } finally {
+      image.dispose();
     }
   }
 }

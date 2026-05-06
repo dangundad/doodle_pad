@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:get/get.dart';
 
+import 'package:doodle_pad/app/services/purchase_service.dart';
+
 import 'ads_helper.dart';
 
 class InterstitialAdManager extends GetxController {
@@ -14,14 +16,31 @@ class InterstitialAdManager extends GetxController {
 
   InterstitialAd? _interstitialAd;
   final RxBool isAdReady = false.obs;
+  Worker? _consentWorker;
 
   @override
   void onInit() {
     super.onInit();
-    loadAd();
+    if (AdHelper.canRequestAds.value) {
+      loadAd();
+    } else {
+      _consentWorker = ever<bool>(AdHelper.canRequestAds, (canRequest) {
+        if (canRequest) {
+          _consentWorker?.dispose();
+          _consentWorker = null;
+          loadAd();
+        }
+      });
+    }
   }
 
   Future<void> loadAd() async {
+    if (!AdHelper.canRequestAds.value) {
+      debugPrint('Interstitial ad skipped: consent/init not ready');
+      _interstitialAd = null;
+      isAdReady.value = false;
+      return;
+    }
     final adUnitId = AdHelper.interstitialAdUnitId;
     if (!AdHelper.hasUsableAdUnitId(adUnitId)) {
       debugPrint('Interstitial ad skipped: release ad unit id is not configured');
@@ -66,6 +85,7 @@ class InterstitialAdManager extends GetxController {
   }
 
   void showAdIfAvailable() {
+    if (PurchaseService.isPremiumActive) return;
     if (_interstitialAd != null && isAdReady.value) {
       _interstitialAd!.show();
     } else {
@@ -75,6 +95,8 @@ class InterstitialAdManager extends GetxController {
 
   @override
   void onClose() {
+    _consentWorker?.dispose();
+    _consentWorker = null;
     _interstitialAd?.dispose();
     super.onClose();
   }

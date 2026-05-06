@@ -261,7 +261,9 @@ class _HomeContentPageState extends State<HomeContentPage>
                                 if (_settingController.hapticEnabled.value) {
                                   DoodleController.to.hapticSelection();
                                 }
-                                DoodleController.to.clearReferenceDrawing();
+                                // 새 그림 진입 시 참조 이미지뿐 아니라 저장하지
+                                // 않은 stroke까지 함께 초기화한다.
+                                DoodleController.to.clearCanvas();
                                 await Get.toNamed(Routes.DRAW);
                               },
                               child: Padding(

@@ -41,7 +41,7 @@ class GalleryPage extends GetView<DoodleController> {
             icon: Icon(Icons.add_rounded, size: 24.r, color: cs.primary),
             tooltip: 'start_drawing'.tr,
             onPressed: () {
-              controller.clearReferenceDrawing();
+              controller.clearCanvas();
               Get.toNamed(Routes.DRAW);
             },
           ),
@@ -297,7 +297,7 @@ class _EmptyGallery extends StatelessWidget {
           SizedBox(height: 24.h),
           FilledButton.icon(
             onPressed: () {
-              Get.find<DoodleController>().clearReferenceDrawing();
+              Get.find<DoodleController>().clearCanvas();
               Get.toNamed(Routes.DRAW);
             },
             icon: const Icon(Icons.brush_rounded),

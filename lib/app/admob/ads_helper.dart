@@ -34,6 +34,9 @@ class AdHelper {
 
   // 배너 광고 로드 상태
   static RxBool bannerAdLoaded = false.obs;
+  // UMP 동의 + MobileAds.initialize 완료 시 true.
+  // 모든 광고 매니저는 이 플래그가 true 가 된 뒤에만 광고 요청을 시작한다.
+  static final RxBool canRequestAds = false.obs;
   static const banner = 'Banner';
   @visibleForTesting
   static Future<void> Function() loadAndShowConsentFormIfRequired =
@@ -77,6 +80,7 @@ class AdHelper {
       }
 
       await _initializeMobileAdsOnce(initializeMobileAds);
+      AdHelper.canRequestAds.value = true;
       return true;
     } catch (e) {
       debugPrint('Ad consent and initialization error: $e');
@@ -207,6 +211,7 @@ class AdHelper {
     mobileAdsInitializer = () => MobileAds.instance.initialize();
     _mobileAdsInitialization = null;
     _mobileAdsInitializationGuard = null;
+    canRequestAds.value = false;
     debugModeOverride = null;
     targetPlatformOverride = null;
     releaseBannerAdUnitIdAndroidOverride = null;

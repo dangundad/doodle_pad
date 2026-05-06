@@ -22,6 +22,10 @@ void main() {
   });
 
   tearDown(() {
+    AdHelper.resetInitializationStateForTest();
+  });
+
+  tearDown(() {
     final messenger =
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
     messenger.setMockMethodCallHandler(adsChannel, null);
@@ -60,6 +64,27 @@ void main() {
       });
 
       final manager = RewardedAdManager();
+      await manager.loadAd();
+
+      expect(calls, isEmpty);
+      expect(manager.isAdReady.value, isFalse);
+    },
+  );
+
+  test(
+    'interstitial load skips plugin request when consent is granted but ad unit id is empty',
+    () async {
+      AdHelper.canRequestAds.value = true;
+      final messenger =
+          TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+      final calls = <String>[];
+
+      messenger.setMockMethodCallHandler(adsChannel, (call) async {
+        calls.add(call.method);
+        return null;
+      });
+
+      final manager = InterstitialAdManager();
       await manager.loadAd();
 
       expect(calls, isEmpty);

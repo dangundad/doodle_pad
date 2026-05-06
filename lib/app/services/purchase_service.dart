@@ -336,11 +336,12 @@ class PurchaseService extends GetxService {
 
   Future<void> _syncAdsForPremiumStatus(bool isPremiumActive) async {
     if (isPremiumActive) {
+      // permanent: true 로 등록되어 있어 force: true 가 없으면 실제 삭제되지 않는다.
       if (Get.isRegistered<InterstitialAdManager>()) {
-        await Get.delete<InterstitialAdManager>();
+        await Get.delete<InterstitialAdManager>(force: true);
       }
       if (Get.isRegistered<RewardedAdManager>()) {
-        await Get.delete<RewardedAdManager>();
+        await Get.delete<RewardedAdManager>(force: true);
       }
       return;
     }
