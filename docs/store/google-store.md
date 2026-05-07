@@ -5,47 +5,32 @@
 Doodle Pad - Draw & Sketch
 
 #### 앱 간략한 설명 (60자 이내)
-Draw freely with brushes, colors, save and share.
+Draw quick doodles with brushes, colors, and easy sharing.
 
 #### 앱 설명 (4000자 이내)
-Doodle Pad is a simple drawing canvas for quick sketches, ideas, notes, and casual doodles. Open the app, start drawing, save your artwork, and share it right away.
+Doodle Pad is a simple drawing app for quick sketches, playful doodles, visual notes, and everyday ideas. Open a clean canvas, choose a brush, pick a color, and start drawing right away.
 
-It is built for everyday drawing: a clean canvas, easy brush controls, local gallery, and lightweight tools that stay out of the way.
+The app keeps the drawing experience light and friendly, so you can focus on the moment instead of complicated menus.
 
 ✨ Key features
 
-🎨 Five drawing tools
-• Pen for clean lines
+🎨 Drawing tools for every mood
+• Pen for clean, simple lines
 • Marker for bold strokes
-• Eraser for quick fixes
+• Eraser for quick touch-ups
 • Watercolor and Airbrush for softer styles
 
-🖌️ Easy control
-• 16 color palette
+🖌️ Easy creative controls
+• 16 ready-to-use colors
 • Brush size slider
 • Smooth stroke rendering
-• Undo and redo support
+• Undo and redo when you want to adjust your drawing
 
-🖼️ Save and reuse
-• Save drawings as PNG files
-• Keep saved drawings in the in-app gallery
-• Load a saved image as a reference for a new drawing
-• Delete drawings you no longer need
+📤 Share your doodles
+• Share finished drawings with messaging apps, social apps, or other Android share options
+• Great for quick notes, small ideas, fun sketches, and casual drawing moments
 
-📤 Share in one tap
-• Share finished drawings through messaging apps, social apps, or other Android share targets
-• Works well for quick doodles, ideas, and visual notes
-
-🌐 Comfortable app experience
-• Supports 11 languages
-• Light and dark theme support
-• Haptic feedback option
-• Local settings and drawing history
-
-Ads and Premium:
-Doodle Pad is free and includes ads. Watercolor and Airbrush can be unlocked by watching a rewarded ad. A one-time support purchase removes ads and unlocks premium brush access. Small, Medium, and Large support options provide the same benefits; the difference is only the support amount.
-
-Doodle Pad — a clean canvas for quick drawing.
+Doodle Pad — a clean canvas whenever you want to draw.
 
 ---
 
@@ -55,47 +40,32 @@ Doodle Pad — a clean canvas for quick drawing.
 두들 패드 - 드로잉 & 낙서
 
 #### 앱 간략한 설명 (60자 이내)
-브러시와 색상으로 그리고, 저장하고, 바로 공유하세요.
+가볍게 그리고, 색을 고르고, 완성한 그림을 바로 공유하세요.
 
 #### 앱 설명 (4000자 이내)
-두들 패드는 빠른 스케치, 아이디어 메모, 가벼운 낙서를 위한 드로잉 캔버스 앱입니다. 앱을 열고 바로 그리고, 완성한 그림을 저장하거나 공유할 수 있어요.
+두들 패드는 빠른 스케치, 아이디어 메모, 가벼운 낙서를 위한 심플한 드로잉 앱입니다. 깨끗한 캔버스를 열고, 브러시와 색상을 고른 뒤 바로 그릴 수 있어요.
 
-복잡한 설정보다 깨끗한 캔버스와 쉬운 도구에 집중했습니다. 손가락으로 가볍게 그리는 순간에 잘 맞습니다.
+복잡한 메뉴보다 손끝의 흐름에 집중했습니다. 떠오른 생각을 그림으로 남기고 싶을 때, 짧은 메모를 시각적으로 표현하고 싶을 때 편하게 사용할 수 있습니다.
 
 ✨ 주요 기능
 
-🎨 5가지 드로잉 도구
-• 깔끔한 선을 위한 펜
-• 굵고 선명한 마커
-• 원하는 부분을 지우는 지우개
-• 부드러운 표현을 위한 수채화와 에어브러시
+🎨 기분에 맞게 고르는 드로잉 도구
+• 깔끔한 선을 그리는 펜
+• 굵고 선명하게 표현하는 마커
+• 원하는 부분을 빠르게 정리하는 지우개
+• 부드러운 느낌을 더하는 수채화와 에어브러시
 
-🖌️ 쉬운 조작
-• 16색 팔레트
-• 브러시 크기 슬라이더
-• 부드러운 선 렌더링
-• 실행 취소와 다시 실행 지원
+🖌️ 쉬운 그리기 조작
+• 바로 고를 수 있는 16가지 색상
+• 브러시 크기 조절 슬라이더
+• 부드러운 선 표현
+• 마음에 들 때까지 실행 취소와 다시 실행
 
-🖼️ 저장과 다시 활용
-• PNG 이미지로 그림 저장
-• 앱 내 갤러리에서 저장한 그림 관리
-• 저장한 그림을 새 그림의 참고 이미지로 불러오기
-• 필요 없는 그림 삭제
+📤 그린 뒤 바로 공유
+• 완성한 그림을 메신저, SNS 등 Android 공유 메뉴로 전송
+• 낙서, 아이디어, 간단한 그림 메모, 가벼운 스케치에 적합
 
-📤 바로 공유
-• 완성한 그림을 메신저, SNS, Android 공유 대상에 바로 공유
-• 낙서, 아이디어, 간단한 그림 메모에 적합
-
-🌐 편안한 사용
-• 11개 언어 지원
-• 라이트/다크 테마 지원
-• 진동 피드백 옵션
-• 로컬 설정과 사용 기록 저장
-
-광고와 프리미엄 안내:
-두들 패드는 무료 앱이며 광고가 포함됩니다. 수채화와 에어브러시는 보상형 광고를 보고 해금할 수 있습니다. 1회 후원을 구매하면 광고가 제거되고 프리미엄 브러시 접근이 열립니다. 작은/중간/큰 후원은 혜택이 같고 후원 금액만 다릅니다.
-
-두들 패드 — 빠르게 그릴 수 있는 깨끗한 캔버스.
+두들 패드 — 그리고 싶을 때 바로 열 수 있는 깨끗한 캔버스.
 
 ---
 
@@ -105,47 +75,32 @@ Doodle Pad — a clean canvas for quick drawing.
 落書きパッド - お絵かき
 
 #### 앱 간략한 설명 (60字 이내)
-ブラシと色で描いて、保存して、すぐ共有。
+ブラシと色を選んで、気軽に描いてすぐ共有。
 
 #### 앱 설명 (4000字 이내)
-Doodle Pad は、スケッチ、アイデア、メモ、ちょっとした落書きをすぐ描けるシンプルなキャンバスアプリです。開いたらすぐ描き、保存して共有できます。
+Doodle Pad は、スケッチ、アイデアメモ、ちょっとした落書きをすぐ描けるシンプルなお絵かきアプリです。きれいなキャンバスを開き、ブラシと色を選んで、そのまま描き始められます。
 
-複雑な設定より、きれいなキャンバスと使いやすい道具を大切にしています。
+複雑なメニューよりも、描く気持ちよさを大切にしました。
 
 ✨ 主な機能
 
-🎨 5つの描画ツール
+🎨 気分に合わせて選べるツール
 • きれいな線のペン
 • 太くはっきり描けるマーカー
-• 直したい部分を消せる消しゴム
-• 柔らかい表現の水彩とエアブラシ
+• すばやく直せる消しゴム
+• やわらかい表現の水彩とエアブラシ
 
-🖌️ かんたん操作
-• 16色パレット
+🖌️ かんたんな操作
+• すぐ使える16色
 • ブラシサイズ調整
 • なめらかな線
 • 元に戻す / やり直し
 
-🖼️ 保存と再利用
-• PNGで保存
-• アプリ内ギャラリーで管理
-• 保存した画像を新しい絵の参考に使用
-• 不要な絵を削除
-
 📤 すぐ共有
-• 完成した絵をメッセージアプリやSNSへ共有
-• 落書き、アイデア、簡単なメモに便利
+• 完成した絵をメッセージアプリやSNSなどに共有
+• メモ、アイデア、気軽なスケッチに便利
 
-🌐 快適な体験
-• 11言語対応
-• ライト / ダークテーマ
-• 振動フィードバック設定
-• ローカル設定と履歴
-
-広告とPremium:
-Doodle Pad は無料で広告を含みます。水彩とエアブラシはリワード広告で解除できます。1回の応援購入で広告を削除し、Premiumブラシを使えます。小・中・大の応援は特典が同じで、応援額だけが異なります。
-
-Doodle Pad — すぐ描けるきれいなキャンバス。
+Doodle Pad — 描きたいときにすぐ開けるきれいなキャンバス。
 
 ---
 
@@ -155,47 +110,32 @@ Doodle Pad — すぐ描けるきれいなキャンバス。
 Doodle Pad - Zeichnen
 
 #### 앱 간략한 설명 (60자 이내)
-Frei zeichnen, speichern und sofort teilen.
+Schnell zeichnen, Farben wählen und einfach teilen.
 
 #### 앱 설명 (4000자 이내)
-Doodle Pad ist eine einfache Zeichenfläche für schnelle Skizzen, Ideen, Notizen und kleine Kritzeleien. App öffnen, zeichnen, speichern und direkt teilen.
+Doodle Pad ist eine einfache Zeichen-App für schnelle Skizzen, kleine Ideen, visuelle Notizen und lockere Kritzeleien. Öffne eine klare Leinwand, wähle Pinsel und Farbe und beginne sofort zu zeichnen.
 
-Der Fokus liegt auf einer klaren Leinwand und einfachen Werkzeugen.
+Die App bleibt bewusst leicht, damit du dich auf deine Idee konzentrieren kannst.
 
 ✨ Hauptfunktionen
 
-🎨 Fünf Zeichenwerkzeuge
+🎨 Werkzeuge für deinen Stil
 • Stift für klare Linien
 • Marker für kräftige Striche
 • Radierer für schnelle Korrekturen
 • Aquarell und Airbrush für weiche Effekte
 
 🖌️ Einfache Steuerung
-• 16-Farben-Palette
+• 16 sofort nutzbare Farben
 • Regler für die Pinselgröße
 • Glatte Strichdarstellung
 • Rückgängig und Wiederholen
 
-🖼️ Speichern und weiterverwenden
-• Zeichnungen als PNG speichern
-• In der App-Galerie verwalten
-• Gespeicherte Bilder als Vorlage laden
-• Nicht benötigte Zeichnungen löschen
+📤 Einfach teilen
+• Teile fertige Zeichnungen über Messenger, soziale Apps oder andere Android-Optionen
+• Ideal für schnelle Notizen, Ideen und kleine Skizzen
 
-📤 Direkt teilen
-• Fertige Zeichnungen über Android-Apps teilen
-• Gut für Skizzen, Ideen und visuelle Notizen
-
-🌐 Angenehme Nutzung
-• 11 Sprachen
-• Heller und dunkler Modus
-• Haptisches Feedback optional
-• Lokale Einstellungen und Verlauf
-
-Werbung und Premium:
-Doodle Pad ist kostenlos und enthält Werbung. Aquarell und Airbrush können über eine Rewarded Ad freigeschaltet werden. Eine einmalige Unterstützung entfernt Werbung und schaltet Premium-Pinselzugriff frei. Kleine, mittlere und große Unterstützung bieten dieselben Vorteile; nur der Betrag ist anders.
-
-Doodle Pad — eine klare Leinwand für schnelle Zeichnungen.
+Doodle Pad — eine klare Leinwand, wenn du zeichnen möchtest.
 
 ---
 
@@ -205,47 +145,32 @@ Doodle Pad — eine klare Leinwand für schnelle Zeichnungen.
 Doodle Pad - Рисование
 
 #### 앱 간략한 설명 (60자 이내)
-Рисуйте, сохраняйте и делитесь без лишнего.
+Рисуйте быстро, выбирайте цвета и делитесь.
 
 #### 앱 설명 (4000자 이내)
-Doodle Pad — простой холст для быстрых скетчей, идей, заметок и рисунков. Откройте приложение, начните рисовать, сохраните работу и поделитесь ей.
+Doodle Pad — простое приложение для быстрых скетчей, идей, заметок и лёгких рисунков. Откройте чистый холст, выберите кисть и цвет, а затем начните рисовать сразу.
 
-Приложение делает упор на чистый холст и понятные инструменты.
+Приложение не перегружает вас сложными меню и помогает сосредоточиться на идее.
 
 ✨ Основные возможности
 
-🎨 Пять инструментов
+🎨 Инструменты под настроение
 • Перо для чистых линий
 • Маркер для ярких штрихов
-• Ластик для правок
+• Ластик для быстрых правок
 • Акварель и аэрограф для мягких эффектов
 
 🖌️ Простое управление
-• Палитра из 16 цветов
+• 16 готовых цветов
 • Настройка размера кисти
 • Плавные линии
 • Отмена и повтор
 
-🖼️ Сохранение и повторное использование
-• Сохранение в PNG
-• Галерея внутри приложения
-• Загрузка сохранённого рисунка как основы
-• Удаление ненужных рисунков
-
 📤 Быстрая отправка
-• Делитесь рисунками через Android-приложения
-• Удобно для скетчей, идей и заметок
+• Делитесь готовыми рисунками через мессенджеры, соцсети и другие варианты Android
+• Удобно для идей, заметок и небольших скетчей
 
-🌐 Комфорт
-• 11 языков
-• Светлая и тёмная тема
-• Настройка виброотклика
-• Локальные настройки и история
-
-Реклама и Premium:
-Doodle Pad бесплатен и содержит рекламу. Акварель и аэрограф можно открыть через rewarded-рекламу. Разовая поддержка убирает рекламу и открывает доступ к Premium-кистям. Малый, средний и большой варианты дают одинаковые преимущества; отличается только сумма поддержки.
-
-Doodle Pad — чистый холст для быстрых рисунков.
+Doodle Pad — чистый холст, когда хочется рисовать.
 
 ---
 
@@ -255,47 +180,32 @@ Doodle Pad — чистый холст для быстрых рисунков.
 Doodle Pad - Dessin
 
 #### 앱 간략한 설명 (60자 이내)
-Dessinez, enregistrez et partagez simplement.
+Dessinez vite, choisissez vos couleurs et partagez.
 
 #### 앱 설명 (4000자 이내)
-Doodle Pad est une toile de dessin simple pour croquis rapides, idées, notes et petits dessins. Ouvrez l’app, dessinez, enregistrez et partagez.
+Doodle Pad est une application de dessin simple pour les croquis rapides, les idées, les notes visuelles et les petits dessins du quotidien. Ouvrez une toile claire, choisissez un pinceau et une couleur, puis commencez tout de suite.
 
-L’app privilégie une toile claire et des outils faciles à utiliser.
+L’app reste légère et agréable pour laisser plus de place à votre idée.
 
 ✨ Fonctions principales
 
-🎨 Cinq outils de dessin
-• Stylo pour lignes nettes
-• Marqueur pour traits forts
-• Gomme pour corriger vite
+🎨 Des outils selon votre style
+• Stylo pour des lignes nettes
+• Marqueur pour des traits plus forts
+• Gomme pour corriger rapidement
 • Aquarelle et aérographe pour un rendu doux
 
 🖌️ Contrôle simple
-• Palette de 16 couleurs
+• 16 couleurs prêtes à utiliser
 • Taille de pinceau réglable
 • Traits fluides
 • Annuler et rétablir
 
-🖼️ Enregistrer et réutiliser
-• Sauvegarde en PNG
-• Galerie intégrée
-• Charger un dessin comme référence
-• Supprimer les dessins inutiles
+📤 Partage facile
+• Partagez vos dessins via messageries, réseaux sociaux ou autres options Android
+• Idéal pour notes rapides, idées et croquis simples
 
-📤 Partage rapide
-• Partage via les apps Android
-• Idéal pour croquis, idées et notes visuelles
-
-🌐 Utilisation confortable
-• 11 langues
-• Thèmes clair et sombre
-• Retour haptique optionnel
-• Réglages et historique locaux
-
-Publicités et Premium:
-Doodle Pad est gratuit avec publicités. Aquarelle et aérographe peuvent être débloqués avec une publicité récompensée. Un soutien unique supprime les publicités et débloque l’accès aux pinceaux Premium. Petit, moyen et grand soutien offrent les mêmes avantages; seul le montant change.
-
-Doodle Pad — une toile claire pour dessiner vite.
+Doodle Pad — une toile claire dès que vous voulez dessiner.
 
 ---
 
@@ -305,47 +215,32 @@ Doodle Pad — une toile claire pour dessiner vite.
 Doodle Pad - Dibujar
 
 #### 앱 간략한 설명 (60자 이내)
-Dibuja, guarda y comparte de forma simple.
+Dibuja rápido, elige colores y comparte fácil.
 
 #### 앱 설명 (4000자 이내)
-Doodle Pad es un lienzo sencillo para bocetos rápidos, ideas, notas y dibujos casuales. Abre la app, dibuja, guarda y comparte.
+Doodle Pad es una app de dibujo sencilla para bocetos rápidos, ideas, notas visuales y garabatos del día a día. Abre un lienzo limpio, elige un pincel y un color, y empieza a dibujar al instante.
 
-Está pensada para una experiencia limpia, rápida y fácil.
+La experiencia es ligera y amable para que puedas concentrarte en tu idea.
 
 ✨ Funciones principales
 
-🎨 Cinco herramientas
+🎨 Herramientas para cada estilo
 • Lápiz para líneas limpias
-• Marcador para trazos fuertes
-• Borrador para corregir
-• Acuarela y aerógrafo para estilos suaves
+• Marcador para trazos más fuertes
+• Borrador para correcciones rápidas
+• Acuarela y aerógrafo para efectos suaves
 
 🖌️ Control fácil
-• Paleta de 16 colores
+• 16 colores listos para usar
 • Ajuste de tamaño del pincel
 • Trazos suaves
 • Deshacer y rehacer
 
-🖼️ Guardar y reutilizar
-• Guarda dibujos en PNG
-• Galería dentro de la app
-• Carga dibujos como referencia
-• Elimina lo que ya no necesitas
+📤 Comparte tus dibujos
+• Comparte tus dibujos con apps de mensajería, redes sociales u otras opciones de Android
+• Útil para notas rápidas, ideas y bocetos simples
 
-📤 Compartir rápido
-• Comparte con apps de Android
-• Útil para bocetos, ideas y notas visuales
-
-🌐 Uso cómodo
-• 11 idiomas
-• Tema claro y oscuro
-• Respuesta háptica opcional
-• Ajustes e historial locales
-
-Anuncios y Premium:
-Doodle Pad es gratis e incluye anuncios. Acuarela y aerógrafo se pueden desbloquear viendo un anuncio recompensado. Un apoyo único elimina anuncios y abre el acceso a pinceles Premium. Las opciones pequeña, media y grande tienen los mismos beneficios; solo cambia el importe de apoyo.
-
-Doodle Pad — un lienzo limpio para dibujar rápido.
+Doodle Pad — un lienzo limpio cuando quieras dibujar.
 
 ---
 
@@ -355,47 +250,32 @@ Doodle Pad — un lienzo limpio para dibujar rápido.
 Doodle Pad - Desenhar
 
 #### 앱 간략한 설명 (60자 이내)
-Desenhe, salve e compartilhe com facilidade.
+Desenhe rápido, escolha cores e compartilhe fácil.
 
 #### 앱 설명 (4000자 이내)
-Doodle Pad é uma tela simples para esboços rápidos, ideias, notas e rabiscos. Abra o app, desenhe, salve e compartilhe.
+Doodle Pad é um app de desenho simples para esboços rápidos, ideias, notas visuais e rabiscos do dia a dia. Abra uma tela limpa, escolha um pincel e uma cor, e comece a desenhar na hora.
 
-O foco é uma tela limpa com ferramentas fáceis.
+A experiência é leve e direta, para você focar no que quer criar.
 
 ✨ Principais recursos
 
-🎨 Cinco ferramentas
+🎨 Ferramentas para cada estilo
 • Caneta para linhas limpas
 • Marcador para traços fortes
-• Borracha para correções
-• Aquarela e aerógrafo para estilos suaves
+• Borracha para correções rápidas
+• Aquarela e aerógrafo para efeitos suaves
 
 🖌️ Controle fácil
-• Paleta de 16 cores
+• 16 cores prontas para usar
 • Ajuste de tamanho do pincel
 • Traços suaves
 • Desfazer e refazer
 
-🖼️ Salvar e reutilizar
-• Salve em PNG
-• Galeria no app
-• Carregue desenhos como referência
-• Exclua o que não precisa
+📤 Compartilhe seus desenhos
+• Compartilhe por apps de mensagem, redes sociais ou outras opções do Android
+• Bom para notas rápidas, ideias e pequenos esboços
 
-📤 Compartilhamento rápido
-• Compartilhe por apps Android
-• Bom para esboços, ideias e notas visuais
-
-🌐 Uso confortável
-• 11 idiomas
-• Tema claro e escuro
-• Feedback tátil opcional
-• Configurações e histórico locais
-
-Anúncios e Premium:
-Doodle Pad é grátis e inclui anúncios. Aquarela e aerógrafo podem ser liberados com anúncio recompensado. Um apoio único remove anúncios e libera acesso a pincéis Premium. Apoio pequeno, médio e grande dão os mesmos benefícios; só muda o valor.
-
-Doodle Pad — uma tela limpa para desenhar rápido.
+Doodle Pad — uma tela limpa sempre que quiser desenhar.
 
 ---
 
@@ -405,47 +285,32 @@ Doodle Pad — uma tela limpa para desenhar rápido.
 Doodle Pad - Menggambar
 
 #### 앱 간략한 설명 (60자 이내)
-Gambar, simpan, dan bagikan dengan mudah.
+Gambar cepat, pilih warna, dan bagikan dengan mudah.
 
 #### 앱 설명 (4000자 이내)
-Doodle Pad adalah kanvas sederhana untuk sketsa cepat, ide, catatan, dan coretan. Buka aplikasi, mulai menggambar, simpan, lalu bagikan.
+Doodle Pad adalah aplikasi menggambar sederhana untuk sketsa cepat, ide, catatan visual, dan coretan sehari-hari. Buka kanvas bersih, pilih kuas dan warna, lalu mulai menggambar.
 
-Aplikasi ini fokus pada kanvas bersih dan alat yang mudah dipakai.
+Pengalaman dibuat ringan dan mudah agar kamu bisa fokus pada ide.
 
 ✨ Fitur utama
 
-🎨 Lima alat gambar
+🎨 Alat untuk berbagai gaya
 • Pena untuk garis rapi
 • Marker untuk garis tebal
-• Penghapus untuk koreksi
-• Cat air dan airbrush untuk gaya lembut
+• Penghapus untuk koreksi cepat
+• Cat air dan airbrush untuk efek lembut
 
 🖌️ Kontrol mudah
-• Palet 16 warna
+• 16 warna siap pakai
 • Pengatur ukuran kuas
 • Garis halus
 • Undo dan redo
 
-🖼️ Simpan dan pakai ulang
-• Simpan sebagai PNG
-• Galeri di dalam aplikasi
-• Muat gambar tersimpan sebagai referensi
-• Hapus gambar yang tidak diperlukan
+📤 Bagikan gambar
+• Bagikan ke aplikasi pesan, media sosial, atau opsi berbagi Android lainnya
+• Cocok untuk catatan cepat, ide, dan sketsa santai
 
-📤 Bagikan cepat
-• Bagikan lewat aplikasi Android
-• Cocok untuk sketsa, ide, dan catatan visual
-
-🌐 Nyaman digunakan
-• Mendukung 11 bahasa
-• Tema terang dan gelap
-• Umpan balik getar opsional
-• Pengaturan dan riwayat lokal
-
-Iklan dan Premium:
-Doodle Pad gratis dan berisi iklan. Cat air dan airbrush bisa dibuka dengan iklan reward. Dukungan sekali bayar menghapus iklan dan membuka akses kuas Premium. Dukungan kecil, sedang, dan besar memberi manfaat yang sama; hanya jumlah dukungan yang berbeda.
-
-Doodle Pad — kanvas bersih untuk menggambar cepat.
+Doodle Pad — kanvas bersih kapan pun kamu ingin menggambar.
 
 ---
 
@@ -455,47 +320,32 @@ Doodle Pad — kanvas bersih untuk menggambar cepat.
 涂鸦画板 - 绘画速写
 
 #### 앱 간략한 설명 (60자 이내)
-自由绘画，保存作品，并轻松分享。
+快速涂鸦，选择颜色，并轻松分享。
 
 #### 앱 설명 (4000자 이내)
-Doodle Pad 是一款简单的绘画画布，适合快速草图、想法、笔记和随手涂鸦。打开应用即可开始绘画，保存作品并分享。
+Doodle Pad 是一款简单的绘画应用，适合快速草图、灵感记录、视觉笔记和日常涂鸦。打开干净的画布，选择画笔和颜色，就能马上开始创作。
 
-它专注于干净的画布和容易上手的工具。
+应用保持轻巧易用，让你把注意力放在想画的内容上。
 
 ✨ 主要功能
 
-🎨 五种绘画工具
+🎨 适合不同风格的工具
 • 画笔绘制清晰线条
 • 马克笔绘制粗线
 • 橡皮快速修正
 • 水彩和喷枪带来柔和效果
 
 🖌️ 简单控制
-• 16 色调色板
+• 16 种可直接使用的颜色
 • 画笔大小滑块
 • 平滑笔触
 • 撤销和重做
 
-🖼️ 保存和再利用
-• 保存为 PNG
-• 应用内图库管理
-• 将保存的图片作为参考
-• 删除不需要的绘画
+📤 轻松分享
+• 可通过聊天应用、社交应用或其他 Android 分享选项发送作品
+• 适合快速笔记、灵感草图和轻松涂鸦
 
-📤 快速分享
-• 通过 Android 分享目标发送作品
-• 适合草图、想法和视觉笔记
-
-🌐 舒适体验
-• 支持 11 种语言
-• 浅色和深色主题
-• 可选触觉反馈
-• 本地设置和历史记录
-
-广告和 Premium:
-Doodle Pad 免费使用并包含广告。水彩和喷枪可通过激励广告解锁。一次性支持可移除广告并开启 Premium 画笔访问。小份、中份、大份支持的权益相同，只是支持金额不同。
-
-Doodle Pad — 用干净画布快速绘画。
+Doodle Pad — 想画的时候，马上打开的干净画布。
 
 ---
 
@@ -505,44 +355,29 @@ Doodle Pad — 用干净画布快速绘画。
 Doodle Pad - الرسم
 
 #### 앱 간략한 설명 (60자 이내)
-ارسم واحفظ وشارك بسهولة.
+ارسم بسرعة، اختر الألوان، وشارك بسهولة.
 
 #### 앱 설명 (4000자 이내)
-Doodle Pad هو تطبيق لوحة رسم بسيط للرسومات السريعة والأفكار والملاحظات والخربشات. افتح التطبيق وابدأ الرسم ثم احفظ عملك وشاركه.
+Doodle Pad هو تطبيق رسم بسيط للرسومات السريعة والأفكار والملاحظات البصرية والخربشات اليومية. افتح لوحة نظيفة، اختر الفرشاة واللون، وابدأ الرسم فورًا.
 
-يركز التطبيق على لوحة نظيفة وأدوات سهلة.
+تم تصميم التجربة لتكون خفيفة وسهلة حتى تركز على فكرتك.
 
 ✨ المزايا الرئيسية
 
-🎨 خمس أدوات رسم
+🎨 أدوات تناسب أسلوبك
 • قلم لخطوط واضحة
 • قلم تحديد لخطوط قوية
 • ممحاة للتعديل السريع
 • ألوان مائية وبخاخ لتأثيرات ناعمة
 
 🖌️ تحكم بسيط
-• لوحة من 16 لونًا
+• 16 لونًا جاهزًا للاستخدام
 • شريط حجم الفرشاة
 • خطوط ناعمة
 • تراجع وإعادة
 
-🖼️ حفظ وإعادة استخدام
-• حفظ بصيغة PNG
-• معرض داخل التطبيق
-• تحميل رسم محفوظ كمرجع
-• حذف الرسومات غير المطلوبة
+📤 مشاركة سهلة
+• شارك الرسومات عبر تطبيقات الرسائل أو التطبيقات الاجتماعية أو خيارات مشاركة Android
+• مناسب للملاحظات السريعة والأفكار والرسومات الخفيفة
 
-📤 مشاركة سريعة
-• مشاركة الرسومات عبر تطبيقات Android
-• مناسب للرسومات والأفكار والملاحظات المرئية
-
-🌐 تجربة مريحة
-• دعم 11 لغة
-• مظهر فاتح وداكن
-• اهتزاز اختياري
-• إعدادات وسجل محلي
-
-الإعلانات و Premium:
-Doodle Pad مجاني ويحتوي على إعلانات. يمكن فتح الألوان المائية والبخاخ عبر إعلان بمكافأة. دعم لمرة واحدة يزيل الإعلانات ويفتح الوصول إلى فرش Premium. خيارات الدعم البسيط والمتوسط والكبير تقدم المزايا نفسها؛ يختلف مبلغ الدعم فقط.
-
-Doodle Pad — لوحة نظيفة للرسم السريع.
+Doodle Pad — لوحة نظيفة كلما أردت الرسم.
