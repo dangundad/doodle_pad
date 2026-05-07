@@ -83,6 +83,16 @@ class DoodleController extends GetxController {
     HiveService.to.setSetting(_canvasColorKey, colorValue);
   }
 
+  /// 드로잉 사용자 선호값(캔버스/커스텀 색상)만 기본값으로 되돌린다.
+  /// 보상형 광고로 해금한 브러시 상태와 프리미엄 구매 상태는 유지한다.
+  Future<void> resetDrawingPreferences() async {
+    canvasColor.value = defaultCanvasColor;
+    customColor.value = null;
+    final box = HiveService.to.settingsBox;
+    await box.delete(_canvasColorKey);
+    await box.delete(_customColorKey);
+  }
+
   // Reference image (used by share preview overlay only).
   final referenceImagePath = RxnString();
 
@@ -93,8 +103,13 @@ class DoodleController extends GetxController {
   final isAirbrushUnlocked = false.obs;
 
   // 캔버스/커스텀 색상 영속화 키
-  static const _canvasColorKey = 'canvas_color';
-  static const _customColorKey = 'custom_color';
+  // (clearAppSettings 등 외부 초기화 코드가 참조할 수 있도록 public 노출.)
+  static const canvasColorKey = 'canvas_color';
+  static const customColorKey = 'custom_color';
+  static const _canvasColorKey = canvasColorKey;
+  static const _customColorKey = customColorKey;
+
+  static const int defaultCanvasColor = 0xFFFFFFFF;
 
   // Color palette (16 colors)
   static const colorPalette = [
@@ -262,7 +277,20 @@ class DoodleController extends GetxController {
   }
 
   void _watchRewardedAdForBrush(BrushType type) {
-    RewardedAdManager.to.showAdIfAvailable(
+    final adManager = RewardedAdManager.to;
+    // 광고가 준비되지 않은 상태에서는 사용자가 누른 결과가 조용히 무시되지 않도록
+    // 안내 토스트를 띄우고, 백그라운드 로드만 트리거한다.
+    if (!adManager.isAdReady.value) {
+      AppToast.show(
+        AppToastMessage.info(
+          title: 'brush_unlock_pending_title'.tr,
+          description: 'brush_unlock_pending_desc'.tr,
+        ),
+      );
+      adManager.loadAd();
+      return;
+    }
+    adManager.showAdIfAvailable(
       onUserEarnedReward: (RewardItem reward) {
         if (type == BrushType.watercolor) {
           isWatercolorUnlocked.value = true;
@@ -381,9 +409,27 @@ class DoodleController extends GetxController {
     File? tmpFile;
     try {
       image = await _captureCanvas();
-      if (image == null) return;
+      if (image == null) {
+        // 캔버스가 아직 렌더링되지 않았거나 boundary 를 찾지 못한 경우.
+        // 사용자가 아무 반응을 못 느끼는 회귀를 막기 위해 명시적으로 안내.
+        AppToast.show(
+          AppToastMessage.error(
+            title: 'error'.tr,
+            description: 'share_error'.tr,
+          ),
+        );
+        return;
+      }
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      if (byteData == null) return;
+      if (byteData == null) {
+        AppToast.show(
+          AppToastMessage.error(
+            title: 'error'.tr,
+            description: 'share_error'.tr,
+          ),
+        );
+        return;
+      }
       final bytes = byteData.buffer.asUint8List();
       final dir = await getTemporaryDirectory();
       tmpFile = File(

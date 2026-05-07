@@ -185,8 +185,8 @@ class _BenefitRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = [
       (LucideIcons.badgeCheck, 'premium_benefit_remove_ads'.tr),
-      (LucideIcons.paintbrush, 'premium_benefit_unlimited'.tr),
-      (LucideIcons.chartBarBig, 'premium_benefit_statistics'.tr),
+      (LucideIcons.paintbrush, 'premium_benefit_premium_brushes'.tr),
+      (LucideIcons.heart, 'premium_benefit_one_time_support'.tr),
     ];
 
     return Row(

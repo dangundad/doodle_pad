@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:doodle_pad/app/controllers/doodle_controller.dart';
 import 'package:doodle_pad/app/services/app_rating_service.dart';
 import 'package:doodle_pad/app/utils/app_constants.dart';
 import 'package:doodle_pad/app/utils/app_toast.dart';
@@ -127,9 +128,12 @@ class SettingController extends GetxController {
   }
 
   Future<void> setLanguage(String value) async {
-    language.value = value;
+    // 지원하지 않는 코드는 'en' 으로 정규화. 손상된 저장값이나 외부 주입에 의해
+    // language.value 와 실제 적용되는 locale 이 어긋나는 회귀를 막는다.
+    final normalized = _supportedLanguageCodes.contains(value) ? value : 'en';
+    language.value = normalized;
     final box = await _openSettingBox();
-    await box.put(_kLanguageKey, value);
+    await box.put(_kLanguageKey, normalized);
     await _updateLocaleFn(currentLocale);
   }
 
@@ -141,6 +145,17 @@ class SettingController extends GetxController {
     askBeforeClear.value = true;
     language.value = 'en';
     await _updateLocaleFn(const Locale('en'));
+
+    // 드로잉 사용자 선호값(캔버스/커스텀 색상)도 함께 리셋.
+    // 보상형 광고로 해금한 브러시(watercolor/airbrush) 상태와 인앱 결제(is_premium)는
+    // 의도적으로 보존한다. 사용자가 광고/결제로 얻은 권한이 사라지는 회귀를 막기 위함.
+    if (Get.isRegistered<DoodleController>()) {
+      try {
+        await DoodleController.to.resetDrawingPreferences();
+      } catch (_) {
+        // HiveService 미등록 등 비정상 상황에서는 조용히 패스 — UI 초기화는 계속 진행.
+      }
+    }
   }
 
   Future<void> rateApp() async {

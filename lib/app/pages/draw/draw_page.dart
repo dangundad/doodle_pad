@@ -436,14 +436,21 @@ class _BottomToolbar extends StatelessWidget {
           SizedBox(height: 10.h),
           _ColorPalette(ctrl: ctrl),
           SizedBox(height: 4.h),
-          if (settingCtrl.showBrushGuide.value)
-            Text(
-              'brush_guide_desc'.tr,
-              style: TextStyle(fontSize: 11.sp, color: cs.onSurfaceVariant),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
+          // 설정 변경 시 즉시 반영되도록 Obx로 감싼다.
+          Obx(
+            () => settingCtrl.showBrushGuide.value
+                ? Text(
+                    'brush_guide_desc'.tr,
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      color: cs.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  )
+                : const SizedBox.shrink(),
+          ),
         ],
       ),
     );
