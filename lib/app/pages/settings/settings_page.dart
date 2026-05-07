@@ -9,9 +9,20 @@ import 'package:doodle_pad/app/utils/app_toast.dart';
 class SettingsPage extends GetView<SettingController> {
   const SettingsPage({super.key});
 
+  /// supportedLocales(translate.dart)와 1:1로 매칭되는 사용자 표시 라벨.
+  /// 언어 라벨은 해당 언어의 자국어 표기(endonym)를 사용한다.
   static const Map<String, String> _languageOptions = {
     'en': 'English',
     'ko': '한국어',
+    'ja': '日本語',
+    'de': 'Deutsch',
+    'ru': 'Русский',
+    'fr': 'Français',
+    'es': 'Español',
+    'pt': 'Português',
+    'id': 'Bahasa Indonesia',
+    'zh': '中文',
+    'ar': 'العربية',
   };
 
   @override
@@ -22,20 +33,6 @@ class SettingsPage extends GetView<SettingController> {
           _loc('settings', 'Settings'),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(3),
-          child: Container(
-            height: 3,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Get.theme.colorScheme.primary,
-                  Get.theme.colorScheme.tertiary,
-                ],
-              ),
-            ),
-          ),
         ),
       ),
       body: SafeArea(

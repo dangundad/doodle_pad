@@ -2,16 +2,16 @@
 {
   "app_name": {
     "en": "Doodle Pad",
-    "ko": "두들 패드",
-    "ja": "落書きパッド",
-    "de": "Doodle Pad",
-    "ru": "Doodle Pad",
-    "fr": "Doodle Pad",
-    "es": "Doodle Pad",
-    "pt": "Doodle Pad",
-    "id": "Doodle Pad",
-    "zh": "涂鸦画板",
-    "ar": "لوحة الرسم"
+    "ko": "간단 그림판",
+    "ja": "かんたんお絵かき",
+    "de": "Zeichenblock",
+    "ru": "Рисуй легко",
+    "fr": "Bloc dessin",
+    "es": "Dibujo Fácil",
+    "pt": "Tela Fácil",
+    "id": "Gambar Mudah",
+    "zh": "简易画板",
+    "ar": "الرسم السهل"
   }
 }
 
@@ -19,15 +19,15 @@
 {
   "google_play_store_title": {
     "en": "Doodle Pad - Draw & Sketch",
-    "ko": "두들 패드 - 드로잉 & 낙서",
-    "ja": "落書きパッド - お絵かき",
-    "de": "Doodle Pad - Zeichnen",
-    "ru": "Doodle Pad - Рисование",
-    "fr": "Doodle Pad - Dessin",
-    "es": "Doodle Pad - Dibujar",
-    "pt": "Doodle Pad - Desenhar",
-    "id": "Doodle Pad - Menggambar",
-    "zh": "涂鸦画板 - 绘画速写",
-    "ar": "Doodle Pad - الرسم"
+    "ko": "간단 그림판 - 그리기와 스케치",
+    "ja": "かんたんお絵かき - スケッチ",
+    "de": "Zeichenblock - Skizzen",
+    "ru": "Рисуй легко - Скетчи",
+    "fr": "Bloc dessin - Croquis",
+    "es": "Dibujo Fácil - Bocetos",
+    "pt": "Tela Fácil - Esboços",
+    "id": "Gambar Mudah - Sketsa",
+    "zh": "简易画板 - 绘画速写",
+    "ar": "الرسم السهل - اسكتشات"
   }
 }

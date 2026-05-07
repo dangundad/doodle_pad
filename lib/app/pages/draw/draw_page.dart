@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -14,9 +15,10 @@ class DrawPage extends GetView<DoodleController> {
   @override
   Widget build(BuildContext context) {
     final settingCtrl = SettingController.to;
+    final cs = Get.theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade300,
+      backgroundColor: cs.surfaceContainerHighest,
       body: Stack(
         children: [
           // Full-screen drawing canvas
@@ -38,7 +40,7 @@ class DrawPage extends GetView<DoodleController> {
                   return Stack(
                     fit: StackFit.expand,
                     children: [
-                      const ColoredBox(color: Colors.white),
+                      ColoredBox(color: Color(controller.canvasColor.value)),
                       if (referencePath != null)
                         IgnorePointer(
                           child: Image.file(
@@ -122,21 +124,15 @@ class _TopToolbar extends StatelessWidget {
       margin: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 0),
       padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
       decoration: BoxDecoration(
-        color: cs.surface.withValues(alpha: 0.92),
+        color: cs.surface,
         borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
-            blurRadius: 12,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: cs.outlineVariant),
       ),
       child: Obx(() {
         return Row(
           children: [
             IconButton(
-              icon: const Icon(Icons.arrow_back_rounded),
+              icon: const Icon(LucideIcons.arrowLeft),
               onPressed: () {
                 _maybeHaptic(settingCtrl);
                 Get.back();
@@ -146,7 +142,7 @@ class _TopToolbar extends StatelessWidget {
             const Spacer(),
             IconButton(
               icon: Icon(
-                Icons.undo_rounded,
+                LucideIcons.undo2,
                 color: ctrl.canUndo
                     ? cs.onSurface
                     : cs.onSurface.withValues(alpha: 0.3),
@@ -163,7 +159,7 @@ class _TopToolbar extends StatelessWidget {
             ),
             IconButton(
               icon: Icon(
-                Icons.redo_rounded,
+                LucideIcons.redo2,
                 color: ctrl.canRedo
                     ? cs.onSurface
                     : cs.onSurface.withValues(alpha: 0.3),
@@ -177,8 +173,13 @@ class _TopToolbar extends StatelessWidget {
               tooltip: 'redo'.tr,
             ),
             IconButton(
+              icon: Icon(LucideIcons.paintBucket, color: cs.onSurface),
+              onPressed: () => _openCanvasColorPicker(context, settingCtrl),
+              tooltip: 'canvas_color'.tr,
+            ),
+            IconButton(
               icon: Icon(
-                Icons.delete_outline_rounded,
+                LucideIcons.trash2,
                 color: ctrl.hasDrawableContent
                     ? cs.error
                     : cs.error.withValues(alpha: 0.3),
@@ -190,7 +191,7 @@ class _TopToolbar extends StatelessWidget {
             ),
             IconButton(
               icon: Icon(
-                Icons.share_rounded,
+                LucideIcons.share2,
                 color: ctrl.hasDrawableContent
                     ? cs.onSurface
                     : cs.onSurface.withValues(alpha: 0.3),
@@ -216,6 +217,97 @@ class _TopToolbar extends StatelessWidget {
     ctrl.hapticSelection();
   }
 
+  void _openCanvasColorPicker(
+    BuildContext context,
+    SettingController settingCtrl,
+  ) {
+    if (settingCtrl.hapticEnabled.value) {
+      ctrl.hapticSelection();
+    }
+    final cs = Get.theme.colorScheme;
+    Get.bottomSheet(
+      Container(
+        decoration: BoxDecoration(
+          color: cs.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+        ),
+        padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 24.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(LucideIcons.paintBucket, size: 18.r, color: cs.primary),
+                SizedBox(width: 8.w),
+                Text(
+                  'canvas_color'.tr,
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              'canvas_color_desc'.tr,
+              style: TextStyle(fontSize: 12.sp, color: cs.onSurfaceVariant),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            SizedBox(height: 16.h),
+            Obx(() {
+              final current = ctrl.canvasColor.value;
+              return Wrap(
+                spacing: 12.w,
+                runSpacing: 12.h,
+                children: DoodleController.canvasColorPresets.map((c) {
+                  final selected = current == c;
+                  final color = Color(c);
+                  final luminance = color.computeLuminance();
+                  final checkColor = luminance > 0.6
+                      ? Colors.black
+                      : Colors.white;
+                  return GestureDetector(
+                    onTap: () {
+                      if (settingCtrl.hapticEnabled.value) {
+                        ctrl.hapticSelection();
+                      }
+                      ctrl.setCanvasColor(c);
+                      Get.back();
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      width: 56.r,
+                      height: 56.r,
+                      decoration: BoxDecoration(
+                        color: color,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: selected ? cs.primary : cs.outlineVariant,
+                          width: selected ? 3 : 1,
+                        ),
+                      ),
+                      child: selected
+                          ? Icon(
+                              LucideIcons.check,
+                              size: 22.r,
+                              color: checkColor,
+                            )
+                          : null,
+                    ),
+                  );
+                }).toList(),
+              );
+            }),
+          ],
+        ),
+      ),
+      isScrollControlled: false,
+    );
+  }
+
   void _confirmClear(
     BuildContext context,
     ColorScheme cs,
@@ -229,36 +321,31 @@ class _TopToolbar extends StatelessWidget {
     Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28.r),
+          borderRadius: BorderRadius.circular(20.r),
         ),
         clipBehavior: Clip.antiAlias,
+        backgroundColor: cs.surface,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(vertical: 20.h),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [cs.errorContainer, cs.error.withValues(alpha: 0.3)],
-                ),
-              ),
-              child: Center(
-                child: Container(
-                  width: 52.r,
-                  height: 52.r,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: cs.error.withValues(alpha: 0.15),
-                  ),
-                  child: Icon(LucideIcons.trash2, size: 26.r, color: cs.error),
-                ),
-              ),
-            ),
             Padding(
-              padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 8.h),
+              padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 8.h),
               child: Column(
                 children: [
+                  Container(
+                    width: 52.r,
+                    height: 52.r,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: cs.errorContainer,
+                    ),
+                    child: Icon(
+                      LucideIcons.trash2,
+                      size: 26.r,
+                      color: cs.onErrorContainer,
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
                   Text(
                     'clear_canvas'.tr,
                     style: TextStyle(
@@ -294,38 +381,19 @@ class _TopToolbar extends StatelessWidget {
                   ),
                   SizedBox(width: 8.w),
                   Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [cs.error, cs.errorContainer],
-                        ),
-                        borderRadius: BorderRadius.circular(12.r),
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: cs.error,
+                        foregroundColor: cs.onError,
                       ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12.r),
-                          onTap: () {
-                            ctrl.clearCanvas();
-                            if (settingCtrl.hapticEnabled.value) {
-                              ctrl.hapticHeavy();
-                            }
-                            Get.back();
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 12.h),
-                            child: Center(
-                              child: Text(
-                                'clear'.tr,
-                                style: TextStyle(
-                                  color: cs.onError,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                      onPressed: () {
+                        ctrl.clearCanvas();
+                        if (settingCtrl.hapticEnabled.value) {
+                          ctrl.hapticHeavy();
+                        }
+                        Get.back();
+                      },
+                      child: Text('clear'.tr),
                     ),
                   ),
                 ],
@@ -352,15 +420,9 @@ class _BottomToolbar extends StatelessWidget {
       margin: EdgeInsets.fromLTRB(12.w, 0, 12.w, 8.h),
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: cs.surface.withValues(alpha: 0.92),
+        color: cs.surface,
         borderRadius: BorderRadius.circular(20.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
-            blurRadius: 12,
-            offset: const Offset(0, -2),
-          ),
-        ],
+        border: Border.all(color: cs.outlineVariant),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -409,6 +471,20 @@ class _BrushTypeSelector extends StatelessWidget {
                 type == BrushType.watercolor || type == BrushType.airbrush;
             final isLocked = isSpecial && !ctrl.isBrushUnlocked(type);
 
+            // 선택된 도구는 primary 배경 + onPrimary 아이콘으로 충분한 대비 확보.
+            final Color bgColor;
+            final Color iconColor;
+            if (selected) {
+              bgColor = cs.primary;
+              iconColor = cs.onPrimary;
+            } else if (isLocked) {
+              bgColor = cs.surfaceContainerLow;
+              iconColor = cs.onSurface.withValues(alpha: 0.35);
+            } else {
+              bgColor = cs.surfaceContainerHigh;
+              iconColor = cs.onSurfaceVariant;
+            }
+
             return GestureDetector(
               onTap: () {
                 if (settingCtrl.hapticEnabled.value) {
@@ -426,39 +502,19 @@ class _BrushTypeSelector extends StatelessWidget {
                 width: 44.r,
                 height: 44.r,
                 decoration: BoxDecoration(
-                  color: selected
-                      ? cs.primaryContainer
-                      : isLocked
-                      ? cs.surfaceContainerLow
-                      : cs.surfaceContainerHigh,
+                  color: bgColor,
                   borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(
-                    color: selected
-                        ? cs.primary
-                        : isSpecial
-                        ? cs.tertiary.withValues(alpha: 0.5)
-                        : Colors.transparent,
-                    width: 2,
-                  ),
                 ),
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    Icon(
-                      _brushIcon(type),
-                      size: 20.r,
-                      color: selected
-                          ? cs.primary
-                          : isLocked
-                          ? cs.onSurface.withValues(alpha: 0.35)
-                          : cs.onSurfaceVariant,
-                    ),
+                    Icon(_brushIcon(type), size: 20.r, color: iconColor),
                     if (isLocked)
                       Positioned(
                         right: 4.r,
                         bottom: 4.r,
                         child: Icon(
-                          Icons.lock_rounded,
+                          LucideIcons.lock,
                           size: 10.r,
                           color: cs.tertiary,
                         ),
@@ -476,15 +532,15 @@ class _BrushTypeSelector extends StatelessWidget {
   IconData _brushIcon(BrushType type) {
     switch (type) {
       case BrushType.pen:
-        return Icons.edit_rounded;
+        return LucideIcons.pen;
       case BrushType.marker:
-        return Icons.brush_rounded;
+        return LucideIcons.brush;
       case BrushType.eraser:
-        return Icons.auto_fix_normal_rounded;
+        return LucideIcons.eraser;
       case BrushType.watercolor:
-        return Icons.water_drop_rounded;
+        return LucideIcons.droplet;
       case BrushType.airbrush:
-        return Icons.blur_on_rounded;
+        return LucideIcons.sprayCan;
     }
   }
 }
@@ -515,7 +571,7 @@ class _BrushSizeSlider extends StatelessWidget {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Live preview dot
+          // Live preview dot — 현재 선택된 색상을 시각적으로 보여준다.
           SizedBox(
             width: 32.r,
             height: 32.r,
@@ -527,6 +583,7 @@ class _BrushSizeSlider extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isEraser ? cs.outline : Color(ctrl.brushColor.value),
                   shape: BoxShape.circle,
+                  border: Border.all(color: cs.outlineVariant, width: 1),
                 ),
               ),
             ),
@@ -562,7 +619,7 @@ class _ColorPalette extends StatelessWidget {
 
       if (isEraser) {
         return SizedBox(
-          height: 36.r,
+          height: 40.r,
           child: Center(
             child: Text(
               'eraser_mode'.tr,
@@ -574,51 +631,189 @@ class _ColorPalette extends StatelessWidget {
         );
       }
 
+      // 팔레트 + 마지막 슬롯(커스텀 컬러 피커).
+      final paletteLength = DoodleController.colorPalette.length;
+      // +1 = 커스텀 슬롯
+      final itemCount = paletteLength + 1;
+
       return SizedBox(
-        height: 36.r,
+        height: 40.r,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
-          itemCount: DoodleController.colorPalette.length,
+          itemCount: itemCount,
           itemBuilder: (ctx, i) {
+            // 마지막 슬롯: 커스텀 컬러 피커
+            if (i == paletteLength) {
+              return _CustomColorSlot(ctrl: ctrl, settingCtrl: settingCtrl);
+            }
+
             final c = DoodleController.colorPalette[i];
             final selected = ctrl.brushColor.value == c;
-            return GestureDetector(
+            return _ColorSwatch(
+              colorValue: c,
+              selected: selected,
               onTap: () {
                 if (settingCtrl.hapticEnabled.value) {
                   ctrl.hapticSelection();
                 }
                 ctrl.brushColor.value = c;
               },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                width: selected ? 36.r : 30.r,
-                height: selected ? 36.r : 30.r,
-                margin: EdgeInsets.symmetric(
-                  horizontal: 3.w,
-                  vertical: selected ? 0 : 3.r,
-                ),
-                decoration: BoxDecoration(
-                  color: Color(c),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: selected ? cs.primary : cs.outlineVariant,
-                    width: selected ? 3 : 1,
-                  ),
-                  boxShadow: selected
-                      ? [
-                          BoxShadow(
-                            color: Color(c).withValues(alpha: 0.5),
-                            blurRadius: 6,
-                            spreadRadius: 1,
-                          ),
-                        ]
-                      : null,
-                ),
-              ),
             );
           },
         ),
       );
     });
+  }
+}
+
+class _ColorSwatch extends StatelessWidget {
+  final int colorValue;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _ColorSwatch({
+    required this.colorValue,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Get.theme.colorScheme;
+    final color = Color(colorValue);
+    // 흰색 등 밝은 색상에서도 체크 표시가 보이도록 휘도 기반 대비 색상 선택.
+    final luminance = color.computeLuminance();
+    final checkColor = luminance > 0.6 ? Colors.black : Colors.white;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        width: selected ? 40.r : 32.r,
+        height: selected ? 40.r : 32.r,
+        margin: EdgeInsets.symmetric(
+          horizontal: 3.w,
+          vertical: selected ? 0 : 4.r,
+        ),
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: selected ? cs.primary : cs.outlineVariant,
+            width: selected ? 3 : 1,
+          ),
+        ),
+        child: selected
+            ? Icon(LucideIcons.check, size: 18.r, color: checkColor)
+            : null,
+      ),
+    );
+  }
+}
+
+class _CustomColorSlot extends StatelessWidget {
+  final DoodleController ctrl;
+  final SettingController settingCtrl;
+
+  const _CustomColorSlot({required this.ctrl, required this.settingCtrl});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Get.theme.colorScheme;
+    final custom = ctrl.customColor.value;
+    final hasCustom = custom != null;
+    // 커스텀 색상이 설정되어 있고 현재 선택과 같으면 "선택됨" 표시.
+    final selected = hasCustom && ctrl.brushColor.value == custom;
+
+    final color = hasCustom ? Color(custom) : cs.surfaceContainerHigh;
+    final luminance = color.computeLuminance();
+    final fgColor = luminance > 0.6 ? Colors.black : Colors.white;
+
+    return GestureDetector(
+      onTap: () => _openPicker(context),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        width: selected ? 40.r : 32.r,
+        height: selected ? 40.r : 32.r,
+        margin: EdgeInsets.symmetric(
+          horizontal: 3.w,
+          vertical: selected ? 0 : 4.r,
+        ),
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: selected ? cs.primary : cs.outline,
+            width: selected ? 3 : 1.5,
+          ),
+        ),
+        child: Icon(
+          selected ? LucideIcons.check : LucideIcons.plus,
+          size: 18.r,
+          color: hasCustom ? fgColor : cs.onSurfaceVariant,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openPicker(BuildContext context) async {
+    if (settingCtrl.hapticEnabled.value) {
+      ctrl.hapticSelection();
+    }
+    final cs = Get.theme.colorScheme;
+    Color picked = Color(ctrl.customColor.value ?? ctrl.brushColor.value);
+
+    await Get.dialog(
+      Dialog(
+        backgroundColor: cs.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 12.h),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'pick_color'.tr,
+                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
+              ),
+              SizedBox(height: 12.h),
+              ColorPicker(
+                pickerColor: picked,
+                onColorChanged: (c) => picked = c,
+                enableAlpha: false,
+                labelTypes: const [],
+                pickerAreaHeightPercent: 0.6,
+                displayThumbColor: true,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: Get.back,
+                      child: Text('cancel'.tr),
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () {
+                        // 알파 채널은 항상 0xFF 로 강제.
+                        // ignore: deprecated_member_use
+                        final argb = picked.value | 0xFF000000;
+                        ctrl.setCustomColor(argb);
+                        Get.back();
+                      },
+                      child: Text('confirm'.tr),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

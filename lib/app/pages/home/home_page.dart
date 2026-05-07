@@ -43,12 +43,12 @@ class _HomePageState extends State<HomePage>
   }
 
   static const _features = [
-    (Icons.edit_rounded, 'feature_pen'),
-    (Icons.brush_rounded, 'feature_marker'),
-    (Icons.auto_fix_normal_rounded, 'feature_eraser'),
-    (Icons.palette_rounded, 'feature_colors'),
-    (Icons.undo_rounded, 'feature_undo'),
-    (Icons.share_rounded, 'feature_share'),
+    (LucideIcons.pen, 'feature_pen'),
+    (LucideIcons.brush, 'feature_marker'),
+    (LucideIcons.eraser, 'feature_eraser'),
+    (LucideIcons.palette, 'feature_colors'),
+    (LucideIcons.undo2, 'feature_undo'),
+    (LucideIcons.share2, 'feature_share'),
   ];
 
   @override
@@ -63,85 +63,59 @@ class _HomePageState extends State<HomePage>
         }
       },
       child: Scaffold(
+        backgroundColor: cs.surface,
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: cs.surface.withValues(alpha: 0.85),
           title: Text(
             'app_name'.tr,
-            style: TextStyle(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.w800,
-              color: cs.onSurface,
-            ),
+            style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w800),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           actions: [
             IconButton(
-              icon: Icon(LucideIcons.crown, size: 20.r, color: cs.tertiary),
+              icon: Icon(LucideIcons.crown, size: 20.r),
               tooltip: 'premium_title'.tr,
               onPressed: () => Get.toNamed(Routes.PREMIUM),
             ),
             IconButton(
-              icon: Icon(LucideIcons.settings, size: 20.r, color: cs.onSurface),
+              icon: Icon(LucideIcons.settings, size: 20.r),
               tooltip: 'settings'.tr,
               onPressed: () => Get.toNamed(Routes.SETTINGS),
             ),
           ],
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(3),
-            child: Container(
-              height: 3,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [cs.primary, cs.tertiary]),
-              ),
-            ),
-          ),
         ),
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                cs.primary.withValues(alpha: 0.14),
-                cs.surface,
-                cs.secondaryContainer.withValues(alpha: 0.18),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 24.r,
-                      vertical: 12.r,
-                    ),
-                    child: Column(
-                      children: [
-                        _Hero(),
-                        SizedBox(height: 26.h),
-                        _TitleBlock(),
-                        SizedBox(height: 30.h),
-                        _FeatureChipsCard(features: _features),
-                        SizedBox(height: 28.h),
-                        _StartDrawingCta(pulseAnim: _pulseAnim),
-                      ],
-                    ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24.r,
+                    vertical: 12.r,
+                  ),
+                  child: Column(
+                    children: [
+                      _Hero(),
+                      SizedBox(height: 26.h),
+                      _TitleBlock(),
+                      SizedBox(height: 30.h),
+                      _FeatureChipsCard(features: _features),
+                      SizedBox(height: 28.h),
+                      _StartDrawingCta(pulseAnim: _pulseAnim),
+                    ],
                   ),
                 ),
-                Obx(
-                  () => PurchaseService.isPremiumActive
-                      ? const SizedBox.shrink()
-                      : BannerAdWidget(
-                          adUnitId: AdHelper.bannerAdUnitId,
-                          type: AdHelper.banner,
-                        ),
-                ),
-              ],
-            ),
+              ),
+              Obx(
+                () => PurchaseService.isPremiumActive
+                    ? const SizedBox.shrink()
+                    : BannerAdWidget(
+                        adUnitId: AdHelper.bannerAdUnitId,
+                        type: AdHelper.banner,
+                      ),
+              ),
+            ],
           ),
         ),
       ),
@@ -161,35 +135,22 @@ class _Hero extends StatelessWidget {
         opacity: value.clamp(0.0, 1.0),
         child: Transform.scale(scale: value, child: child),
       ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            width: 132.r,
-            height: 132.r,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: [
-                  cs.primaryContainer,
-                  cs.secondaryContainer,
-                  cs.tertiaryContainer,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+      child: Tooltip(
+        message: 'app_subtitle'.tr,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: 132.r,
+              height: 132.r,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: cs.primaryContainer,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: cs.primary.withValues(alpha: 0.26),
-                  blurRadius: 28,
-                  spreadRadius: 2,
-                  offset: const Offset(0, 12),
-                ),
-              ],
             ),
-          ),
-          Text('🎨', style: TextStyle(fontSize: 56.sp)),
-        ],
+            Text('🎨', style: TextStyle(fontSize: 56.sp)),
+          ],
+        ),
       ),
     );
   }
@@ -271,29 +232,32 @@ class _FeatureChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-      decoration: BoxDecoration(
-        color: cs.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: cs.primary.withValues(alpha: 0.12)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14.r, color: cs.primary),
-          SizedBox(width: 5.w),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: cs.onSurfaceVariant,
-              fontWeight: FontWeight.w500,
+    return Tooltip(
+      message: label,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+        decoration: BoxDecoration(
+          color: cs.surfaceContainerHigh,
+          borderRadius: BorderRadius.circular(20.r),
+          border: Border.all(color: cs.outlineVariant),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14.r, color: cs.primary),
+            SizedBox(width: 5.w),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: cs.onSurfaceVariant,
+                fontWeight: FontWeight.w500,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -312,58 +276,44 @@ class _StartDrawingCta extends StatelessWidget {
       animation: pulseAnim,
       builder: (context, child) =>
           Transform.scale(scale: pulseAnim.value, child: child),
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [cs.primary, cs.tertiary],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          borderRadius: BorderRadius.circular(16.r),
-          boxShadow: [
-            BoxShadow(
-              color: cs.primary.withValues(alpha: 0.45),
-              blurRadius: 20,
-              spreadRadius: 1,
-              offset: const Offset(0, 6),
-            ),
-            BoxShadow(
-              color: cs.tertiary.withValues(alpha: 0.20),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
+      child: Tooltip(
+        message: 'start_drawing'.tr,
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: cs.primary,
             borderRadius: BorderRadius.circular(16.r),
-            onTap: () async {
-              if (settingCtrl.hapticEnabled.value) {
-                DoodleController.to.hapticSelection();
-              }
-              DoodleController.to.clearCanvas();
-              await Get.toNamed(Routes.DRAW);
-            },
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.brush_rounded, size: 22.r, color: cs.onPrimary),
-                  SizedBox(width: 10.w),
-                  Text(
-                    'start_drawing'.tr,
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w700,
-                      color: cs.onPrimary,
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16.r),
+              onTap: () async {
+                if (settingCtrl.hapticEnabled.value) {
+                  DoodleController.to.hapticSelection();
+                }
+                DoodleController.to.clearCanvas();
+                await Get.toNamed(Routes.DRAW);
+              },
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.h),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(LucideIcons.brush, size: 22.r, color: cs.onPrimary),
+                    SizedBox(width: 10.w),
+                    Text(
+                      'start_drawing'.tr,
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w700,
+                        color: cs.onPrimary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

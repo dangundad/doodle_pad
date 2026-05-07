@@ -54,6 +54,35 @@ class DoodleController extends GetxController {
   final brushColor = 0xFF000000.obs;
   final brushSize = 6.0.obs;
 
+  /// 사용자가 컬러 피커로 선택한 마지막 커스텀 색상.
+  /// null 이면 팔레트 마지막 슬롯이 "+" 추가 버튼으로 표시된다.
+  final customColor = Rxn<int>();
+
+  /// 컬러 피커에서 색상이 선택되면 호출.
+  void setCustomColor(int colorValue) {
+    customColor.value = colorValue;
+    brushColor.value = colorValue;
+    HiveService.to.setSetting(_customColorKey, colorValue);
+  }
+
+  /// 캔버스 배경 색상 (기본: 흰색). 공유 시에도 이 색이 그대로 캡처된다.
+  final canvasColor = 0xFFFFFFFF.obs;
+
+  /// 캔버스 배경 프리셋 (6개).
+  static const canvasColorPresets = [
+    0xFFFFFFFF, // white
+    0xFFFDF6E3, // cream
+    0xFFF1F1F1, // light gray
+    0xFFE3F2FD, // light blue
+    0xFFFFF9C4, // light yellow
+    0xFF1A1A1A, // dark
+  ];
+
+  void setCanvasColor(int colorValue) {
+    canvasColor.value = colorValue;
+    HiveService.to.setSetting(_canvasColorKey, colorValue);
+  }
+
   // Reference image (used by share preview overlay only).
   final referenceImagePath = RxnString();
 
@@ -62,6 +91,10 @@ class DoodleController extends GetxController {
   static const _airbrushUnlockedKey = 'airbrush_unlocked';
   final isWatercolorUnlocked = false.obs;
   final isAirbrushUnlocked = false.obs;
+
+  // 캔버스/커스텀 색상 영속화 키
+  static const _canvasColorKey = 'canvas_color';
+  static const _customColorKey = 'custom_color';
 
   // Color palette (16 colors)
   static const colorPalette = [
@@ -131,6 +164,11 @@ class DoodleController extends GetxController {
         hive.getSetting<bool>(_watercolorUnlockedKey) ?? false;
     isAirbrushUnlocked.value =
         hive.getSetting<bool>(_airbrushUnlockedKey) ?? false;
+
+    final savedCanvas = hive.getSetting<int>(_canvasColorKey);
+    if (savedCanvas != null) canvasColor.value = savedCanvas;
+    final savedCustom = hive.getSetting<int>(_customColorKey);
+    if (savedCustom != null) customColor.value = savedCustom;
   }
 
   void startStroke(Offset point) {

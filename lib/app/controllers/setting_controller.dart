@@ -84,8 +84,29 @@ class SettingController extends GetxController {
     unawaited(_updateLocaleFn(currentLocale));
   }
 
-  Locale get currentLocale =>
-      language.value == 'ko' ? const Locale('ko') : const Locale('en');
+  /// translate.dart 의 supportedLocales 와 동일한 화이트리스트.
+  /// 알 수 없는 코드가 저장되어 있으면 'en' 으로 폴백한다.
+  static const _supportedLanguageCodes = <String>{
+    'en',
+    'ko',
+    'ja',
+    'de',
+    'ru',
+    'fr',
+    'es',
+    'pt',
+    'id',
+    'zh',
+    'ar',
+  };
+
+  Locale get currentLocale {
+    final code = language.value;
+    if (_supportedLanguageCodes.contains(code)) {
+      return Locale(code);
+    }
+    return const Locale('en');
+  }
 
   Future<void> setHapticEnabled(bool value) async {
     hapticEnabled.value = value;
