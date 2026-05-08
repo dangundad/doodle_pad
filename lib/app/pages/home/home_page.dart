@@ -11,6 +11,95 @@ import 'package:doodle_pad/app/routes/app_pages.dart';
 import 'package:doodle_pad/app/services/purchase_service.dart';
 import 'package:doodle_pad/app/widgets/exit_bottom_sheet.dart';
 
+/// 홈에서 그리기 화면으로 진입할 때 호출.
+/// 작업 중인 그림이 남아 있으면 "이어 그리기 / 새로 시작" 다이얼로그를 띄우고,
+/// 사용자가 새로 시작을 고르거나 캔버스가 비어있으면 자동으로 clearCanvas() 한다.
+Future<void> _enterDrawing(SettingController settingCtrl) async {
+  final ctrl = DoodleController.to;
+  if (settingCtrl.hapticEnabled.value) {
+    ctrl.hapticSelection();
+  }
+
+  if (!ctrl.hasDrawableContent) {
+    ctrl.clearCanvas();
+    await Get.toNamed(Routes.DRAW);
+    return;
+  }
+
+  final cs = Get.theme.colorScheme;
+  final continueExisting = await Get.dialog<bool>(
+    Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20.r),
+      ),
+      clipBehavior: Clip.antiAlias,
+      backgroundColor: cs.surface,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 16.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 52.r,
+              height: 52.r,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: cs.primaryContainer,
+              ),
+              child: Icon(
+                LucideIcons.brush,
+                size: 26.r,
+                color: cs.onPrimaryContainer,
+              ),
+            ),
+            SizedBox(height: 16.h),
+            Text(
+              'continue_or_new_title'.tr,
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              'continue_or_new_desc'.tr,
+              style: TextStyle(fontSize: 14.sp, color: cs.onSurfaceVariant),
+              textAlign: TextAlign.center,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+            SizedBox(height: 20.h),
+            Row(
+              children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: () => Get.back(result: false),
+                    child: Text('start_new'.tr),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: () => Get.back(result: true),
+                    child: Text('continue_drawing'.tr),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+    barrierDismissible: false,
+  );
+
+  if (continueExisting == null) return;
+  if (!continueExisting) {
+    ctrl.clearCanvas();
+  }
+  await Get.toNamed(Routes.DRAW);
+}
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -288,13 +377,7 @@ class _StartDrawingCta extends StatelessWidget {
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(16.r),
-              onTap: () async {
-                if (settingCtrl.hapticEnabled.value) {
-                  DoodleController.to.hapticSelection();
-                }
-                DoodleController.to.clearCanvas();
-                await Get.toNamed(Routes.DRAW);
-              },
+              onTap: () => _enterDrawing(settingCtrl),
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 16.h),
                 child: Row(

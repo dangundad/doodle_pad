@@ -130,27 +130,80 @@ void main() {
     expect(Get.currentRoute, Routes.PREMIUM);
   });
 
-  testWidgets('start drawing CTA clears canvas and navigates to /draw', (
-    tester,
-  ) async {
-    tester.view.physicalSize = const Size(1080, 2400);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.reset);
+  testWidgets(
+    'start drawing CTA on empty canvas navigates to /draw without dialog',
+    (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
 
-    Get.put<PurchaseService>(FakePurchaseService(), permanent: true);
+      Get.put<PurchaseService>(FakePurchaseService(), permanent: true);
 
-    final doodle = DoodleController.to;
-    doodle.referenceImagePath.value = 'C:\\temp\\reference.png';
+      await tester.pumpWidget(_buildApp(initialRoute: Routes.HOME));
+      await tester.pump();
 
-    await tester.pumpWidget(_buildApp(initialRoute: Routes.HOME));
-    await tester.pump();
+      await tester.tap(find.text('Start Drawing'));
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Start Drawing'));
-    await tester.pumpAndSettle();
+      expect(Get.currentRoute, Routes.DRAW);
+    },
+  );
 
-    expect(Get.currentRoute, Routes.DRAW);
-    expect(doodle.referenceImagePath.value, isNull);
-  });
+  testWidgets(
+    'start drawing CTA prompts continue/start-new when drawing exists',
+    (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      Get.put<PurchaseService>(FakePurchaseService(), permanent: true);
+
+      final doodle = DoodleController.to;
+      doodle.referenceImagePath.value = 'C:\\temp\\reference.png';
+
+      await tester.pumpWidget(_buildApp(initialRoute: Routes.HOME));
+      await tester.pump();
+
+      await tester.tap(find.text('Start Drawing'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 250));
+
+      expect(find.text('Continue your drawing?'), findsOneWidget);
+
+      await tester.tap(find.text('Start new'));
+      await tester.pumpAndSettle();
+
+      expect(Get.currentRoute, Routes.DRAW);
+      expect(doodle.referenceImagePath.value, isNull);
+    },
+  );
+
+  testWidgets(
+    'start drawing CTA continue option keeps the existing reference image',
+    (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      Get.put<PurchaseService>(FakePurchaseService(), permanent: true);
+
+      final doodle = DoodleController.to;
+      doodle.referenceImagePath.value = 'C:\\temp\\reference.png';
+
+      await tester.pumpWidget(_buildApp(initialRoute: Routes.HOME));
+      await tester.pump();
+
+      await tester.tap(find.text('Start Drawing'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 250));
+
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+
+      expect(Get.currentRoute, Routes.DRAW);
+      expect(doodle.referenceImagePath.value, 'C:\\temp\\reference.png');
+    },
+  );
 
   testWidgets('system back gesture opens ExitBottomSheet', (tester) async {
     tester.view.physicalSize = const Size(1080, 2400);

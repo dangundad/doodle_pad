@@ -12,12 +12,120 @@ import 'package:doodle_pad/app/pages/draw/widgets/canvas_painter.dart';
 class DrawPage extends GetView<DoodleController> {
   const DrawPage({super.key});
 
+  /// 작업 중 그림이 있을 때 뒤로 나가기를 시도하면 확인 다이얼로그를 표시한다.
+  /// 반환값이 true면 호출자가 화면을 닫고, false면 그리기 화면을 유지한다.
+  static Future<bool> _confirmDiscardIfNeeded(
+    DoodleController ctrl,
+    SettingController settingCtrl,
+  ) async {
+    if (!ctrl.hasDrawableContent) return true;
+
+    final cs = Get.theme.colorScheme;
+    final result = await Get.dialog<bool>(
+      Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        clipBehavior: Clip.antiAlias,
+        backgroundColor: cs.surface,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 8.h),
+              child: Column(
+                children: [
+                  Container(
+                    width: 52.r,
+                    height: 52.r,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: cs.errorContainer,
+                    ),
+                    child: Icon(
+                      LucideIcons.triangleAlert,
+                      size: 26.r,
+                      color: cs.onErrorContainer,
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+                  Text(
+                    'discard_drawing_title'.tr,
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    'discard_drawing_desc'.tr,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: cs.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Get.back(result: false),
+                      child: Text('keep_drawing'.tr),
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: cs.error,
+                        foregroundColor: cs.onError,
+                      ),
+                      onPressed: () {
+                        if (settingCtrl.hapticEnabled.value) {
+                          ctrl.hapticHeavy();
+                        }
+                        Get.back(result: true);
+                      },
+                      child: Text('discard'.tr),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      barrierDismissible: false,
+    );
+    return result ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final settingCtrl = SettingController.to;
     final cs = Get.theme.colorScheme;
 
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final shouldPop = await _confirmDiscardIfNeeded(controller, settingCtrl);
+        if (shouldPop) {
+          controller.clearCanvas();
+          Get.back();
+        }
+      },
+      child: Scaffold(
       backgroundColor: cs.surfaceContainerHighest,
       body: Stack(
         children: [
@@ -105,6 +213,7 @@ class DrawPage extends GetView<DoodleController> {
           ),
         ],
       ),
+      ),
     );
   }
 }
@@ -133,9 +242,14 @@ class _TopToolbar extends StatelessWidget {
           children: [
             IconButton(
               icon: const Icon(LucideIcons.arrowLeft),
-              onPressed: () {
+              onPressed: () async {
                 _maybeHaptic(settingCtrl);
-                Get.back();
+                final shouldPop =
+                    await DrawPage._confirmDiscardIfNeeded(ctrl, settingCtrl);
+                if (shouldPop) {
+                  ctrl.clearCanvas();
+                  Get.back();
+                }
               },
               tooltip: 'back'.tr,
             ),
@@ -176,6 +290,25 @@ class _TopToolbar extends StatelessWidget {
               icon: Icon(LucideIcons.paintBucket, color: cs.onSurface),
               onPressed: () => _openCanvasColorPicker(context, settingCtrl),
               tooltip: 'canvas_color'.tr,
+            ),
+            IconButton(
+              icon: Icon(
+                ctrl.referenceImagePath.value != null
+                    ? LucideIcons.imageMinus
+                    : LucideIcons.imagePlus,
+                color: cs.onSurface,
+              ),
+              onPressed: () async {
+                _maybeHaptic(settingCtrl);
+                if (ctrl.referenceImagePath.value != null) {
+                  ctrl.clearReferenceDrawing();
+                } else {
+                  await ctrl.pickReferenceImage();
+                }
+              },
+              tooltip: ctrl.referenceImagePath.value != null
+                  ? 'remove_image'.tr
+                  : 'import_image'.tr,
             ),
             IconButton(
               icon: Icon(

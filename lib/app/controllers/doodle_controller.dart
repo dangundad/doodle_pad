@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -367,6 +368,31 @@ class DoodleController extends GetxController {
 
   void clearReferenceDrawing() {
     referenceImagePath.value = null;
+  }
+
+  /// 갤러리에서 사진을 골라 참조 이미지로 설정한다.
+  /// Android 13+에서는 시스템 Photo Picker가 권한 없이 동작한다.
+  /// 실패 시 토스트로 안내하고 false를 반환.
+  Future<bool> pickReferenceImage() async {
+    try {
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 90,
+        maxWidth: 4096,
+      );
+      if (picked == null) return false;
+      referenceImagePath.value = picked.path;
+      return true;
+    } catch (_) {
+      AppToast.show(
+        AppToastMessage.error(
+          title: 'error'.tr,
+          description: 'import_image_failed'.tr,
+        ),
+      );
+      return false;
+    }
   }
 
   /// 캔버스를 PNG로 캡처하여 반환.
