@@ -1,8 +1,7 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
+import 'package:doodle_pad/app/data/brushes/brush_presets.dart';
 
 class CanvasPainter extends CustomPainter {
   final List<DrawingStroke> strokes;
@@ -27,19 +26,10 @@ class CanvasPainter extends CustomPainter {
     for (final stroke in strokes) {
       if (stroke.points.isEmpty) continue;
 
-      switch (stroke.brushType) {
-        case BrushType.watercolor:
-          _drawWatercolor(canvas, stroke);
-          break;
-        case BrushType.airbrush:
-          _drawAirbrush(canvas, stroke);
-          break;
-        case BrushType.eraser:
-          _drawEraser(canvas, stroke);
-          break;
-        default:
-          _drawNormal(canvas, stroke);
-          break;
+      if (stroke.brushType == BrushType.eraser) {
+        _drawEraser(canvas, stroke);
+      } else {
+        BrushPresets.of(stroke.brushType).render(canvas, stroke);
       }
     }
 
@@ -48,29 +38,19 @@ class CanvasPainter extends CustomPainter {
     }
   }
 
-  /// Build a smooth Bezier path through [points].
-  ///
-  /// Uses midpoint-chaining quadratic Bezier curves so every segment is
-  /// C1-continuous (tangent-matched at joins).  The final segment goes
-  /// directly to the last point via a quadratic curve (control point =
-  /// the second-to-last raw point), removing the straight-line kink that
-  /// `lineTo` produces when the finger is lifted mid-curve.
+  /// 부드러운 quadratic bezier path. eraser와 outline-empty fallback에서만 사용한다.
   Path _buildSmoothPath(List<Offset> points) {
     final path = Path()..moveTo(points.first.dx, points.first.dy);
 
     if (points.length == 1) {
-      // Single point: just moveTo is enough; the caller draws a dot.
       return path;
     }
 
     if (points.length == 2) {
-      // Only two points: straight line is the best we can do.
       path.lineTo(points[1].dx, points[1].dy);
       return path;
     }
 
-    // For every interior point, curve from the previous midpoint to the
-    // next midpoint with the interior point as the Bezier control.
     for (int i = 1; i < points.length - 1; i++) {
       final mid = Offset(
         (points[i].dx + points[i + 1].dx) / 2,
@@ -84,8 +64,6 @@ class CanvasPainter extends CustomPainter {
       );
     }
 
-    // Fix: finish the path with a curve to the true last point instead of
-    // a straight lineTo, so the stroke tip is smooth.
     final n = points.length;
     path.quadraticBezierTo(
       points[n - 2].dx,
@@ -97,128 +75,23 @@ class CanvasPainter extends CustomPainter {
     return path;
   }
 
-  void _drawNormal(Canvas canvas, DrawingStroke stroke) {
+  void _drawEraser(Canvas canvas, DrawingStroke stroke) {
     final paint = Paint()
-      ..color = stroke.isEraser ? Colors.transparent : stroke.color
+      ..color = Colors.transparent
       ..strokeWidth = stroke.width
       ..strokeCap = stroke.cap
       ..strokeJoin = StrokeJoin.round
       ..style = PaintingStyle.stroke
-      ..blendMode =
-          stroke.isEraser ? BlendMode.clear : BlendMode.srcOver;
+      ..blendMode = BlendMode.clear;
 
     if (stroke.points.length == 1) {
       final dotPaint = Paint()
-        ..color = stroke.isEraser ? Colors.transparent : stroke.color
+        ..color = Colors.transparent
         ..style = PaintingStyle.fill
-        ..blendMode =
-            stroke.isEraser ? BlendMode.clear : BlendMode.srcOver;
-
-      if (stroke.cap == StrokeCap.square) {
-        // Marker: 사각형 점 그리기
-        final half = stroke.width / 2;
-        canvas.drawRect(
-          Rect.fromCenter(
-            center: stroke.points.first,
-            width: half * 2,
-            height: half * 2,
-          ),
-          dotPaint,
-        );
-      } else {
-        canvas.drawCircle(stroke.points.first, stroke.width / 2, dotPaint);
-      }
+        ..blendMode = BlendMode.clear;
+      canvas.drawCircle(stroke.points.first, stroke.width / 2, dotPaint);
     } else {
       canvas.drawPath(_buildSmoothPath(stroke.points), paint);
-    }
-  }
-
-  void _drawEraser(Canvas canvas, DrawingStroke stroke) {
-    _drawNormal(canvas, stroke);
-  }
-
-  void _drawWatercolor(Canvas canvas, DrawingStroke stroke) {
-    // Watercolor: low opacity + blur gives soft, layered look
-    final blurRadius = stroke.width / 2;
-    final paint = Paint()
-      ..color = stroke.color.withValues(alpha: 0.28)
-      ..strokeWidth = stroke.width * 2
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..style = PaintingStyle.stroke
-      ..maskFilter = MaskFilter.blur(BlurStyle.normal, blurRadius)
-      ..blendMode = BlendMode.srcOver;
-
-    // Inner layer: slightly more opaque for center definition
-    final innerPaint = Paint()
-      ..color = stroke.color.withValues(alpha: 0.15)
-      ..strokeWidth = stroke.width * 1.2
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..style = PaintingStyle.stroke
-      ..blendMode = BlendMode.srcOver;
-
-    if (stroke.points.length == 1) {
-      canvas.drawCircle(stroke.points.first, stroke.width, paint);
-      canvas.drawCircle(stroke.points.first, stroke.width * 0.6, innerPaint);
-    } else {
-      final path = _buildSmoothPath(stroke.points);
-      canvas.drawPath(path, paint);
-      canvas.drawPath(path, innerPaint);
-    }
-  }
-
-  void _drawAirbrush(Canvas canvas, DrawingStroke stroke) {
-    // Airbrush: scattered dots around each point simulate spray effect.
-    // Use the stroke's fixed seed so the spray pattern is identical on every
-    // repaint, preventing the "flickering dots" artifact that occurs when other
-    // strokes are added/removed and this stroke is re-drawn with a new Random.
-    final random = math.Random(stroke.seed);
-    final dotPaint = Paint()
-      ..style = PaintingStyle.fill
-      ..blendMode = BlendMode.srcOver;
-
-    final radius = stroke.width / 2;
-    const dotCount = 25;
-
-    // Subsample points: skip nearby points to avoid excessive dot density
-    // on long strokes, which degrades performance noticeably.
-    final minDist = radius * 0.3;
-    final minDistSq = minDist * minDist;
-    Offset? prev;
-
-    for (final point in stroke.points) {
-      if (prev != null) {
-        final ddx = point.dx - prev.dx;
-        final ddy = point.dy - prev.dy;
-        if (ddx * ddx + ddy * ddy < minDistSq) {
-          // Still advance the RNG to keep pattern stable.
-          for (int i = 0; i < dotCount; i++) {
-            random.nextDouble();
-            random.nextDouble();
-            random.nextDouble();
-            random.nextDouble();
-          }
-          continue;
-        }
-      }
-      prev = point;
-
-      for (int i = 0; i < dotCount; i++) {
-        // Random angle and distance within the spray radius
-        final angle = random.nextDouble() * 2 * math.pi;
-        // Gaussian-like distribution: more dots near center
-        final dist = random.nextDouble() * radius * (0.3 + random.nextDouble() * 0.7);
-        final dx = point.dx + dist * math.cos(angle);
-        final dy = point.dy + dist * math.sin(angle);
-
-        // Dots closer to center are more opaque
-        final normalizedDist = dist / radius;
-        final opacity = (1.0 - normalizedDist * 0.7) * 0.35;
-
-        dotPaint.color = stroke.color.withValues(alpha: opacity.clamp(0.05, 0.4));
-        canvas.drawCircle(Offset(dx, dy), 1.0 + random.nextDouble() * 1.2, dotPaint);
-      }
     }
   }
 

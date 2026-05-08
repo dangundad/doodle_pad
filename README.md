@@ -14,8 +14,8 @@
 
 ## 주요 기능
 
-- **5종 브러시**: 펜, 마커, 지우개, 수채화, 에어브러시
-- **브러시 해금**: 수채화/에어브러시는 보상형 광고 또는 Premium으로 사용
+- **10종 브러시**: 펜, 연필, 마커, 붓, 형광펜, 만년필, 크레파스, 수채화, 에어브러시, 지우개. stroke 엔진은 `perfect_freehand` 기반으로 가변 굵기/taper를 지원
+- **브러시 해금**: 수채화/에어브러시는 보상형 광고 또는 Premium으로 사용. 그 외 브러시는 모두 무료
 - **16색 팔레트 + 커스텀 컬러 피커**: 기본 색상과 사용자 색상 슬롯
 - **캔버스 배경 색상**: 6종 프리셋
 - **브러시 크기 조절**: 슬라이더로 굵기 변경
@@ -34,7 +34,7 @@
 - **Flutter / Dart**
 - **GetX**: 상태 관리, 라우팅, 다국어
 - **Hive_CE**: 로컬 설정과 앱 데이터 저장
-- **CustomPainter**: 드로잉 캔버스 렌더링
+- **CustomPainter + perfect_freehand**: 드로잉 캔버스 렌더링과 stroke outline 생성
 - **flutter_screenutil**: 반응형 UI
 - **flex_color_scheme**: Material 3 테마
 - **lucide_icons_flutter**: 아이콘
@@ -81,6 +81,7 @@ lib/
     ├── admob/          # AdMob 광고 관리
     ├── bindings/       # GetX 바인딩
     ├── controllers/    # doodle, premium, setting
+    ├── data/           # brushes/ (BrushPreset 정의 + registry)
     ├── pages/          # home, draw, settings, premium
     ├── routes/         # GetX routes
     ├── services/       # Hive, purchase, rating

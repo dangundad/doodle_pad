@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -12,6 +13,30 @@ import 'package:doodle_pad/app/services/hive_service.dart';
 import 'package:doodle_pad/app/services/purchase_service.dart';
 
 import '../helpers/fake_purchase_service.dart';
+
+class _BlockingHiveService extends HiveService {
+  final Completer<void> _setCompleter = Completer<void>();
+  bool settingWriteStarted = false;
+  bool settingWriteCompleted = false;
+
+  @override
+  T? getSetting<T>(String key, {T? defaultValue}) => defaultValue;
+
+  @override
+  Future<void> setSetting(String key, dynamic value) async {
+    if (key == DoodleController.canvasColorKey) {
+      settingWriteStarted = true;
+      await _setCompleter.future;
+      settingWriteCompleted = true;
+    }
+  }
+
+  void completeSettingWrite() {
+    if (!_setCompleter.isCompleted) {
+      _setCompleter.complete();
+    }
+  }
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -104,6 +129,33 @@ void main() {
     expect(controller.referenceImagePath.value, 'C:\\temp\\reference.png');
     expect(controller.strokes, isEmpty);
   });
+
+  test(
+    'setCanvasColor waits for settings persistence before completing',
+    () async {
+      final hive = _BlockingHiveService();
+      Get.delete<HiveService>(force: true);
+      Get.put<HiveService>(hive, permanent: true);
+      final controller = DoodleController();
+
+      var completed = false;
+      final save = controller.setCanvasColor(0xFFE3F2FD).then((_) {
+        completed = true;
+      });
+
+      await Future<void>.delayed(Duration.zero);
+
+      expect(hive.settingWriteStarted, isTrue);
+      expect(hive.settingWriteCompleted, isFalse);
+      expect(completed, isFalse);
+
+      hive.completeSettingWrite();
+      await save;
+
+      expect(completed, isTrue);
+      expect(hive.settingWriteCompleted, isTrue);
+    },
+  );
 
   test(
     'unlockBrush allows premium users to select special brushes without rewarded ads',

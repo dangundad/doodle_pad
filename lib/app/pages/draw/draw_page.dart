@@ -7,6 +7,7 @@ import 'dart:io';
 
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
+import 'package:doodle_pad/app/data/brushes/brush_presets.dart';
 import 'package:doodle_pad/app/pages/draw/widgets/canvas_painter.dart';
 
 class DrawPage extends GetView<DoodleController> {
@@ -607,9 +608,13 @@ class _BrushTypeSelector extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: BrushType.values.map((type) {
             final selected = ctrl.brushType.value == type;
-            final isSpecial =
-                type == BrushType.watercolor || type == BrushType.airbrush;
-            final isLocked = isSpecial && !ctrl.isBrushUnlocked(type);
+            final isEraser = type == BrushType.eraser;
+            final preset = isEraser ? null : BrushPresets.of(type);
+            final isLocked = !isEraser && !ctrl.isBrushUnlocked(type);
+
+            final IconData icon = isEraser
+                ? LucideIcons.eraser
+                : preset!.icon;
 
             // 선택된 도구는 primary 배경 + onPrimary 아이콘으로 충분한 대비 확보.
             final Color bgColor;
@@ -648,7 +653,7 @@ class _BrushTypeSelector extends StatelessWidget {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    Icon(_brushIcon(type), size: 20.r, color: iconColor),
+                    Icon(icon, size: 20.r, color: iconColor),
                     if (isLocked)
                       Positioned(
                         right: 4.r,
@@ -667,21 +672,6 @@ class _BrushTypeSelector extends StatelessWidget {
         ),
       );
     });
-  }
-
-  IconData _brushIcon(BrushType type) {
-    switch (type) {
-      case BrushType.pen:
-        return LucideIcons.pen;
-      case BrushType.marker:
-        return LucideIcons.brush;
-      case BrushType.eraser:
-        return LucideIcons.eraser;
-      case BrushType.watercolor:
-        return LucideIcons.droplet;
-      case BrushType.airbrush:
-        return LucideIcons.sprayCan;
-    }
   }
 }
 

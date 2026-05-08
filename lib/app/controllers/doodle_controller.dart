@@ -11,12 +11,25 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:doodle_pad/app/admob/ads_rewarded.dart';
+import 'package:doodle_pad/app/data/brushes/brush_preset.dart';
+import 'package:doodle_pad/app/data/brushes/brush_presets.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
 import 'package:doodle_pad/app/services/purchase_service.dart';
 import 'package:doodle_pad/app/utils/app_toast.dart';
 import 'package:vibration/vibration.dart';
 
-enum BrushType { pen, marker, eraser, watercolor, airbrush }
+enum BrushType {
+  pen,
+  pencil,
+  marker,
+  brush,
+  highlighter,
+  fountainPen,
+  crayon,
+  watercolor,
+  airbrush,
+  eraser,
+}
 
 class DrawingStroke {
   final List<Offset> points;
@@ -25,6 +38,7 @@ class DrawingStroke {
   final bool isEraser;
   final StrokeCap cap;
   final BrushType brushType;
+
   /// Fixed seed for the airbrush Random, so the spray pattern is stable
   /// across repaints (avoids flickering when other strokes are updated).
   final int seed;
@@ -60,10 +74,10 @@ class DoodleController extends GetxController {
   final customColor = Rxn<int>();
 
   /// 컬러 피커에서 색상이 선택되면 호출.
-  void setCustomColor(int colorValue) {
+  Future<void> setCustomColor(int colorValue) async {
     customColor.value = colorValue;
     brushColor.value = colorValue;
-    HiveService.to.setSetting(_customColorKey, colorValue);
+    await HiveService.to.setSetting(_customColorKey, colorValue);
   }
 
   /// 캔버스 배경 색상 (기본: 흰색). 공유 시에도 이 색이 그대로 캡처된다.
@@ -79,9 +93,9 @@ class DoodleController extends GetxController {
     0xFF1A1A1A, // dark
   ];
 
-  void setCanvasColor(int colorValue) {
+  Future<void> setCanvasColor(int colorValue) async {
     canvasColor.value = colorValue;
-    HiveService.to.setSetting(_canvasColorKey, colorValue);
+    await HiveService.to.setSetting(_canvasColorKey, colorValue);
   }
 
   /// 드로잉 사용자 선호값(캔버스/커스텀 색상)만 기본값으로 되돌린다.
@@ -197,39 +211,64 @@ class DoodleController extends GetxController {
 
     final type = brushType.value;
     final isEraser = type == BrushType.eraser;
-    final isMarker = type == BrushType.marker;
-    final isWatercolor = type == BrushType.watercolor;
-    final isAirbrush = type == BrushType.airbrush;
-
-    double widthMultiplier;
-    if (isEraser) {
-      widthMultiplier = 4.0;
-    } else if (isMarker) {
-      widthMultiplier = 2.5;
-    } else if (isWatercolor) {
-      widthMultiplier = 2.0;
-    } else if (isAirbrush) {
-      widthMultiplier = 1.0;
-    } else {
-      widthMultiplier = 1.0;
-    }
 
     // Clear redo stack only when the user intentionally starts a new stroke.
     _undoStack.clear();
 
+    // BrushPreset이 brush별 size multiplier/cap을 책임지므로 여기서는
+    // 사용자 슬라이더 값(brushSize.value)을 그대로 baseSize로 저장한다.
+    // eraser만 BrushPreset 등록 대상이 아니라서 기존 4배율을 유지.
+    final baseWidth = isEraser ? brushSize.value * 4.0 : brushSize.value;
+
     _currentStroke = DrawingStroke(
       points: [point],
       color: isEraser ? Colors.transparent : Color(brushColor.value),
-      width: brushSize.value * widthMultiplier,
+      width: baseWidth,
       isEraser: isEraser,
-      cap: isMarker ? StrokeCap.square : StrokeCap.round,
+      cap: StrokeCap.round,
       brushType: type,
     );
     strokes.add(_currentStroke!);
   }
 
+  /// 잠금 카테고리(watercolor/airbrush)별 현재 unlock 상태.
+  bool _isLockUnlocked(BrushLock lock) {
+    switch (lock) {
+      case BrushLock.none:
+        return true;
+      case BrushLock.watercolor:
+        return isWatercolorUnlocked.value;
+      case BrushLock.airbrush:
+        return isAirbrushUnlocked.value;
+    }
+  }
+
+  /// 보상형 광고 시청 후 호출되는 unlock 적용 + Hive 영속화.
+  Future<void> _persistUnlock(BrushLock lock) async {
+    switch (lock) {
+      case BrushLock.none:
+        return;
+      case BrushLock.watercolor:
+        isWatercolorUnlocked.value = true;
+        await HiveService.to.setSetting(_watercolorUnlockedKey, true);
+        break;
+      case BrushLock.airbrush:
+        isAirbrushUnlocked.value = true;
+        await HiveService.to.setSetting(_airbrushUnlockedKey, true);
+        break;
+    }
+  }
+
   // Special brush unlock via rewarded ad
   void unlockBrush(BrushType type) {
+    final preset = BrushPresets.maybeOf(type);
+
+    // eraser나 등록되지 않은 brush는 잠금 개념 자체가 없다.
+    if (preset == null || preset.lock == BrushLock.none) {
+      brushType.value = type;
+      return;
+    }
+
     if (hasPremiumBrushAccess) {
       brushType.value = type;
       return;
@@ -237,16 +276,13 @@ class DoodleController extends GetxController {
 
     if (!Get.isRegistered<RewardedAdManager>()) return;
 
-    final alreadyUnlocked = type == BrushType.watercolor
-        ? isWatercolorUnlocked.value
-        : isAirbrushUnlocked.value;
-    if (alreadyUnlocked) {
+    if (_isLockUnlocked(preset.lock)) {
       brushType.value = type;
       return;
     }
 
     Get.defaultDialog(
-      title: type == BrushType.watercolor ? 'watercolor_brush'.tr : 'airbrush_brush'.tr,
+      title: preset.labelKey.tr,
       titleStyle: TextStyle(color: Get.theme.colorScheme.onSurface),
       backgroundColor: Get.theme.colorScheme.surface,
       middleText: 'brush_unlock_message'.tr,
@@ -264,20 +300,20 @@ class DoodleController extends GetxController {
   }
 
   bool isBrushUnlocked(BrushType type) {
-    if (type != BrushType.watercolor && type != BrushType.airbrush) {
+    final preset = BrushPresets.maybeOf(type);
+    if (preset == null || preset.lock == BrushLock.none) {
       return true;
     }
-
     if (hasPremiumBrushAccess) {
       return true;
     }
-
-    return type == BrushType.watercolor
-        ? isWatercolorUnlocked.value
-        : isAirbrushUnlocked.value;
+    return _isLockUnlocked(preset.lock);
   }
 
   void _watchRewardedAdForBrush(BrushType type) {
+    final preset = BrushPresets.maybeOf(type);
+    if (preset == null || preset.lock == BrushLock.none) return;
+
     final adManager = RewardedAdManager.to;
     // 광고가 준비되지 않은 상태에서는 사용자가 누른 결과가 조용히 무시되지 않도록
     // 안내 토스트를 띄우고, 백그라운드 로드만 트리거한다.
@@ -292,21 +328,13 @@ class DoodleController extends GetxController {
       return;
     }
     adManager.showAdIfAvailable(
-      onUserEarnedReward: (RewardItem reward) {
-        if (type == BrushType.watercolor) {
-          isWatercolorUnlocked.value = true;
-          HiveService.to.setSetting(_watercolorUnlockedKey, true);
-        } else if (type == BrushType.airbrush) {
-          isAirbrushUnlocked.value = true;
-          HiveService.to.setSetting(_airbrushUnlockedKey, true);
-        }
+      onUserEarnedReward: (RewardItem reward) async {
+        await _persistUnlock(preset.lock);
         brushType.value = type;
         AppToast.show(
           AppToastMessage.success(
             title: 'brush_unlocked'.tr,
-            description: type == BrushType.watercolor
-                ? 'watercolor_brush'.tr
-                : 'airbrush_brush'.tr,
+            description: preset.labelKey.tr,
           ),
         );
       },
@@ -410,8 +438,7 @@ class DoodleController extends GetxController {
     final w = size.width;
     final h = size.height;
     if (w <= 0 || h <= 0) return _maxCapturePixelRatio;
-    final maxRatioByPixelBudget =
-        math.sqrt(_maxCapturePixels / (w * h));
+    final maxRatioByPixelBudget = math.sqrt(_maxCapturePixels / (w * h));
     final ratio = maxRatioByPixelBudget < _maxCapturePixelRatio
         ? maxRatioByPixelBudget
         : _maxCapturePixelRatio;
@@ -423,10 +450,7 @@ class DoodleController extends GetxController {
   Future<void> shareCanvas() async {
     if (!hasDrawableContent) {
       AppToast.show(
-        AppToastMessage.info(
-          title: 'share'.tr,
-          description: 'canvas_empty'.tr,
-        ),
+        AppToastMessage.info(title: 'share'.tr, description: 'canvas_empty'.tr),
       );
       return;
     }
@@ -459,17 +483,15 @@ class DoodleController extends GetxController {
       final bytes = byteData.buffer.asUint8List();
       final dir = await getTemporaryDirectory();
       tmpFile = File(
-          '${dir.path}/doodle_${DateTime.now().millisecondsSinceEpoch}.png');
+        '${dir.path}/doodle_${DateTime.now().millisecondsSinceEpoch}.png',
+      );
       await tmpFile.writeAsBytes(bytes);
       await SharePlus.instance.share(
         ShareParams(files: [XFile(tmpFile.path, mimeType: 'image/png')]),
       );
     } catch (_) {
       AppToast.show(
-        AppToastMessage.error(
-          title: 'error'.tr,
-          description: 'share_error'.tr,
-        ),
+        AppToastMessage.error(title: 'error'.tr, description: 'share_error'.tr),
       );
       // 공유 실패 시에만 임시 파일 정리 (성공 시에는 OS가 관리하므로 삭제하지 않음)
       try {
