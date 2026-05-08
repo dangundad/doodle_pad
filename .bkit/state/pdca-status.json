@@ -1,9 +1,18 @@
 {
   "version": "3.0",
-  "lastUpdated": "2026-05-06T00:37:12.094Z",
+  "lastUpdated": "2026-05-08T00:00:00.000Z",
   "activeFeatures": [],
   "primaryFeature": null,
-  "features": {},
+  "features": {
+    "brush-overhaul": {
+      "phase": "archived",
+      "matchRate": 95.5,
+      "iterationCount": 1,
+      "startedAt": "2026-05-08T00:00:00.000Z",
+      "archivedAt": "2026-05-08T00:00:00.000Z",
+      "archivedTo": "docs/archive/2026-05/brush-overhaul/"
+    }
+  },
   "pipeline": {
     "currentPhase": 1,
     "level": "Dynamic",
