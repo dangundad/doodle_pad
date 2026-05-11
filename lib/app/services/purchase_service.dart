@@ -67,6 +67,9 @@ class PurchaseService extends GetxService {
 
     await _loadPremiumFromStorage();
 
+    // forceRefresh 경로에서 기존 구독을 정리하지 않으면 동일 purchase update를
+    // 다중 listener가 받아 completePurchase / snackbar / Premium 저장이 중복 실행된다.
+    await _purchaseSubscription?.cancel();
     _purchaseSubscription = _inAppPurchase.purchaseStream.listen(
       _handlePurchaseUpdates,
       onDone: () => _purchaseSubscription?.cancel(),
@@ -158,7 +161,20 @@ class PurchaseService extends GetxService {
     try {
       isLoading.value = true;
       final purchaseParam = PurchaseParam(productDetails: product);
-      await _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
+      final launched = await _inAppPurchase.buyNonConsumable(
+        purchaseParam: purchaseParam,
+      );
+      // buyNonConsumable이 false를 반환하면 결제 UI 실행 자체가 실패한 상황이며
+      // purchaseStream으로 후속 이벤트가 오지 않아 isLoading이 풀리지 않는다.
+      if (!launched) {
+        statusMessage.value = 'purchase_failed'.tr;
+        isLoading.value = false;
+        Get.snackbar(
+          'purchase_error'.tr,
+          'purchase_failed'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
     } catch (e) {
       statusMessage.value = 'purchase_failed'.tr;
       errorMessage.value = e.toString();

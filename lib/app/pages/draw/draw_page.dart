@@ -120,100 +120,117 @@ class DrawPage extends GetView<DoodleController> {
       canPop: false,
       onPopInvokedWithResult: (didPop, _) async {
         if (didPop) return;
-        final shouldPop = await _confirmDiscardIfNeeded(controller, settingCtrl);
+        final shouldPop = await _confirmDiscardIfNeeded(
+          controller,
+          settingCtrl,
+        );
         if (shouldPop) {
           controller.clearCanvas();
           Get.back();
         }
       },
       child: Scaffold(
-      backgroundColor: cs.surfaceContainerHighest,
-      body: Stack(
-        children: [
-          // Full-screen drawing canvas
-          Positioned.fill(
-            child: RepaintBoundary(
-              key: controller.canvasKey,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onPanStart: (d) {
-                  if (settingCtrl.hapticEnabled.value) {
-                    controller.hapticSelection();
-                  }
-                  controller.startStroke(d.localPosition);
-                },
-                onPanUpdate: (d) => controller.continueStroke(d.localPosition),
-                onPanEnd: (_) => controller.endStroke(),
-                child: Obx(() {
-                  final referencePath = controller.referenceImagePath.value;
-                  return Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      ColoredBox(color: Color(controller.canvasColor.value)),
-                      if (referencePath != null)
-                        IgnorePointer(
-                          child: Image.file(
-                            File(referencePath),
-                            key: const ValueKey('draw-reference-image'),
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const SizedBox.shrink();
-                            },
+        backgroundColor: cs.surfaceContainerHighest,
+        body: Stack(
+          children: [
+            // Full-screen drawing canvas
+            Positioned.fill(
+              child: RepaintBoundary(
+                key: controller.canvasKey,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onPanStart: (d) {
+                    if (settingCtrl.hapticEnabled.value) {
+                      controller.hapticSelection();
+                    }
+                    controller.startStroke(d.localPosition);
+                  },
+                  onPanUpdate: (d) =>
+                      controller.continueStroke(d.localPosition),
+                  onPanEnd: (_) => controller.endStroke(),
+                  child: Obx(() {
+                    final referencePath = controller.referenceImagePath.value;
+                    return Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        ColoredBox(color: Color(controller.canvasColor.value)),
+                        if (referencePath != null)
+                          IgnorePointer(
+                            child: Image.file(
+                              File(referencePath),
+                              key: ValueKey(
+                                'draw-reference-image-$referencePath',
+                              ),
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                // 캐시 정리/권한 변경 등으로 파일이 사라지면
+                                // 화면에서도 사라지지만 hasDrawableContent는 true로 남아
+                                // 빈 캔버스가 공유될 수 있다. 상태를 즉시 정리한다.
+                                WidgetsBinding.instance.addPostFrameCallback((
+                                  _,
+                                ) {
+                                  if (controller.referenceImagePath.value ==
+                                      referencePath) {
+                                    controller.clearReferenceDrawing();
+                                  }
+                                });
+                                return const SizedBox.shrink();
+                              },
+                            ),
                           ),
+                        CustomPaint(
+                          painter: CanvasPainter(
+                            strokes: controller.strokes.toList(),
+                            bgColor: Colors.transparent,
+                          ),
+                          child: const SizedBox.expand(),
                         ),
-                      CustomPaint(
-                        painter: CanvasPainter(
-                          strokes: controller.strokes.toList(),
-                          bgColor: Colors.transparent,
-                        ),
-                        child: const SizedBox.expand(),
-                      ),
-                    ],
-                  );
-                }),
+                      ],
+                    );
+                  }),
+                ),
               ),
             ),
-          ),
 
-          // Top toolbar with slide-down entrance animation
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0.0, end: 1.0),
-              duration: const Duration(milliseconds: 400),
-              curve: Curves.easeOutCubic,
-              builder: (ctx, v, child) {
-                return Transform.translate(
-                  offset: Offset(0, -60 * (1 - v)),
-                  child: Opacity(opacity: v.clamp(0.0, 1.0), child: child),
-                );
-              },
-              child: SafeArea(child: _TopToolbar(ctrl: controller)),
+            // Top toolbar with slide-down entrance animation
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeOutCubic,
+                builder: (ctx, v, child) {
+                  return Transform.translate(
+                    offset: Offset(0, -60 * (1 - v)),
+                    child: Opacity(opacity: v.clamp(0.0, 1.0), child: child),
+                  );
+                },
+                child: SafeArea(child: _TopToolbar(ctrl: controller)),
+              ),
             ),
-          ),
 
-          // Bottom toolbar with slide-up entrance animation
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0.0, end: 1.0),
-              duration: const Duration(milliseconds: 400),
-              curve: Curves.easeOutCubic,
-              builder: (ctx, v, child) {
-                return Transform.translate(
-                  offset: Offset(0, 60 * (1 - v)),
-                  child: Opacity(opacity: v.clamp(0.0, 1.0), child: child),
-                );
-              },
-              child: SafeArea(child: _BottomToolbar(ctrl: controller)),
+            // Bottom toolbar with slide-up entrance animation
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeOutCubic,
+                builder: (ctx, v, child) {
+                  return Transform.translate(
+                    offset: Offset(0, 60 * (1 - v)),
+                    child: Opacity(opacity: v.clamp(0.0, 1.0), child: child),
+                  );
+                },
+                child: SafeArea(child: _BottomToolbar(ctrl: controller)),
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }
@@ -245,8 +262,10 @@ class _TopToolbar extends StatelessWidget {
               icon: const Icon(LucideIcons.arrowLeft),
               onPressed: () async {
                 _maybeHaptic(settingCtrl);
-                final shouldPop =
-                    await DrawPage._confirmDiscardIfNeeded(ctrl, settingCtrl);
+                final shouldPop = await DrawPage._confirmDiscardIfNeeded(
+                  ctrl,
+                  settingCtrl,
+                );
                 if (shouldPop) {
                   ctrl.clearCanvas();
                   Get.back();
@@ -612,9 +631,7 @@ class _BrushTypeSelector extends StatelessWidget {
             final preset = isEraser ? null : BrushPresets.of(type);
             final isLocked = !isEraser && !ctrl.isBrushUnlocked(type);
 
-            final IconData icon = isEraser
-                ? LucideIcons.eraser
-                : preset!.icon;
+            final IconData icon = isEraser ? LucideIcons.eraser : preset!.icon;
 
             // 선택된 도구는 primary 배경 + onPrimary 아이콘으로 충분한 대비 확보.
             final Color bgColor;

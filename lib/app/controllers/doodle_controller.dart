@@ -448,6 +448,13 @@ class DoodleController extends GetxController {
 
   /// 공유 (임시 파일로 저장 후 공유)
   Future<void> shareCanvas() async {
+    // 참조 이미지 경로가 캐시 정리/권한 변경 등으로 무효화된 경우,
+    // 화면에는 사진이 사라졌지만 상태는 그대로 남아 빈 캔버스가 공유될 수 있다.
+    final refPath = referenceImagePath.value;
+    if (refPath != null && !await File(refPath).exists()) {
+      clearReferenceDrawing();
+    }
+
     if (!hasDrawableContent) {
       AppToast.show(
         AppToastMessage.info(title: 'share'.tr, description: 'canvas_empty'.tr),

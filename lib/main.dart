@@ -148,7 +148,7 @@ class _DoodlePadAppState extends State<DoodlePadApp> {
         themeMode: ThemeMode.system,
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
-        home: const Scaffold(body: SizedBox.shrink()),
+        home: const _StartupFailureScreen(),
       ),
     );
   }
@@ -188,6 +188,49 @@ class _DoodlePadAppState extends State<DoodlePadApp> {
           ),
         );
       },
+    );
+  }
+}
+
+/// 핵심 서비스(Hive) 초기화 실패 시 표시되는 안내 화면.
+/// 사용자가 빈 화면을 보고 멈춤으로 오인하는 회귀를 막기 위해
+/// 상황 설명과 재시작 안내를 제공한다.
+class _StartupFailureScreen extends StatelessWidget {
+  const _StartupFailureScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: theme.colorScheme.error,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'startup_failure_title'.tr,
+                  style: theme.textTheme.titleLarge,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'startup_failure_message'.tr,
+                  style: theme.textTheme.bodyMedium,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
