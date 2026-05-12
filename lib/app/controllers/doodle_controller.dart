@@ -16,6 +16,7 @@ import 'package:doodle_pad/app/data/brushes/brush_presets.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
 import 'package:doodle_pad/app/services/purchase_service.dart';
 import 'package:doodle_pad/app/utils/app_toast.dart';
+import 'package:doodle_pad/app/utils/share_file_cleanup.dart';
 import 'package:vibration/vibration.dart';
 
 enum BrushType {
@@ -489,6 +490,7 @@ class DoodleController extends GetxController {
       }
       final bytes = byteData.buffer.asUint8List();
       final dir = await getTemporaryDirectory();
+      await ShareFileCleanup.deleteStaleDoodleShareFiles(dir);
       tmpFile = File(
         '${dir.path}/doodle_${DateTime.now().millisecondsSinceEpoch}.png',
       );

@@ -53,10 +53,7 @@ class SettingsPage extends GetView<SettingController> {
                 child: _ListItem(
                   icon: Icons.auto_awesome,
                   title: _loc('premium_title', 'Premium'),
-                  subtitle: _loc(
-                    'premium_subtitle',
-                    'Unlock premium features',
-                  ),
+                  subtitle: _loc('premium_subtitle', 'Unlock premium features'),
                   onTap: () => Get.toNamed(Routes.PREMIUM),
                 ),
               ),
@@ -114,10 +111,7 @@ class SettingsPage extends GetView<SettingController> {
                   _ListItem(
                     icon: Icons.delete_outline,
                     title: _loc('clear_data', 'Clear local data'),
-                    subtitle: _loc(
-                      'clear_data_desc',
-                      'Reset app preferences and usage history',
-                    ),
+                    subtitle: _loc('clear_data_desc', 'Reset app preferences'),
                     onTap: () => _confirmAndClear(),
                   ),
                   _ListItem(
@@ -210,7 +204,6 @@ class SettingsPage extends GetView<SettingController> {
       ),
     );
   }
-
 }
 
 class _BuildLanguageTile extends StatelessWidget {

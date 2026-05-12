@@ -273,91 +273,101 @@ class _TopToolbar extends StatelessWidget {
               },
               tooltip: 'back'.tr,
             ),
-            const Spacer(),
-            IconButton(
-              icon: Icon(
-                LucideIcons.undo2,
-                color: ctrl.canUndo
-                    ? cs.onSurface
-                    : cs.onSurface.withValues(alpha: 0.3),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        LucideIcons.undo2,
+                        color: ctrl.canUndo
+                            ? cs.onSurface
+                            : cs.onSurface.withValues(alpha: 0.3),
+                      ),
+                      onPressed: ctrl.canUndo
+                          ? () {
+                              if (settingCtrl.hapticEnabled.value) {
+                                ctrl.hapticLight();
+                              }
+                              ctrl.undo();
+                            }
+                          : null,
+                      tooltip: 'undo'.tr,
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        LucideIcons.redo2,
+                        color: ctrl.canRedo
+                            ? cs.onSurface
+                            : cs.onSurface.withValues(alpha: 0.3),
+                      ),
+                      onPressed: ctrl.canRedo
+                          ? () {
+                              _maybeHaptic(settingCtrl);
+                              ctrl.redo();
+                            }
+                          : null,
+                      tooltip: 'redo'.tr,
+                    ),
+                    IconButton(
+                      icon: Icon(LucideIcons.paintBucket, color: cs.onSurface),
+                      onPressed: () =>
+                          _openCanvasColorPicker(context, settingCtrl),
+                      tooltip: 'canvas_color'.tr,
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        ctrl.referenceImagePath.value != null
+                            ? LucideIcons.imageMinus
+                            : LucideIcons.imagePlus,
+                        color: cs.onSurface,
+                      ),
+                      onPressed: () async {
+                        _maybeHaptic(settingCtrl);
+                        if (ctrl.referenceImagePath.value != null) {
+                          ctrl.clearReferenceDrawing();
+                        } else {
+                          await ctrl.pickReferenceImage();
+                        }
+                      },
+                      tooltip: ctrl.referenceImagePath.value != null
+                          ? 'remove_image'.tr
+                          : 'import_image'.tr,
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        LucideIcons.trash2,
+                        color: ctrl.hasDrawableContent
+                            ? cs.error
+                            : cs.error.withValues(alpha: 0.3),
+                      ),
+                      onPressed: ctrl.hasDrawableContent
+                          ? () => _confirmClear(context, cs, settingCtrl)
+                          : null,
+                      tooltip: 'clear_canvas'.tr,
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        LucideIcons.share2,
+                        color: ctrl.hasDrawableContent
+                            ? cs.onSurface
+                            : cs.onSurface.withValues(alpha: 0.3),
+                      ),
+                      onPressed: ctrl.hasDrawableContent
+                          ? () {
+                              if (settingCtrl.hapticEnabled.value) {
+                                ctrl.hapticMedium();
+                              }
+                              ctrl.shareCanvas();
+                            }
+                          : null,
+                      tooltip: 'share'.tr,
+                    ),
+                  ],
+                ),
               ),
-              onPressed: ctrl.canUndo
-                  ? () {
-                      if (settingCtrl.hapticEnabled.value) {
-                        ctrl.hapticLight();
-                      }
-                      ctrl.undo();
-                    }
-                  : null,
-              tooltip: 'undo'.tr,
-            ),
-            IconButton(
-              icon: Icon(
-                LucideIcons.redo2,
-                color: ctrl.canRedo
-                    ? cs.onSurface
-                    : cs.onSurface.withValues(alpha: 0.3),
-              ),
-              onPressed: ctrl.canRedo
-                  ? () {
-                      _maybeHaptic(settingCtrl);
-                      ctrl.redo();
-                    }
-                  : null,
-              tooltip: 'redo'.tr,
-            ),
-            IconButton(
-              icon: Icon(LucideIcons.paintBucket, color: cs.onSurface),
-              onPressed: () => _openCanvasColorPicker(context, settingCtrl),
-              tooltip: 'canvas_color'.tr,
-            ),
-            IconButton(
-              icon: Icon(
-                ctrl.referenceImagePath.value != null
-                    ? LucideIcons.imageMinus
-                    : LucideIcons.imagePlus,
-                color: cs.onSurface,
-              ),
-              onPressed: () async {
-                _maybeHaptic(settingCtrl);
-                if (ctrl.referenceImagePath.value != null) {
-                  ctrl.clearReferenceDrawing();
-                } else {
-                  await ctrl.pickReferenceImage();
-                }
-              },
-              tooltip: ctrl.referenceImagePath.value != null
-                  ? 'remove_image'.tr
-                  : 'import_image'.tr,
-            ),
-            IconButton(
-              icon: Icon(
-                LucideIcons.trash2,
-                color: ctrl.hasDrawableContent
-                    ? cs.error
-                    : cs.error.withValues(alpha: 0.3),
-              ),
-              onPressed: ctrl.hasDrawableContent
-                  ? () => _confirmClear(context, cs, settingCtrl)
-                  : null,
-              tooltip: 'clear_canvas'.tr,
-            ),
-            IconButton(
-              icon: Icon(
-                LucideIcons.share2,
-                color: ctrl.hasDrawableContent
-                    ? cs.onSurface
-                    : cs.onSurface.withValues(alpha: 0.3),
-              ),
-              onPressed: ctrl.hasDrawableContent
-                  ? () {
-                      if (settingCtrl.hapticEnabled.value) {
-                        ctrl.hapticMedium();
-                      }
-                      ctrl.shareCanvas();
-                    }
-                  : null,
-              tooltip: 'share'.tr,
             ),
           ],
         );

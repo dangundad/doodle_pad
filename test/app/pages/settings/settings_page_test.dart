@@ -24,10 +24,7 @@ void main() {
     Get.put<SettingController>(_FakeSettingController());
 
     await tester.pumpWidget(
-      const _AppShell(
-        locale: Locale('en'),
-        home: SettingsPage(),
-      ),
+      const _AppShell(locale: Locale('en'), home: SettingsPage()),
     );
     await tester.pumpAndSettle();
 
@@ -62,16 +59,40 @@ void main() {
     expect(controller.openMoreAppsCallCount, 1);
     expect(controller.openPrivacyPolicyCallCount, 1);
   });
+
+  testWidgets(
+    'clear data fallback copy does not mention removed usage history',
+    (tester) async {
+      Get.put<SettingController>(_FakeSettingController());
+
+      await tester.pumpWidget(
+        const _AppShell(
+          locale: Locale('en'),
+          home: SettingsPage(),
+          includeTranslations: false,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -600));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Reset app preferences'), findsOneWidget);
+      expect(find.textContaining('usage history'), findsNothing);
+    },
+  );
 }
 
 class _AppShell extends StatelessWidget {
   const _AppShell({
     required this.home,
     required this.locale,
+    this.includeTranslations = true,
   });
 
   final Widget home;
   final Locale locale;
+  final bool includeTranslations;
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +102,7 @@ class _AppShell extends StatelessWidget {
       splitScreenMode: true,
       builder: (context, child) {
         return GetMaterialApp(
-          translations: Languages(),
+          translations: includeTranslations ? Languages() : null,
           locale: locale,
           home: home,
         );
