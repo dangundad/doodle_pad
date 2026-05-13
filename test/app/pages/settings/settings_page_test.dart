@@ -81,6 +81,43 @@ void main() {
       expect(find.textContaining('usage history'), findsNothing);
     },
   );
+
+  testWidgets(
+    'clear data confirm dialog fallback omits removed usage logs copy',
+    (tester) async {
+      Get.put<SettingController>(_FakeSettingController());
+
+      await tester.pumpWidget(
+        const _AppShell(
+          locale: Locale('en'),
+          home: SettingsPage(),
+          includeTranslations: false,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final clearTile = find.text('Clear local data');
+      await tester.scrollUntilVisible(
+        clearTile,
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(clearTile);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(
+        find.text('This will reset local preferences. Continue?'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('usage logs'), findsNothing);
+
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+    },
+  );
 }
 
 class _AppShell extends StatelessWidget {

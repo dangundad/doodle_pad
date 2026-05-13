@@ -170,7 +170,7 @@ class SettingsPage extends GetView<SettingController> {
         content: Text(
           _loc(
             'clear_data_confirm',
-            'This will reset local preferences and usage logs. Continue?',
+            'This will reset local preferences. Continue?',
           ),
           maxLines: 3,
           overflow: TextOverflow.ellipsis,
