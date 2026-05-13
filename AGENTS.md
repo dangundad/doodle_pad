@@ -2,7 +2,7 @@
 
 > 문서: `CLAUDE.md`
 > This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-> 최종 업데이트: 2026-05-11
+> 최종 업데이트: 2026-05-13
 > 기준: 현재 앱 저장소 스캔 + `C:\Flutter_WorkSpace\Flutter_Plan\AGENTS.md` 포트폴리오 상태표
 
 ## 프로젝트 요약
@@ -42,11 +42,13 @@ flutter run
 - 기반: `get` ^4.7.3, `hive_ce` ^2.19.3, `hive_ce_flutter` ^2.3.4, `path_provider` ^2.1.5, `shared_preferences` ^2.5.5
 - 드로잉/이미지: `perfect_freehand` ^2.5.2, `image_picker` ^1.1.2, `flutter_colorpicker` ^1.1.0
 - UI/UX: `flutter_screenutil` ^5.9.3, `flex_color_scheme` ^8.4.0, `google_fonts` ^8.1.0, `lucide_icons_flutter` ^3.1.13, `toastification` ^3.2.0
-- 수익화/운영: `google_mobile_ads` ^8.0.0, `gma_mediation_applovin` ^2.5.2, `gma_mediation_pangle` ^3.5.3, `gma_mediation_unity` ^1.6.5, `in_app_purchase` ^3.2.3, `in_app_purchase_android` ^0.4.0+10, `in_app_review` ^2.0.11, `rate_my_app` ^2.4.0, `firebase_core` ^4.7.0, `firebase_analytics` ^12.3.0, `firebase_crashlytics` ^5.2.0, `device_info_plus` ^13.1.0, `share_plus` ^13.1.0, `url_launcher` ^6.3.2, `vibration` ^3.1.8
+- 수익화/운영: `google_mobile_ads` ^8.0.0, `gma_mediation_applovin` ^2.5.2, `gma_mediation_pangle` ^3.5.3, `gma_mediation_unity` ^1.6.5, `in_app_purchase` ^3.2.3, `in_app_purchase_android` ^0.4.0+10, `in_app_review` ^2.0.11, `rate_my_app` ^2.4.0, `firebase_core` ^4.8.0, `firebase_analytics` ^12.4.0, `firebase_crashlytics` ^5.2.1, `device_info_plus` ^13.1.0, `share_plus` ^13.1.0, `url_launcher` ^6.3.2, `vibration` ^3.1.8
+- 로컬라이제이션: `flutter_localizations` (SDK)
 - 개발 도구: `build_runner` ^2.15.0, `hive_ce_generator` ^1.11.1, `flutter_lints` ^6.0.0, `flutter_launcher_icons` ^0.14.4, `flutter_native_splash` ^2.4.7, `change_app_package_name` ^1.5.0, `in_app_purchase_platform_interface` ^1.4.0, `plugin_platform_interface` ^2.1.8
 
 ## 현재 코드 구조
 - `lib/app` 디렉터리: `admob`, `bindings`, `controllers`, `data`, `pages`, `routes`, `services`, `theme`, `translate`, `utils`, `widgets`
+- `admob`: `ads_banner.dart`, `ads_helper.dart`, `ads_interstitial.dart`, `ads_rewarded.dart`
 - `bindings`: `app_binding.dart`
 - `routes`: `app_pages.dart`, `app_routes.dart`
 - `controllers`: `doodle_controller.dart`, `premium_controller.dart`, `setting_controller.dart`
@@ -54,9 +56,11 @@ flutter run
 - `services`: `app_rating_service.dart`, `hive_service.dart`, `purchase_service.dart`
 - 기능 중심 서비스: 없음
 - `pages`: `draw`, `home`, `premium`, `settings`
+  - `pages/draw/widgets`: `canvas_painter.dart`
+  - `pages/premium`: `premium_binding.dart`, `premium_page.dart`
 - `widgets`: `exit_bottom_sheet.dart`
 - `mixins`: 없음
-- `utils`: `app_constants.dart`, `app_toast.dart`
+- `utils`: `app_constants.dart`, `app_toast.dart`, `share_file_cleanup.dart`
 - `translate`: `translate.dart`
 - `theme`: `app_theme.dart`
 - `data/brushes`: `brush_preset.dart`, `brush_presets.dart`
@@ -66,7 +70,7 @@ flutter run
 - `data` 루트 파일: 없음
 - 진입점: `lib/main.dart` (Firebase / Hive 초기화 실패 시 `_StartupFailureScreen` fallback)
 - `assets`: `fonts`, `images`
-- `tests`: `test/app/controllers/{setting,doodle,premium}_controller_test.dart`, `test/app/services/purchase_service_test.dart`, `test/app/admob/{ads_helper,ads_loading}_test.dart`, `test/app/data/brushes/brush_presets_test.dart`, `test/app/helpers/fake_purchase_service.dart`, `test/app/pages/{home,settings}/*_page_test.dart`, `test/app/theme/app_theme_test.dart`, `test/app/utils/app_toast_test.dart`, `test/ui/no_gradient_usage_test.dart`, `test/widget_test.dart`
+- `tests`: `test/app/controllers/{setting,doodle,premium}_controller_test.dart`, `test/app/services/purchase_service_test.dart`, `test/app/admob/{ads_helper,ads_loading}_test.dart`, `test/app/data/brushes/brush_presets_test.dart`, `test/app/helpers/fake_purchase_service.dart`, `test/app/pages/{draw,home,settings}/*_page_test.dart`, `test/app/theme/app_theme_test.dart`, `test/app/utils/{app_toast,share_file_cleanup}_test.dart`, `test/ui/no_gradient_usage_test.dart`, `test/widget_test.dart`
 
 ## 문서 유지 규칙
 - 새 페이지나 바인딩을 추가하면 이 문서의 `pages`/`bindings` 요약도 함께 갱신합니다.
