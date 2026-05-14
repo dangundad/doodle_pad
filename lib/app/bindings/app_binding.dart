@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:doodle_pad/app/admob/ads_interstitial.dart';
 import 'package:doodle_pad/app/admob/ads_rewarded.dart';
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
+import 'package:doodle_pad/app/data/models/drawing.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
 
@@ -27,6 +28,9 @@ class AppBinding implements Bindings {
         }
         if (!Hive.isBoxOpen('app_data')) {
           await Hive.openBox('app_data');
+        }
+        if (!Hive.isBoxOpen('drawings')) {
+          await Hive.openBox<Drawing>('drawings');
         }
       } catch (e) {
         Get.log('[AppBinding] Hive reopen failed: $e');

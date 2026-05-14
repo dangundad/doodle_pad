@@ -92,6 +92,18 @@ class SettingsPage extends GetView<SettingController> {
                     icon: Icons.clear,
                     onChanged: controller.setAskBeforeClear,
                   ),
+                  // Plan FR-05: Shake to clear 토글. 기본 OFF.
+                  // Design Ref: §5.5 — 경고 문구를 subtitle로 노출.
+                  _BuildSwitchTile(
+                    value: controller.shakeToClearEnabled.value,
+                    title: _loc('shake_to_clear_title', 'Shake to clear'),
+                    subtitle: _loc(
+                      'shake_to_clear_desc',
+                      'Shake the device to clear the canvas (always asks).',
+                    ),
+                    icon: Icons.vibration,
+                    onChanged: controller.setShakeToClearEnabled,
+                  ),
                   _BuildLanguageTile(
                     value: controller.language.value,
                     options: _languageOptions,

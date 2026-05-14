@@ -3,29 +3,33 @@
 import 'package:get/get.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 
+import 'package:doodle_pad/app/data/models/drawing.dart';
+import 'package:doodle_pad/hive_registrar.g.dart';
+
 class HiveService extends GetxService {
   static HiveService get to => Get.find();
 
   // Box 이름 상수
   static const String SETTINGS_BOX = 'settings';
   static const String APP_DATA_BOX = 'app_data';
-  // ---- 앱별 Box 추가 ----
+  // Design Ref: §3.3 — 작품 영속화용 typed box.
+  static const String DRAWINGS_BOX = 'drawings';
 
   // Box Getters
   Box get settingsBox => Hive.box(SETTINGS_BOX);
   Box get appDataBox => Hive.box(APP_DATA_BOX);
-  // ---- 앱별 Typed Box Getter 추가 ----
-  // Box<MyModel> get myModelBox => Hive.box<MyModel>(MY_MODEL_BOX);
+  Box<Drawing> get drawingsBox => Hive.box<Drawing>(DRAWINGS_BOX);
 
   /// Hive 초기화 (main.dart에서 await 호출)
   static Future<void> init() async {
     await Hive.initFlutter();
+    // Design Ref: §3.3 — openBox 호출 전에 모든 adapter를 등록한다.
+    Hive.registerAdapters();
 
     await Future.wait([
       Hive.openBox(SETTINGS_BOX),
       Hive.openBox(APP_DATA_BOX),
-      // ---- 앱별 Box 추가 ----
-      // Hive.openBox<MyModel>(MY_MODEL_BOX),
+      Hive.openBox<Drawing>(DRAWINGS_BOX),
     ]);
 
     Get.log('Hive 초기화 완료');

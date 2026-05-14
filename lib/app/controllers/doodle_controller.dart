@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -11,12 +12,19 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:doodle_pad/app/admob/ads_rewarded.dart';
+import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/data/brushes/brush_preset.dart';
 import 'package:doodle_pad/app/data/brushes/brush_presets.dart';
+import 'package:doodle_pad/app/data/models/drawing.dart';
+import 'package:doodle_pad/app/mixins/shake_detector_mixin.dart';
+import 'package:doodle_pad/app/services/artwork_repository.dart';
+import 'package:doodle_pad/app/services/export_service.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
 import 'package:doodle_pad/app/services/purchase_service.dart';
 import 'package:doodle_pad/app/utils/app_toast.dart';
 import 'package:doodle_pad/app/utils/share_file_cleanup.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:vibration/vibration.dart';
 
 enum BrushType {
@@ -55,7 +63,7 @@ class DrawingStroke {
   }) : seed = seed ?? DateTime.now().microsecondsSinceEpoch;
 }
 
-class DoodleController extends GetxController {
+class DoodleController extends GetxController with ShakeDetectorMixin {
   static DoodleController get to => Get.find();
 
   static const _maxUndo = 20;
@@ -150,6 +158,21 @@ class DoodleController extends GetxController {
   // Canvas RepaintBoundary key
   final canvasKey = GlobalKey();
 
+  /// Design Ref: §2.2 — InteractiveViewer 줌·팬 상태.
+  /// RepaintBoundary는 InteractiveViewer의 child 안쪽에 두므로 캡처는 logical 좌표 그대로.
+  final transformController = TransformationController();
+
+  /// 더블탭으로 줌 리셋. 위젯에서 애니메이션을 입혀 호출한다.
+  void resetCanvasTransform() {
+    transformController.value = Matrix4.identity();
+  }
+
+  @override
+  void onClose() {
+    transformController.dispose();
+    super.onClose();
+  }
+
   bool _hasVibrator = false;
 
   bool get canUndo => strokes.isNotEmpty;
@@ -171,6 +194,136 @@ class DoodleController extends GetxController {
     super.onInit();
     Vibration.hasVibrator().then((v) => _hasVibrator = v);
     _loadBrushUnlockState();
+    _bindShakeToClearSetting();
+  }
+
+  /// Design Ref: §2.2 — SettingController.shakeToClearEnabled 변경에 반응해
+  /// 가속도계 구독을 켜고 끈다. SettingController 미등록 시 조용히 패스.
+  void _bindShakeToClearSetting() {
+    if (!Get.isRegistered<SettingController>()) return;
+    final settings = SettingController.to;
+    if (settings.shakeToClearEnabled.value) {
+      enableShakeDetection(_handleShake);
+    }
+    ever<bool>(settings.shakeToClearEnabled, (enabled) {
+      if (enabled) {
+        enableShakeDetection(_handleShake);
+      } else {
+        disableShakeDetection();
+      }
+    });
+  }
+
+  /// 흔들림 감지 콜백.
+  /// Plan FR-06: 직접 clear 금지 — 항상 확인 다이얼로그를 거친다.
+  void _handleShake() {
+    if (!hasDrawableContent) return;
+    confirmClearViaShake();
+  }
+
+  /// Plan FR-06 — Shake 트리거용 확인 다이얼로그.
+  /// _confirmClear와 같은 모양의 다이얼로그를 컨트롤러에서 띄운다.
+  /// 이미 다른 dialog/sheet가 떠 있으면 중복 호출을 막는다.
+  Future<void> confirmClearViaShake() async {
+    if (Get.isDialogOpen ?? false) return;
+    if (Get.isBottomSheetOpen ?? false) return;
+    if (!hasDrawableContent) return;
+
+    final cs = Get.theme.colorScheme;
+    final settings = Get.isRegistered<SettingController>()
+        ? SettingController.to
+        : null;
+
+    if (settings != null && !settings.askBeforeClear.value) {
+      // 사용자가 확인 다이얼로그를 끈 상태라도 Shake로 인한 손실은 방지.
+      // 명시적으로 한 번 더 확인을 띄운다.
+    }
+
+    await Get.dialog<void>(
+      Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        clipBehavior: Clip.antiAlias,
+        backgroundColor: cs.surface,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 8.h),
+              child: Column(
+                children: [
+                  Container(
+                    width: 52.r,
+                    height: 52.r,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: cs.errorContainer,
+                    ),
+                    child: Icon(
+                      LucideIcons.triangleAlert,
+                      size: 26.r,
+                      color: cs.onErrorContainer,
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+                  Text(
+                    'shake_to_clear_title'.tr,
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    'clear_canvas_confirm'.tr,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: cs.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: Get.back,
+                      child: Text('cancel'.tr),
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: cs.error,
+                        foregroundColor: cs.onError,
+                      ),
+                      onPressed: () {
+                        clearCanvas();
+                        if (settings?.hapticEnabled.value ?? false) {
+                          hapticHeavy();
+                        }
+                        Get.back();
+                      },
+                      child: Text('clear'.tr),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      barrierDismissible: true,
+    );
   }
 
   void hapticSelection() {
@@ -508,6 +661,211 @@ class DoodleController extends GetxController {
       } catch (_) {}
     } finally {
       image?.dispose();
+    }
+  }
+
+  /// 갤러리 저장.
+  /// Design Ref: §4.1 — ExportService에 위임, 결과에 따라 toast 분기.
+  /// Plan SC (a): 1탭 갤러리 저장 / (d): 해상도·포맷 선택.
+  ///
+  /// [exportService]는 테스트 주입용. 기본값은 싱글톤.
+  Future<ExportResult> exportToGallery({
+    required int resolutionMultiplier,
+    required ExportImageFormat format,
+    ExportService? exportService,
+  }) async {
+    // shareCanvas와 동일하게 stale ref 정리.
+    final refPath = referenceImagePath.value;
+    if (refPath != null && !await File(refPath).exists()) {
+      clearReferenceDrawing();
+    }
+
+    if (!hasDrawableContent) {
+      AppToast.show(
+        AppToastMessage.info(title: 'save'.tr, description: 'canvas_empty'.tr),
+      );
+      return const ExportResult.failed(ExportFailure.noContent);
+    }
+
+    final service = exportService ?? ExportService.instance;
+    final result = await service.saveCanvasToGallery(
+      canvasKey: canvasKey,
+      resolutionMultiplier: resolutionMultiplier,
+      format: format,
+    );
+    _showExportResultToast(result);
+    return result;
+  }
+
+  /// Plan FR-08/FR-11 — 현재 캔버스를 작품으로 저장.
+  /// canvasKey 캡처(1.0x) → PNG bytes → ArtworkRepository.save 위임.
+  /// Design Ref: §4.2 — 외부 IO는 모두 ArtworkRepository로 위임.
+  Future<Drawing?> saveAsArtwork({
+    String? name,
+    ArtworkRepository? repository,
+  }) async {
+    if (!hasDrawableContent) {
+      AppToast.show(
+        AppToastMessage.info(
+          title: 'artwork_title'.tr,
+          description: 'canvas_empty'.tr,
+        ),
+      );
+      return null;
+    }
+
+    ui.Image? image;
+    Uint8List? bytes;
+    Size canvasSize = Size.zero;
+    try {
+      final boundary =
+          canvasKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
+      canvasSize = boundary?.size ?? Size.zero;
+      image = await _captureCanvas();
+      if (image == null) {
+        AppToast.show(
+          AppToastMessage.error(
+            title: 'error'.tr,
+            description: 'artwork_save_failed'.tr,
+          ),
+        );
+        return null;
+      }
+      final bd = await image.toByteData(format: ui.ImageByteFormat.png);
+      bytes = bd?.buffer.asUint8List();
+    } finally {
+      image?.dispose();
+    }
+
+    if (bytes == null || canvasSize == Size.zero) {
+      AppToast.show(
+        AppToastMessage.error(
+          title: 'error'.tr,
+          description: 'artwork_save_failed'.tr,
+        ),
+      );
+      return null;
+    }
+
+    final serial = strokes.map(_serializeStroke).toList();
+    final id = 'artwork_${DateTime.now().millisecondsSinceEpoch}';
+    final repo = repository ?? ArtworkRepository.instance;
+    try {
+      final saved = await repo.save(
+        id: id,
+        canvasColor: canvasColor.value,
+        canvasLogicalSize: canvasSize,
+        referenceImagePath: referenceImagePath.value,
+        strokes: serial,
+        thumbnailPngBytes: bytes,
+        name: name,
+      );
+      AppToast.show(
+        AppToastMessage.success(
+          title: 'artwork_title'.tr,
+          description: 'artwork_save_success'.tr,
+        ),
+      );
+      return saved;
+    } catch (_) {
+      AppToast.show(
+        AppToastMessage.error(
+          title: 'error'.tr,
+          description: 'artwork_save_failed'.tr,
+        ),
+      );
+      return null;
+    }
+  }
+
+  /// 작품을 현재 캔버스로 로드해 편집 가능 상태로 만든다.
+  /// Design Ref: §6.2 — viewport 비율 차이는 letterbox 스케일로 흡수.
+  void loadArtwork(Drawing drawing, {Size? viewport}) {
+    final targetW = viewport?.width ?? drawing.canvasLogicalWidth;
+    final targetH = viewport?.height ?? drawing.canvasLogicalHeight;
+    final sx = targetW / drawing.canvasLogicalWidth;
+    final sy = targetH / drawing.canvasLogicalHeight;
+    final scale = sx < sy ? sx : sy;
+
+    clearCanvas();
+    canvasColor.value = drawing.canvasColor;
+    referenceImagePath.value = drawing.referenceImagePath;
+    final restored = drawing.strokes
+        .map((s) => _deserializeStroke(s, scale))
+        .toList();
+    strokes.assignAll(restored);
+    transformController.value = Matrix4.identity();
+  }
+
+  SerializableStroke _serializeStroke(DrawingStroke s) {
+    final flat = <double>[];
+    for (final p in s.points) {
+      flat.add(p.dx);
+      flat.add(p.dy);
+    }
+    return SerializableStroke(
+      colorArgb: s.color.toARGB32(),
+      width: s.width,
+      isEraser: s.isEraser,
+      brushTypeIndex: s.brushType.index,
+      seed: s.seed,
+      pointsXY: flat,
+    );
+  }
+
+  DrawingStroke _deserializeStroke(SerializableStroke s, double scale) {
+    final pts = <Offset>[];
+    for (var i = 0; i + 1 < s.pointsXY.length; i += 2) {
+      pts.add(Offset(s.pointsXY[i] * scale, s.pointsXY[i + 1] * scale));
+    }
+    final idx = s.brushTypeIndex.clamp(0, BrushType.values.length - 1);
+    return DrawingStroke(
+      points: pts,
+      color: Color(s.colorArgb),
+      width: s.width * scale,
+      isEraser: s.isEraser,
+      brushType: BrushType.values[idx],
+      seed: s.seed,
+    );
+  }
+
+  void _showExportResultToast(ExportResult result) {
+    if (result.success) {
+      AppToast.show(
+        AppToastMessage.success(
+          title: 'save'.tr,
+          description: 'save_success'.tr,
+        ),
+      );
+      return;
+    }
+    final failure = result.failure;
+    if (failure == null) return;
+    switch (failure) {
+      case ExportFailure.noContent:
+        AppToast.show(
+          AppToastMessage.info(
+            title: 'save'.tr,
+            description: 'canvas_empty'.tr,
+          ),
+        );
+      case ExportFailure.permissionDenied:
+        AppToast.show(
+          AppToastMessage.error(
+            title: 'save'.tr,
+            description: 'save_permission_denied'.tr,
+          ),
+        );
+      case ExportFailure.encoderError:
+      case ExportFailure.ioError:
+      case ExportFailure.unexpected:
+        AppToast.show(
+          AppToastMessage.error(
+            title: 'save'.tr,
+            description: 'save_failed'.tr,
+          ),
+        );
     }
   }
 }

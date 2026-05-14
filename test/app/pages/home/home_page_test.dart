@@ -10,6 +10,7 @@ import 'package:hive_ce/hive.dart';
 import 'package:doodle_pad/app/admob/ads_banner.dart';
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
+import 'package:doodle_pad/app/data/models/drawing.dart';
 import 'package:doodle_pad/app/pages/home/home_page.dart';
 import 'package:doodle_pad/app/routes/app_pages.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
@@ -31,8 +32,15 @@ void main() {
 
     tempDir = await Directory.systemTemp.createTemp('doodle_pad_home_page_test_');
     Hive.init(tempDir.path);
+    if (!Hive.isAdapterRegistered(2)) {
+      Hive.registerAdapter(DrawingAdapter());
+    }
+    if (!Hive.isAdapterRegistered(3)) {
+      Hive.registerAdapter(SerializableStrokeAdapter());
+    }
     await Hive.openBox(HiveService.SETTINGS_BOX);
     await Hive.openBox(HiveService.APP_DATA_BOX);
+    await Hive.openBox<Drawing>(HiveService.DRAWINGS_BOX);
 
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(vibrationChannel, (call) async {

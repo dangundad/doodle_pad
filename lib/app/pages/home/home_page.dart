@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:doodle_pad/app/admob/ads_banner.dart';
 import 'package:doodle_pad/app/admob/ads_helper.dart';
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
+import 'package:doodle_pad/app/data/models/drawing.dart';
 import 'package:doodle_pad/app/routes/app_pages.dart';
+import 'package:doodle_pad/app/services/hive_service.dart';
 import 'package:doodle_pad/app/services/purchase_service.dart';
 import 'package:doodle_pad/app/widgets/exit_bottom_sheet.dart';
 
@@ -192,6 +195,8 @@ class _HomePageState extends State<HomePage>
                       _FeatureChipsCard(features: _features),
                       SizedBox(height: 28.h),
                       _StartDrawingCta(pulseAnim: _pulseAnim),
+                      SizedBox(height: 14.h),
+                      const _MyArtworksCard(),
                     ],
                   ),
                 ),
@@ -208,6 +213,84 @@ class _HomePageState extends State<HomePage>
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Plan FR-10 — 홈에서 작품 갤러리로 진입.
+/// drawings box를 listenable로 관찰해 작품 수를 실시간 반영.
+class _MyArtworksCard extends StatelessWidget {
+  const _MyArtworksCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Get.theme.colorScheme;
+    return ValueListenableBuilder(
+      valueListenable: HiveService.to.drawingsBox.listenable(),
+      builder: (context, Box<Drawing> box, _) {
+        final count = box.length;
+        return Material(
+          color: cs.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(16.r),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16.r),
+            onTap: () => Get.toNamed(Routes.GALLERY),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40.r,
+                    height: 40.r,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: cs.secondaryContainer,
+                    ),
+                    child: Icon(
+                      LucideIcons.images,
+                      size: 20.r,
+                      color: cs.onSecondaryContainer,
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'gallery_title'.tr,
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w700,
+                            color: cs.onSurface,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 2.h),
+                        Text(
+                          '${'gallery_saved_count'.tr} $count',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: cs.onSurfaceVariant,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    LucideIcons.chevronRight,
+                    size: 18.r,
+                    color: cs.onSurfaceVariant,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -36,11 +36,24 @@ class SettingController extends GetxController {
   static const String _kShowBrushGuideKey = 'show_brush_guide';
   static const String _kAskBeforeClearKey = 'ask_before_clear';
   static const String _kLanguageKey = 'language';
+  // Design Ref: §3.2 — 마지막 저장 옵션을 기억해 다음 저장 시 prefill.
+  static const String _kLastExportResolutionKey = 'last_export_resolution';
+  static const String _kLastExportFormatKey = 'last_export_format';
+  // Design Ref: §5.5 — 흔들어 지우기 옵션. 기본 OFF로 작품 손실 방지.
+  static const String _kShakeToClearEnabledKey = 'shake_to_clear_enabled';
+
+  static const int defaultExportResolution = 2; // 1x / 2x / 3x 중 HD
+  static const String defaultExportFormat = 'png';
+  static const Set<int> supportedExportResolutions = {1, 2, 3};
+  static const Set<String> supportedExportFormats = {'png', 'jpeg'};
 
   final RxBool hapticEnabled = true.obs;
   final RxBool showBrushGuide = true.obs;
   final RxBool askBeforeClear = true.obs;
   final RxString language = 'en'.obs;
+  final RxInt lastExportResolution = defaultExportResolution.obs;
+  final RxString lastExportFormat = defaultExportFormat.obs;
+  final RxBool shakeToClearEnabled = false.obs;
   final bool _loadOnInit;
   final LaunchUrlFn _launchUrlFn;
   final RateAppFn _rateAppFn;
@@ -82,7 +95,28 @@ class SettingController extends GetxController {
     showBrushGuide.value = _readBool(box, _kShowBrushGuideKey, true);
     askBeforeClear.value = _readBool(box, _kAskBeforeClearKey, true);
     language.value = _readString(box, _kLanguageKey, 'en');
+    lastExportResolution.value = _readExportResolution(box);
+    lastExportFormat.value = _readExportFormat(box);
+    shakeToClearEnabled.value = _readBool(box, _kShakeToClearEnabledKey, false);
     unawaited(_updateLocaleFn(currentLocale));
+  }
+
+  int _readExportResolution(Box box) {
+    final raw = box.get(
+      _kLastExportResolutionKey,
+      defaultValue: defaultExportResolution,
+    );
+    if (raw is int && supportedExportResolutions.contains(raw)) return raw;
+    return defaultExportResolution;
+  }
+
+  String _readExportFormat(Box box) {
+    final raw = box.get(
+      _kLastExportFormatKey,
+      defaultValue: defaultExportFormat,
+    );
+    if (raw is String && supportedExportFormats.contains(raw)) return raw;
+    return defaultExportFormat;
   }
 
   /// translate.dart 의 supportedLocales 와 동일한 화이트리스트.
@@ -127,6 +161,33 @@ class SettingController extends GetxController {
     await box.put(_kAskBeforeClearKey, value);
   }
 
+  /// Design Ref: §3.2 — 저장 옵션 시트 "저장" 시 호출.
+  /// 지원하지 않는 값은 디폴트로 정규화해 저장한다.
+  Future<void> setLastExportResolution(int value) async {
+    final normalized = supportedExportResolutions.contains(value)
+        ? value
+        : defaultExportResolution;
+    lastExportResolution.value = normalized;
+    final box = await _openSettingBox();
+    await box.put(_kLastExportResolutionKey, normalized);
+  }
+
+  /// Design Ref: §5.5 — 토글 변경 시 즉시 persist + Rx 알림(ever 리스너 호출).
+  Future<void> setShakeToClearEnabled(bool value) async {
+    shakeToClearEnabled.value = value;
+    final box = await _openSettingBox();
+    await box.put(_kShakeToClearEnabledKey, value);
+  }
+
+  Future<void> setLastExportFormat(String value) async {
+    final normalized = supportedExportFormats.contains(value)
+        ? value
+        : defaultExportFormat;
+    lastExportFormat.value = normalized;
+    final box = await _openSettingBox();
+    await box.put(_kLastExportFormatKey, normalized);
+  }
+
   Future<void> setLanguage(String value) async {
     // 지원하지 않는 코드는 'en' 으로 정규화. 손상된 저장값이나 외부 주입에 의해
     // language.value 와 실제 적용되는 locale 이 어긋나는 회귀를 막는다.
@@ -144,6 +205,9 @@ class SettingController extends GetxController {
     showBrushGuide.value = true;
     askBeforeClear.value = true;
     language.value = 'en';
+    lastExportResolution.value = defaultExportResolution;
+    lastExportFormat.value = defaultExportFormat;
+    shakeToClearEnabled.value = false;
     await _updateLocaleFn(const Locale('en'));
 
     // 드로잉 사용자 선호값(캔버스/커스텀 색상)도 함께 리셋.

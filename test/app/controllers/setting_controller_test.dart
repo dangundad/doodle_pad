@@ -48,6 +48,65 @@ void main() {
       expect(controller.language.value, 'ko');
   });
 
+  test('lastExportResolution / lastExportFormat: 저장 후 재구동 시 복원', () async {
+    final controller = SettingController(
+      loadOnInit: false,
+      updateLocaleFn: (_) async {},
+    );
+    controller.onInit();
+
+    await controller.setLastExportResolution(3);
+    await controller.setLastExportFormat('jpeg');
+
+    expect(controller.lastExportResolution.value, 3);
+    expect(controller.lastExportFormat.value, 'jpeg');
+
+    // 같은 box를 다시 열고 새 컨트롤러 인스턴스로 readback.
+    final reborn = SettingController(updateLocaleFn: (_) async {});
+    reborn.onInit();
+
+    expect(reborn.lastExportResolution.value, 3);
+    expect(reborn.lastExportFormat.value, 'jpeg');
+  });
+
+  test('shakeToClearEnabled: 기본 false, 토글 후 persist + 재구동 시 복원', () async {
+    final controller = SettingController(
+      loadOnInit: false,
+      updateLocaleFn: (_) async {},
+    );
+    controller.onInit();
+
+    expect(controller.shakeToClearEnabled.value, false);
+
+    await controller.setShakeToClearEnabled(true);
+    expect(controller.shakeToClearEnabled.value, true);
+
+    final reborn = SettingController(updateLocaleFn: (_) async {});
+    reborn.onInit();
+
+    expect(reborn.shakeToClearEnabled.value, true);
+  });
+
+  test('lastExport*: 지원하지 않는 값은 디폴트로 정규화', () async {
+    final controller = SettingController(
+      loadOnInit: false,
+      updateLocaleFn: (_) async {},
+    );
+    controller.onInit();
+
+    await controller.setLastExportResolution(99); // out of {1,2,3}
+    await controller.setLastExportFormat('webp'); // out of {'png','jpeg'}
+
+    expect(
+      controller.lastExportResolution.value,
+      SettingController.defaultExportResolution,
+    );
+    expect(
+      controller.lastExportFormat.value,
+      SettingController.defaultExportFormat,
+    );
+  });
+
   test('rateApp delegates to the app rating action', () async {
     var invoked = 0;
     final controller = SettingController(

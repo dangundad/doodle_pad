@@ -9,6 +9,7 @@ abstract class Routes {
   static const PREMIUM = _Paths.PREMIUM;
   static const DRAW = _Paths.DRAW;
   static const SETTINGS = _Paths.SETTINGS;
+  static const GALLERY = _Paths.GALLERY;
 }
 
 abstract class _Paths {
@@ -16,4 +17,5 @@ abstract class _Paths {
   static const PREMIUM = '/premium';
   static const DRAW = '/draw';
   static const SETTINGS = '/settings';
+  static const GALLERY = '/gallery';
 }

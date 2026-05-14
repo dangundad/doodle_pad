@@ -9,6 +9,8 @@ import 'package:doodle_pad/app/controllers/doodle_controller.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/data/brushes/brush_presets.dart';
 import 'package:doodle_pad/app/pages/draw/widgets/canvas_painter.dart';
+import 'package:doodle_pad/app/pages/draw/widgets/save_options_sheet.dart';
+import 'package:doodle_pad/app/services/export_service.dart';
 
 class DrawPage extends GetView<DoodleController> {
   const DrawPage({super.key});
@@ -134,60 +136,82 @@ class DrawPage extends GetView<DoodleController> {
         body: Stack(
           children: [
             // Full-screen drawing canvas
+            // Design Ref: §2.2 — InteractiveViewer가 outer, RepaintBoundary가 inner.
+            // 캡처는 logical 캔버스(transform 미적용) 기준으로 일관됨.
+            // 한 손가락 = GestureDetector 그리기, 두 손가락 = InteractiveViewer 핀치 줌.
             Positioned.fill(
-              child: RepaintBoundary(
-                key: controller.canvasKey,
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onPanStart: (d) {
-                    if (settingCtrl.hapticEnabled.value) {
-                      controller.hapticSelection();
-                    }
-                    controller.startStroke(d.localPosition);
-                  },
-                  onPanUpdate: (d) =>
-                      controller.continueStroke(d.localPosition),
-                  onPanEnd: (_) => controller.endStroke(),
-                  child: Obx(() {
-                    final referencePath = controller.referenceImagePath.value;
-                    return Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        ColoredBox(color: Color(controller.canvasColor.value)),
-                        if (referencePath != null)
-                          IgnorePointer(
-                            child: Image.file(
-                              File(referencePath),
-                              key: ValueKey(
-                                'draw-reference-image-$referencePath',
+              child: InteractiveViewer(
+                transformationController: controller.transformController,
+                // panEnabled=false: 한 손가락 pan은 InteractiveViewer가 거부 →
+                // 아래 GestureDetector가 그리기 제스처를 잡는다.
+                panEnabled: false,
+                scaleEnabled: true,
+                minScale: 0.5,
+                maxScale: 5.0,
+                child: RepaintBoundary(
+                  key: controller.canvasKey,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onPanStart: (d) {
+                      if (settingCtrl.hapticEnabled.value) {
+                        controller.hapticSelection();
+                      }
+                      controller.startStroke(d.localPosition);
+                    },
+                    onPanUpdate: (d) =>
+                        controller.continueStroke(d.localPosition),
+                    onPanEnd: (_) => controller.endStroke(),
+                    // Plan FR-04: 더블탭 시 Fit-to-screen으로 복귀.
+                    onDoubleTap: () {
+                      if (settingCtrl.hapticEnabled.value) {
+                        controller.hapticSelection();
+                      }
+                      controller.resetCanvasTransform();
+                    },
+                    child: Obx(() {
+                      final referencePath =
+                          controller.referenceImagePath.value;
+                      return Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          ColoredBox(
+                            color: Color(controller.canvasColor.value),
+                          ),
+                          if (referencePath != null)
+                            IgnorePointer(
+                              child: Image.file(
+                                File(referencePath),
+                                key: ValueKey(
+                                  'draw-reference-image-$referencePath',
+                                ),
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  // 캐시 정리/권한 변경 등으로 파일이 사라지면
+                                  // 화면에서도 사라지지만 hasDrawableContent는 true로 남아
+                                  // 빈 캔버스가 공유될 수 있다. 상태를 즉시 정리한다.
+                                  WidgetsBinding.instance.addPostFrameCallback(
+                                    (_) {
+                                      if (controller.referenceImagePath.value ==
+                                          referencePath) {
+                                        controller.clearReferenceDrawing();
+                                      }
+                                    },
+                                  );
+                                  return const SizedBox.shrink();
+                                },
                               ),
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) {
-                                // 캐시 정리/권한 변경 등으로 파일이 사라지면
-                                // 화면에서도 사라지지만 hasDrawableContent는 true로 남아
-                                // 빈 캔버스가 공유될 수 있다. 상태를 즉시 정리한다.
-                                WidgetsBinding.instance.addPostFrameCallback((
-                                  _,
-                                ) {
-                                  if (controller.referenceImagePath.value ==
-                                      referencePath) {
-                                    controller.clearReferenceDrawing();
-                                  }
-                                });
-                                return const SizedBox.shrink();
-                              },
                             ),
+                          CustomPaint(
+                            painter: CanvasPainter(
+                              strokes: controller.strokes.toList(),
+                              bgColor: Colors.transparent,
+                            ),
+                            child: const SizedBox.expand(),
                           ),
-                        CustomPaint(
-                          painter: CanvasPainter(
-                            strokes: controller.strokes.toList(),
-                            bgColor: Colors.transparent,
-                          ),
-                          child: const SizedBox.expand(),
-                        ),
-                      ],
-                    );
-                  }),
+                        ],
+                      );
+                    }),
+                  ),
                 ),
               ),
             ),
@@ -348,6 +372,38 @@ class _TopToolbar extends StatelessWidget {
                           : null,
                       tooltip: 'clear_canvas'.tr,
                     ),
+                    // Design Ref: §5.1 — Save 버튼은 Share 좌측에 배치.
+                    // Plan FR-01/FR-07: Save 시트로 해상도·포맷 선택 후 갤러리 저장.
+                    IconButton(
+                      icon: Icon(
+                        LucideIcons.download,
+                        color: ctrl.hasDrawableContent
+                            ? cs.onSurface
+                            : cs.onSurface.withValues(alpha: 0.3),
+                      ),
+                      onPressed: ctrl.hasDrawableContent
+                          ? () => _openSaveSheet(context, settingCtrl)
+                          : null,
+                      tooltip: 'save_to_gallery_title'.tr,
+                    ),
+                    // Plan FR-11: 작품 저장 버튼 — 갤러리 저장과 별개로 in-app 보관.
+                    IconButton(
+                      icon: Icon(
+                        LucideIcons.bookmarkPlus,
+                        color: ctrl.hasDrawableContent
+                            ? cs.onSurface
+                            : cs.onSurface.withValues(alpha: 0.3),
+                      ),
+                      onPressed: ctrl.hasDrawableContent
+                          ? () {
+                              if (settingCtrl.hapticEnabled.value) {
+                                ctrl.hapticMedium();
+                              }
+                              ctrl.saveAsArtwork();
+                            }
+                          : null,
+                      tooltip: 'artwork_save_action'.tr,
+                    ),
                     IconButton(
                       icon: Icon(
                         LucideIcons.share2,
@@ -378,6 +434,30 @@ class _TopToolbar extends StatelessWidget {
   void _maybeHaptic(SettingController settingCtrl) {
     if (!settingCtrl.hapticEnabled.value) return;
     ctrl.hapticSelection();
+  }
+
+  void _openSaveSheet(BuildContext context, SettingController settingCtrl) {
+    if (settingCtrl.hapticEnabled.value) {
+      ctrl.hapticMedium();
+    }
+    SaveOptionsSheet.show(
+      context: context,
+      settingCtrl: settingCtrl,
+      onConfirm: (resolution, format) async {
+        // 마지막 선택 persist + 갤러리 저장 위임.
+        // Plan FR-07: 마지막 선택을 Hive에 저장해 다음 호출 시 prefill.
+        await Future.wait<void>([
+          settingCtrl.setLastExportResolution(resolution),
+          settingCtrl.setLastExportFormat(
+            format == ExportImageFormat.jpeg ? 'jpeg' : 'png',
+          ),
+        ]);
+        await ctrl.exportToGallery(
+          resolutionMultiplier: resolution,
+          format: format,
+        );
+      },
+    );
   }
 
   void _openCanvasColorPicker(
