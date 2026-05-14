@@ -40,6 +40,47 @@ enum BrushType {
   eraser,
 }
 
+/// BrushType의 영속화용 안정적 ID.
+///
+/// 저장된 작품(`SerializableStroke`)은 브러시를 정수 ID로 기억한다. 과거에는
+/// `enum.index`를 그대로 썼는데, 그러면 enum 선언 순서를 바꾸는 순간 기존 작품의
+/// 브러시 해석이 어긋난다. 이를 막기 위해 ID를 enum 순서와 분리해 여기에 고정한다.
+///
+/// 규칙:
+/// - 기존 값은 절대 변경하지 않는다.
+/// - 신규 brush는 반드시 새 정수를 부여한다(현재 최대값 + 1 권장).
+/// - 현재 값들은 과거 `enum.index` 기반 저장 데이터와의 호환을 위해 그 인덱스와 동일하다.
+const Map<BrushType, int> _brushTypeStableIds = {
+  BrushType.pen: 0,
+  BrushType.pencil: 1,
+  BrushType.marker: 2,
+  BrushType.brush: 3,
+  BrushType.highlighter: 4,
+  BrushType.fountainPen: 5,
+  BrushType.crayon: 6,
+  BrushType.watercolor: 7,
+  BrushType.airbrush: 8,
+  BrushType.eraser: 9,
+};
+
+final Map<int, BrushType> _brushTypeFromStableId = {
+  for (final entry in _brushTypeStableIds.entries) entry.value: entry.key,
+};
+
+extension BrushTypePersistence on BrushType {
+  /// 영속화 시 사용하는 enum 순서 비의존 ID.
+  int get stableId => _brushTypeStableIds[this] ?? 0;
+
+  /// 저장된 stable ID로 BrushType을 복원한다. 알 수 없는 ID는 pen으로 폴백.
+  static BrushType fromStableId(int id) =>
+      _brushTypeFromStableId[id] ?? BrushType.pen;
+
+  /// 모든 BrushType에 stable ID가 누락 없이 부여되어 있는지 검증용.
+  @visibleForTesting
+  static Map<BrushType, int> get stableIdMapForTest =>
+      Map.unmodifiable(_brushTypeStableIds);
+}
+
 class DrawingStroke {
   final List<Offset> points;
   final Color color;
@@ -63,7 +104,8 @@ class DrawingStroke {
   }) : seed = seed ?? DateTime.now().microsecondsSinceEpoch;
 }
 
-class DoodleController extends GetxController with ShakeDetectorMixin {
+class DoodleController extends GetxController
+    with ShakeDetectorMixin, GetSingleTickerProviderStateMixin {
   static DoodleController get to => Get.find();
 
   static const _maxUndo = 20;
@@ -120,6 +162,10 @@ class DoodleController extends GetxController with ShakeDetectorMixin {
   // Reference image (used by share preview overlay only).
   final referenceImagePath = RxnString();
 
+  /// 작품 저장 진행 중 플래그. 저장 버튼 연타로 캡처/파일쓰기/Hive put이
+  /// 중복 실행되는 것을 막고, UI는 이 값으로 버튼을 비활성화한다.
+  final isSavingArtwork = false.obs;
+
   // Special brush unlock state
   static const _watercolorUnlockedKey = 'watercolor_unlocked';
   static const _airbrushUnlockedKey = 'airbrush_unlocked';
@@ -162,13 +208,41 @@ class DoodleController extends GetxController with ShakeDetectorMixin {
   /// RepaintBoundary는 InteractiveViewer의 child 안쪽에 두므로 캡처는 logical 좌표 그대로.
   final transformController = TransformationController();
 
-  /// 더블탭으로 줌 리셋. 위젯에서 애니메이션을 입혀 호출한다.
+  /// Plan FR-04 — 더블탭 Fit-to-screen 복귀 애니메이션 (300ms easeOutCubic).
+  /// onInit에서 vsync(this) 기반으로 lazy 초기화한다.
+  AnimationController? _fitAnimController;
+  Matrix4? _fitAnimBegin;
+
+  void _ensureFitAnimController() {
+    if (_fitAnimController != null) return;
+    final ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    ctrl.addListener(() {
+      final begin = _fitAnimBegin;
+      if (begin == null) return;
+      final t = Curves.easeOutCubic.transform(ctrl.value);
+      transformController.value = Matrix4Tween(
+        begin: begin,
+        end: Matrix4.identity(),
+      ).transform(t);
+    });
+    _fitAnimController = ctrl;
+  }
+
+  /// 더블탭으로 줌을 Fit-to-screen(identity)으로 되돌린다.
+  /// 이미 identity면 아무 것도 하지 않는다.
   void resetCanvasTransform() {
-    transformController.value = Matrix4.identity();
+    if (transformController.value == Matrix4.identity()) return;
+    _ensureFitAnimController();
+    _fitAnimBegin = transformController.value.clone();
+    _fitAnimController!.forward(from: 0);
   }
 
   @override
   void onClose() {
+    _fitAnimController?.dispose();
     transformController.dispose();
     super.onClose();
   }
@@ -704,6 +778,9 @@ class DoodleController extends GetxController with ShakeDetectorMixin {
     String? name,
     ArtworkRepository? repository,
   }) async {
+    // 연타 가드: 이미 저장 중이면 무시한다.
+    if (isSavingArtwork.value) return null;
+
     if (!hasDrawableContent) {
       AppToast.show(
         AppToastMessage.info(
@@ -714,16 +791,33 @@ class DoodleController extends GetxController with ShakeDetectorMixin {
       return null;
     }
 
-    ui.Image? image;
-    Uint8List? bytes;
-    Size canvasSize = Size.zero;
+    isSavingArtwork.value = true;
     try {
-      final boundary =
-          canvasKey.currentContext?.findRenderObject()
-              as RenderRepaintBoundary?;
-      canvasSize = boundary?.size ?? Size.zero;
-      image = await _captureCanvas();
-      if (image == null) {
+      ui.Image? image;
+      Uint8List? bytes;
+      Size canvasSize = Size.zero;
+      try {
+        final boundary =
+            canvasKey.currentContext?.findRenderObject()
+                as RenderRepaintBoundary?;
+        canvasSize = boundary?.size ?? Size.zero;
+        image = await _captureCanvas();
+        if (image == null) {
+          AppToast.show(
+            AppToastMessage.error(
+              title: 'error'.tr,
+              description: 'artwork_save_failed'.tr,
+            ),
+          );
+          return null;
+        }
+        final bd = await image.toByteData(format: ui.ImageByteFormat.png);
+        bytes = bd?.buffer.asUint8List();
+      } finally {
+        image?.dispose();
+      }
+
+      if (bytes == null || canvasSize == Size.zero) {
         AppToast.show(
           AppToastMessage.error(
             title: 'error'.tr,
@@ -732,50 +826,38 @@ class DoodleController extends GetxController with ShakeDetectorMixin {
         );
         return null;
       }
-      final bd = await image.toByteData(format: ui.ImageByteFormat.png);
-      bytes = bd?.buffer.asUint8List();
+
+      final serial = strokes.map(_serializeStroke).toList();
+      final id = 'artwork_${DateTime.now().millisecondsSinceEpoch}';
+      final repo = repository ?? ArtworkRepository.instance;
+      try {
+        final saved = await repo.save(
+          id: id,
+          canvasColor: canvasColor.value,
+          canvasLogicalSize: canvasSize,
+          referenceImagePath: referenceImagePath.value,
+          strokes: serial,
+          thumbnailPngBytes: bytes,
+          name: name,
+        );
+        AppToast.show(
+          AppToastMessage.success(
+            title: 'artwork_title'.tr,
+            description: 'artwork_save_success'.tr,
+          ),
+        );
+        return saved;
+      } catch (_) {
+        AppToast.show(
+          AppToastMessage.error(
+            title: 'error'.tr,
+            description: 'artwork_save_failed'.tr,
+          ),
+        );
+        return null;
+      }
     } finally {
-      image?.dispose();
-    }
-
-    if (bytes == null || canvasSize == Size.zero) {
-      AppToast.show(
-        AppToastMessage.error(
-          title: 'error'.tr,
-          description: 'artwork_save_failed'.tr,
-        ),
-      );
-      return null;
-    }
-
-    final serial = strokes.map(_serializeStroke).toList();
-    final id = 'artwork_${DateTime.now().millisecondsSinceEpoch}';
-    final repo = repository ?? ArtworkRepository.instance;
-    try {
-      final saved = await repo.save(
-        id: id,
-        canvasColor: canvasColor.value,
-        canvasLogicalSize: canvasSize,
-        referenceImagePath: referenceImagePath.value,
-        strokes: serial,
-        thumbnailPngBytes: bytes,
-        name: name,
-      );
-      AppToast.show(
-        AppToastMessage.success(
-          title: 'artwork_title'.tr,
-          description: 'artwork_save_success'.tr,
-        ),
-      );
-      return saved;
-    } catch (_) {
-      AppToast.show(
-        AppToastMessage.error(
-          title: 'error'.tr,
-          description: 'artwork_save_failed'.tr,
-        ),
-      );
-      return null;
+      isSavingArtwork.value = false;
     }
   }
 
@@ -808,7 +890,8 @@ class DoodleController extends GetxController with ShakeDetectorMixin {
       colorArgb: s.color.toARGB32(),
       width: s.width,
       isEraser: s.isEraser,
-      brushTypeIndex: s.brushType.index,
+      // enum.index가 아닌 stable ID로 저장해 enum 순서 변경에 둔감하게 한다.
+      brushTypeIndex: s.brushType.stableId,
       seed: s.seed,
       pointsXY: flat,
     );
@@ -819,13 +902,13 @@ class DoodleController extends GetxController with ShakeDetectorMixin {
     for (var i = 0; i + 1 < s.pointsXY.length; i += 2) {
       pts.add(Offset(s.pointsXY[i] * scale, s.pointsXY[i + 1] * scale));
     }
-    final idx = s.brushTypeIndex.clamp(0, BrushType.values.length - 1);
     return DrawingStroke(
       points: pts,
       color: Color(s.colorArgb),
       width: s.width * scale,
       isEraser: s.isEraser,
-      brushType: BrushType.values[idx],
+      // brushTypeIndex는 stable ID. enum 순서와 무관하게 BrushType을 복원한다.
+      brushType: BrushTypePersistence.fromStableId(s.brushTypeIndex),
       seed: s.seed,
     );
   }

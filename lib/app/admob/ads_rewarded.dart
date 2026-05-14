@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:get/get.dart';
 
+import 'package:doodle_pad/app/services/purchase_service.dart';
+
 import 'ads_helper.dart';
 
 class RewardedAdManager extends GetxController {
@@ -29,6 +31,14 @@ class RewardedAdManager extends GetxController {
   }
 
   Future<void> loadAd() async {
+    // Premium 사용자는 광고 로딩 자체를 하지 않는다 (네트워크/배터리 절약 + 광고 비노출 보장).
+    // PurchaseService 캐시가 prime되어 있어 cold start 직후에도 이 guard가 효과적이다.
+    if (PurchaseService.isPremiumActive) {
+      debugPrint('Rewarded ad skipped: premium active');
+      _rewardedAd = null;
+      isAdReady.value = false;
+      return;
+    }
     if (!AdHelper.canRequestAds.value) {
       debugPrint('Rewarded ad skipped: consent/init not ready');
       _rewardedAd = null;

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:gal/gal.dart';
+import 'package:image/image.dart' as img;
 
 /// 갤러리 저장 출력 포맷.
 /// Design Ref: §4.1 — 사용자가 시트에서 선택한 PNG/JPEG.
@@ -141,16 +142,42 @@ class ExportService {
     return boundary.toImage(pixelRatio: ratio);
   }
 
+  /// JPEG 인코딩 품질(0~100). 화질과 용량의 균형점으로 92를 사용한다.
+  static const int _jpegQuality = 92;
+
+  /// 인코딩 로직 단독 검증용 seam.
+  /// RepaintBoundary 캡처는 위젯 트리에 의존하므로, 포맷별 인코딩 결과는
+  /// 작은 [ui.Image]를 직접 만들어 이 메서드로 검증한다.
+  @visibleForTesting
+  Future<Uint8List> encodeForTest(ui.Image image, ExportImageFormat format) {
+    return _encode(image, format);
+  }
+
   Future<Uint8List> _encode(ui.Image image, ExportImageFormat format) async {
-    // PNG는 Flutter 내장. JPEG는 ImageByteFormat에 없으므로 PNG로 인코딩 후
-    // gal 측에서 확장자에 따라 처리. JPEG 강제 변환이 필요하면 image 패키지를
-    // 추가해 별도 처리해야 하지만, gal 2.x는 bytes의 PNG/JPEG 시그니처를 보고
-    // 적절히 저장하므로 PNG bytes로 충분히 동작한다.
-    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    if (byteData == null) {
+    if (format == ExportImageFormat.png) {
+      // PNG는 Flutter 내장 인코더 사용.
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) {
+        throw StateError('toByteData returned null');
+      }
+      return byteData.buffer.asUint8List();
+    }
+
+    // JPEG는 ui.ImageByteFormat에 없으므로 raw RGBA를 image 패키지로 재인코딩한다.
+    // 과거에는 PNG bytes를 .jpg 확장자로만 저장해 실제로는 PNG 파일이었다.
+    final rawRgba = await image.toByteData(
+      format: ui.ImageByteFormat.rawRgba,
+    );
+    if (rawRgba == null) {
       throw StateError('toByteData returned null');
     }
-    return byteData.buffer.asUint8List();
+    final decoded = img.Image.fromBytes(
+      width: image.width,
+      height: image.height,
+      bytes: rawRgba.buffer,
+      numChannels: 4,
+    );
+    return img.encodeJpg(decoded, quality: _jpegQuality);
   }
 
   double _normalizeRatio(int multiplier) {

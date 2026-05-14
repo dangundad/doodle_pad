@@ -24,7 +24,9 @@ class SerializableStroke {
   @HiveField(2)
   final bool isEraser;
 
-  /// `BrushType.values` 인덱스. 미래 추가에 둔감하도록 enum 값 자체가 아니라 정수.
+  /// BrushType의 영속화용 stable ID (enum 선언 순서 비의존).
+  /// 직렬화/역직렬화는 `BrushTypePersistence.stableId` / `.fromStableId`를 쓴다.
+  /// 필드명은 레거시 저장 데이터 호환을 위해 유지하지만 의미는 더 이상 enum.index가 아니다.
   @HiveField(3)
   final int brushTypeIndex;
 

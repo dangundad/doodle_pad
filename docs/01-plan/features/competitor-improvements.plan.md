@@ -95,7 +95,7 @@ version_app: 1.0.0+1
 | FR-03 | 캔버스에서 한 손가락은 기존대로 그리고, 두 손가락은 핀치 줌(0.5x~5.0x) + 팬으로 동작한다. | High | Pending |
 | FR-04 | 줌 상태에서 더블탭하면 Fit-to-screen으로 복귀한다. | Medium | Pending |
 | FR-05 | 설정에 "흔들어 지우기" 토글(기본 OFF)을 추가한다. ON일 때만 가속도계 리스너 활성화. | Medium | Pending |
-| FR-06 | 흔들기 감지 시 기존 `_confirmClear` 다이얼로그를 띄운다(직접 삭제 금지). 임계값 25 m/s² · 200ms. | Medium | Pending |
+| FR-06 | 흔들기 감지 시 기존 `_confirmClear` 다이얼로그를 띄운다(직접 삭제 금지). 임계값 25 m/s², 디바운스 800ms (오작동 방지를 위해 보수적으로 설정). | Medium | Pending |
 | FR-07 | Save 버튼 탭 시 해상도(1x/2x/3x) · 포맷(PNG/JPEG) 선택 시트를 띄운다. 마지막 선택은 Hive에 저장. | High | Pending |
 | FR-08 | Hive `Drawing` 모델로 작품(stroke 리스트 + 캔버스 색 + 참조 이미지 경로 + 썸네일 경로 + createdAt)을 저장한다. | High | Pending |
 | FR-09 | "내 작품" 페이지: 그리드 썸네일, 작품 탭 시 캔버스로 재오픈(편집 가능), 길게 누름 시 삭제 확인. | High | Pending |

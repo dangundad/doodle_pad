@@ -170,4 +170,24 @@ void main() {
       expect(controller.brushType.value, BrushType.watercolor);
     },
   );
+
+  test('saveAsArtwork: 이미 저장 중이면 즉시 null을 반환하고 중복 실행하지 않는다', () async {
+    final controller = DoodleController();
+    controller.strokes.add(
+      DrawingStroke(
+        points: const [Offset(1, 1)],
+        color: Colors.black,
+        width: 4,
+      ),
+    );
+
+    // 첫 호출이 진행 중인 상태를 모사한다.
+    controller.isSavingArtwork.value = true;
+
+    final result = await controller.saveAsArtwork();
+
+    // 연타 가드로 빠졌으므로 캡처/저장 없이 null, 플래그도 건드리지 않는다.
+    expect(result, isNull);
+    expect(controller.isSavingArtwork.value, isTrue);
+  });
 }

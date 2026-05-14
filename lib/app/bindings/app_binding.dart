@@ -77,12 +77,16 @@ class AppBinding implements Bindings {
   }
 
   static void _ensureDependencyServices() {
-    if (!Get.isRegistered<DoodleController>()) {
-      Get.put(DoodleController(), permanent: true);
-    }
-
+    // SettingController는 반드시 DoodleController보다 먼저 등록한다.
+    // DoodleController.onInit -> _bindShakeToClearSetting()이 SettingController.to에
+    // `ever` 리스너를 거는데, SettingController가 아직 없으면 조용히 패스해
+    // shakeToClearEnabled 토글이 가속도계 구독에 반영되지 않는 회귀가 생긴다.
     if (!Get.isRegistered<SettingController>()) {
       Get.put(SettingController(), permanent: true);
+    }
+
+    if (!Get.isRegistered<DoodleController>()) {
+      Get.put(DoodleController(), permanent: true);
     }
 
     if (!Get.isRegistered<InterstitialAdManager>()) {

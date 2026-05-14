@@ -387,14 +387,20 @@ class _TopToolbar extends StatelessWidget {
                       tooltip: 'save_to_gallery_title'.tr,
                     ),
                     // Plan FR-11: 작품 저장 버튼 — 갤러리 저장과 별개로 in-app 보관.
+                    // 저장 진행 중에는 연타로 인한 중복 저장을 막기 위해 비활성화한다.
+                    // 이 Row는 상위 Obx 안이라 isSavingArtwork 읽기가 반응형으로 추적된다.
                     IconButton(
                       icon: Icon(
                         LucideIcons.bookmarkPlus,
-                        color: ctrl.hasDrawableContent
+                        color:
+                            (ctrl.hasDrawableContent &&
+                                !ctrl.isSavingArtwork.value)
                             ? cs.onSurface
                             : cs.onSurface.withValues(alpha: 0.3),
                       ),
-                      onPressed: ctrl.hasDrawableContent
+                      onPressed:
+                          (ctrl.hasDrawableContent &&
+                              !ctrl.isSavingArtwork.value)
                           ? () {
                               if (settingCtrl.hapticEnabled.value) {
                                 ctrl.hapticMedium();

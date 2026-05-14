@@ -48,7 +48,7 @@ version_app: 1.0.0+1
 
 1. **Single Responsibility per Service**: `ExportService`는 픽셀화·저장만, `ArtworkRepository`는 영속화·썸네일 IO만.
 2. **No silent destruction**: Shake / Clear는 반드시 확인 다이얼로그를 거친다.
-3. **Pointer-aware Gesture**: 줌(2 손가락) ↔ 그리기(1 손가락) 분기는 포인터 카운트 기반.
+3. **Pointer-aware Gesture**: 줌(2 손가락) ↔ 그리기(1 손가락) 분기는 InteractiveViewer(panEnabled=false, scaleEnabled=true)의 기본 제스처 분리에 위임 — 한 손가락 pan은 InteractiveViewer가 거부해 하위 GestureDetector가 받는다.
 4. **Backwards-compatible Persistence**: Hive `Drawing` 모델은 nullable·default를 활용해 미래 필드 추가에 둔감.
 5. **i18n First**: 신규 문자열은 모두 `translate.dart` 다국어 키로 추가, 하드코딩 금지.
 
@@ -140,14 +140,14 @@ GalleryPage → 작품 카드 탭
   → Get.toNamed(Routes.draw)
 ```
 
-**줌/팬 (F3/F4)**
+**줌/팬 (F3/F4)** — 실제 구현 기준
 ```
-GestureDetector.onPointerDown
-  → DoodleController.activePointers Rx 증가
-  → 1 → 그리기 (기존 onPan*)
-  → 2+ → InteractiveViewer transform 활성, 그리기 일시 중단
-  → 모든 포인터 release → 그리기 모드 복귀
-더블탭 → Matrix4.identity() 애니메이션 (300ms easeOutCubic)
+InteractiveViewer(panEnabled: false, scaleEnabled: true, minScale: 0.5, maxScale: 5.0)
+  → 한 손가락 pan: InteractiveViewer가 거부 → 하위 GestureDetector.onPan*가 그리기 처리
+  → 두 손가락 핀치: InteractiveViewer가 scale transform 처리 (두 손가락 pan은 scope out)
+  → RepaintBoundary는 InteractiveViewer의 child 안쪽 → 캡처는 항상 logical 좌표
+더블탭 → DoodleController.resetCanvasTransform()
+       → Matrix4Tween(현재 → identity) 300ms easeOutCubic 애니메이션
 ```
 
 **Shake (F5/F6)**
@@ -198,7 +198,7 @@ class SerializableStroke {
   @HiveField(0) int colorArgb;
   @HiveField(1) double width;
   @HiveField(2) bool isEraser;
-  @HiveField(3) int brushTypeIndex; // BrushType.values 인덱스
+  @HiveField(3) int brushTypeIndex; // BrushType의 stable ID (enum 선언 순서 비의존)
   @HiveField(4) int seed;
   @HiveField(5) List<double> pointsXY; // flatten: [x0,y0,x1,y1,...] (Offset 어댑터 생략, 용량 ↓)
 }
@@ -240,38 +240,40 @@ await Hive.openBox<Drawing>('drawings');
 ### 4.1 ExportService
 
 ```dart
+// 실제 구현 기준 (Design 초안의 명칭에서 갱신됨)
 class ExportService {
-  ExportService._();
-  static final ExportService instance = ExportService._();
+  ExportService({GalPutBytesFn? putBytes, GalRequestAccessFn? requestAccess,
+      String? defaultAlbumName});
+  static final ExportService instance = ExportService();
 
-  /// 캔버스를 캡처해 갤러리에 저장한다.
-  /// 권한 거부 시 [GalSavePermissionException], 일반 실패 시 [GalSaveFailedException].
-  Future<ExportResult> saveToGallery({
+  /// canvasKey의 RepaintBoundary를 캡처해 갤러리에 저장한다.
+  /// PNG는 Flutter 내장 인코더, JPEG는 image 패키지(encodeJpg quality:92)로 인코딩.
+  /// 권한 거부 시 1회 재요청 후 재시도, 실패는 ExportResult.failure로 구분 반환.
+  Future<ExportResult> saveCanvasToGallery({
     required GlobalKey canvasKey,
     required int resolutionMultiplier, // 1 / 2 / 3
-    required ImageFormat format,       // png / jpeg
-  });
-
-  /// stroke 리스트로부터 thumbnail PNG bytes를 만든다 (캔버스 미사용, 작품 저장용).
-  Future<Uint8List> renderArtworkThumbnail({
-    required List<DrawingStroke> strokes,
-    required Color canvasColor,
-    required String? referenceImagePath,
-    required Size logicalSize,
-    int targetMaxDimension = 256,
+    required ExportImageFormat format, // png / jpeg
+    String? fileName,
   });
 }
 
-enum ImageFormat { png, jpeg }
+enum ExportImageFormat { png, jpeg }
 
 class ExportResult {
-  final String? savedPath;   // gal이 반환할 경우
+  const ExportResult.success();
+  const ExportResult.failed(ExportFailure failure);
   final bool success;
   final ExportFailure? failure;
 }
 
-enum ExportFailure { permissionDenied, ioError, encoderError }
+enum ExportFailure { noContent, permissionDenied, encoderError, ioError, unexpected }
 ```
+
+> **Note (Design 갱신 2026-05-14)**: 초안의 `saveToGallery` / `ImageFormat` /
+> `ExportResult.savedPath` / `renderArtworkThumbnail`는 실제 구현에서
+> `saveCanvasToGallery` / `ExportImageFormat` / (savedPath 제거) /
+> (별도 thumbnail 렌더링 메서드 없음 — 작품 썸네일은 `DoodleController.saveAsArtwork`가
+> `canvasKey` 캡처로 직접 생성) 로 정착했다. 위 시그니처가 source of truth.
 
 ### 4.2 ArtworkRepository
 
@@ -435,7 +437,7 @@ N은 `ArtworkRepository.count()` 결과를 Rx로 관찰.
 | `ExportFailure.ioError` | 디스크/SD 오류 | toast error "저장 실패" |
 | `ExportFailure.encoderError` | 인코딩 실패 | toast error + 디버그 로그 |
 | `ArtworkRepositorySaveError` | Hive write 실패 | toast error "작품 저장 실패" |
-| `ArtworkLoadError` (썸네일/파일 missing) | 썸네일 unlink된 작품 | 카드 plaeholder + 자동 self-heal (썸네일 재생성) |
+| `ArtworkLoadError` (썸네일/파일 missing) | 썸네일 unlink된 작품 | 카드 placeholder + 자동 self-heal (썸네일 재생성) |
 
 ### 6.2 Coordinate Mismatch (재오픈 시)
 
@@ -465,7 +467,7 @@ final scale = math.min(scaleX, scaleY); // letterbox 방식, 잘림 방지
 
 | Type | Target | Tool | Phase |
 |------|--------|------|-------|
-| L1 (Unit) | `ExportService.renderArtworkThumbnail`, `ArtworkRepository` CRUD, `Drawing` adapter roundtrip | `flutter test` + Hive in-memory + fake gal | Do |
+| L1 (Unit) | `ExportService` 인코딩(encodeForTest), `ArtworkRepository` CRUD, `Drawing` adapter roundtrip | `flutter test` + Hive in-memory + fake gal | Do |
 | L2 (Widget) | SaveOptionsSheet 인터랙션, GalleryPage 렌더, Shake 토글 | `flutter test` widget tester | Do |
 | L3 (Regression) | DrawPage 한 손가락 stroke 무회귀 (기존 test 통과) | `flutter test` | Do/Check |
 | L4 (Manual) | 실기기 gal 권한 / Android 13+ / OEM(MIUI) | 수기 체크리스트 | Check |
@@ -477,9 +479,9 @@ final scale = math.min(scaleX, scaleY); // letterbox 방식, 잘림 방지
 | 1 | `Drawing` adapter | save → reopen box → load by id | 모든 필드 일치, stroke offsets 손실 0 |
 | 2 | `ArtworkRepository.save` | save 호출 → thumbnail 파일 존재 | 파일 존재, Hive entry 1개 |
 | 3 | `ArtworkRepository.delete` | save → delete → list | list empty, thumbnail 파일 없음 |
-| 4 | `ExportService.renderArtworkThumbnail` | stroke 100개 input | targetMaxDimension 이하 PNG bytes |
-| 5 | `ExportService.saveToGallery` (fake gal) | mock returns success | `ExportResult.success == true` |
-| 6 | `ExportService.saveToGallery` (fake gal denied) | mock throws permission | `failure == permissionDenied` |
+| 4 | `ExportService.encodeForTest` | PNG/JPEG 포맷별 인코딩 | PNG/JPEG 시그니처 bytes 반환 |
+| 5 | `ExportService.putBytesForTest` (fake gal) | mock returns success | `ExportResult.success == true` |
+| 6 | `ExportService.putBytesForTest` (fake gal denied) | mock throws permission | `failure == permissionDenied` |
 
 ### 8.3 L2 Test Scenarios
 
@@ -487,7 +489,7 @@ final scale = math.min(scaleX, scaleY); // letterbox 방식, 잘림 방지
 |---|------|--------|----------|
 | 1 | DrawPage | Save 버튼 탭 (drawable 있음) | SaveOptionsSheet 표시 |
 | 2 | DrawPage | Save 버튼 탭 (drawable 없음) | 비활성 — 버튼 onPressed null |
-| 3 | SaveOptionsSheet | 해상도 선택 → 저장 | `ExportService.saveToGallery` 호출 + opts 전달 |
+| 3 | SaveOptionsSheet | 해상도 선택 → 저장 | `ExportService.saveCanvasToGallery` 호출 + opts 전달 |
 | 4 | SaveOptionsSheet | 마지막 선택 prefill | `SettingController.lastExport*` 기준 라디오 선택 |
 | 5 | GalleryPage | 빈 박스 진입 | 빈 상태 위젯 표시 |
 | 6 | GalleryPage | 카드 길게 누름 | 삭제 모드 토글 |
@@ -550,7 +552,7 @@ CLAUDE.md 원칙 + 현 프로젝트 컨벤션 준수.
 | Target | Rule | Example |
 |--------|------|---------|
 | Class | PascalCase | `ExportService`, `ArtworkRepository` |
-| Method | camelCase | `saveToGallery`, `renderArtworkThumbnail` |
+| Method | camelCase | `saveCanvasToGallery`, `saveAsArtwork` |
 | Const | lowerCamelCase (Dart convention) | `defaultThumbnailMaxDimension` |
 | File (class) | snake_case.dart | `export_service.dart`, `artwork_repository.dart` |
 | i18n key | snake_case with prefix | `save_resolution_1x`, `gallery_empty_title` |
@@ -645,7 +647,7 @@ lib/app/
 2. **ExportService 구현 + L1 단위 테스트**
 3. **ArtworkRepository 구현 + L1 단위 테스트**
 4. **SaveOptionsSheet + DoodleController.exportToGallery 위임** (Phase 1 완료)
-5. **InteractiveViewer 통합 + 포인터 분기 + 회귀 테스트** (Phase 2 줌)
+5. **InteractiveViewer 통합 (panEnabled=false 기본 분리) + 회귀 테스트** (Phase 2 줌)
 6. **ShakeDetectorMixin + Settings 토글** (Phase 2 Shake)
 7. **GalleryController + GalleryPage + GalleryBinding + 라우트** (Phase 3)
 8. **HomePage 진입점 카드**

@@ -30,6 +30,14 @@ class InterstitialAdManager extends GetxController {
   }
 
   Future<void> loadAd() async {
+    // Premium 사용자는 광고 로딩 자체를 하지 않는다.
+    // PurchaseService 캐시 prime + _syncAdsForPremiumStatus와 함께 다중 방어선을 형성한다.
+    if (PurchaseService.isPremiumActive) {
+      debugPrint('Interstitial ad skipped: premium active');
+      _interstitialAd = null;
+      isAdReady.value = false;
+      return;
+    }
     if (!AdHelper.canRequestAds.value) {
       debugPrint('Interstitial ad skipped: consent/init not ready');
       _interstitialAd = null;

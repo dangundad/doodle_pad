@@ -1,0 +1,14 @@
+[
+  {
+    "timestamp": "2026-05-14T08:17:13.029Z",
+    "errorType": "unknown",
+    "category": "unknown",
+    "severity": "low",
+    "agentId": null,
+    "agentType": null,
+    "sessionId": "74f0151f-dd35-46ac-8908-4aac67f6701d",
+    "message": "",
+    "parseStatus": "partial",
+    "parseWarnings": "StopFailure payload missing useful fields (keys: session_id,transcript_path,cwd,effort,hook_event_name,error,last_assistant_message)"
+  }
+]

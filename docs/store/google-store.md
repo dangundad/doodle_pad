@@ -5,7 +5,7 @@
 Doodle Pad - Draw & Sketch
 
 #### 앱 간략한 설명 (60자 이내)
-Draw quick doodles with brushes, colors, and easy sharing.
+Draw, save, and reopen doodles with 10 brushes and colors.
 
 #### 앱 설명 (4000자 이내)
 Doodle Pad is a simple drawing app for quick sketches, playful doodles, visual notes, and everyday ideas. Open a clean canvas, choose a brush, pick a color, and start drawing right away.
@@ -14,23 +14,24 @@ The app keeps the drawing experience light and friendly, so you can focus on the
 
 ✨ Key features
 
-🎨 Drawing tools for every mood
-• Pen for clean, simple lines
-• Marker for bold strokes
+🎨 10 brushes for every mood
+• Pen, pencil, marker, brush, highlighter, and fountain pen
+• Crayon, watercolor, and airbrush for softer, textured styles
 • Eraser for quick touch-ups
-• Watercolor and Airbrush for softer styles
 
 🖌️ Easy creative controls
-• 16 ready-to-use colors
-• Brush size slider
+• 16 ready-to-use colors plus a custom color picker
+• Brush size slider and canvas background colors
 • Smooth stroke rendering
 • Undo and redo when you want to adjust your drawing
+• Draw on top of a photo from your gallery
 
-📤 Share your doodles
+💾 Save and come back later
+• Save to your device gallery as PNG or JPEG at 1x, 2x, or 3x resolution
+• Keep drawings in the in-app artwork gallery and reopen them anytime to keep drawing
 • Share finished drawings with messaging apps, social apps, or other Android share options
-• Great for quick notes, small ideas, fun sketches, and casual drawing moments
 
-Doodle Pad — a clean canvas whenever you want to draw.
+Doodle Pad — draw it, save it, and pick it back up whenever you want.
 
 ---
 
@@ -40,7 +41,7 @@ Doodle Pad — a clean canvas whenever you want to draw.
 간단 그림판 - 그리기와 스케치
 
 #### 앱 간략한 설명 (60자 이내)
-가볍게 그리고, 색을 고르고, 완성한 그림을 바로 공유하세요.
+10종 브러시로 그리고, 저장하고, 다시 열어 이어 그리세요.
 
 #### 앱 설명 (4000자 이내)
 간단 그림판은 빠른 스케치, 아이디어 메모, 가벼운 그림을 위한 쉬운 그리기 앱입니다. 깨끗한 화면을 열고, 브러시와 색상을 고른 뒤 바로 그릴 수 있어요.
@@ -49,23 +50,24 @@ Doodle Pad — a clean canvas whenever you want to draw.
 
 ✨ 주요 기능
 
-🎨 기분에 맞게 고르는 그리기 도구
-• 깔끔한 선을 그리는 펜
-• 굵고 선명하게 표현하는 마커
+🎨 기분에 맞게 고르는 10종 브러시
+• 펜, 연필, 마커, 붓, 형광펜, 만년필
+• 부드럽고 질감 있는 크레파스, 수채화, 에어브러시
 • 원하는 부분을 빠르게 정리하는 지우개
-• 부드러운 느낌을 더하는 수채화와 에어브러시
 
 🖌️ 쉬운 그리기 조작
-• 바로 고를 수 있는 16가지 색상
-• 브러시 크기 조절 슬라이더
+• 바로 고를 수 있는 16가지 색상과 커스텀 컬러 피커
+• 브러시 크기 조절 슬라이더, 캔버스 배경 색상
 • 부드러운 선 표현
 • 마음에 들 때까지 실행 취소와 다시 실행
+• 갤러리 사진을 불러와 그 위에 그리기
 
-📤 그린 뒤 바로 공유
+💾 저장하고 다시 이어 그리기
+• 기기 갤러리에 PNG 또는 JPEG로, 1x/2x/3x 해상도를 골라 저장
+• 앱 내 작품 보관함에 저장하고 언제든 다시 열어 이어 그리기
 • 완성한 그림을 메신저, SNS 등 Android 공유 메뉴로 전송
-• 낙서, 아이디어, 간단한 그림 메모, 가벼운 스케치에 적합
 
-간단 그림판 — 그리고 싶을 때 바로 열 수 있는 깨끗한 그림판.
+간단 그림판 — 그리고, 저장하고, 원할 때 다시 이어 그리는 그림판.
 
 ---
 
@@ -75,32 +77,33 @@ Doodle Pad — a clean canvas whenever you want to draw.
 かんたんお絵かき - スケッチ
 
 #### 앱 간략한 설명 (60字 이내)
-ブラシと色を選んで、気軽に描いてすぐ共有。
+10種類のブラシで描いて保存し、また開いて続けられます。
 
 #### 앱 설명 (4000字 이내)
-かんたんお絵かきは、スケッチ、アイデアメモ、ちょっとした絵をすぐ描けるシンプルなお絵かきアプリです。きれいな画面を開き、ブラシと色を選んで、そのまま描き始められます。
+かんたんお絵かきは、すばやいスケッチ、楽しい落書き、アイデアメモ、日常のちょっとした絵に使えるシンプルなお絵かきアプリです。きれいなキャンバスを開き、ブラシと色を選んで、すぐに描き始められます。
 
-複雑なメニューよりも、描く気持ちよさを大切にしました。
+複雑なメニューに迷わず、その瞬間のアイデアに集中できるよう、軽くて親しみやすい描き心地を大切にしました。
 
 ✨ 主な機能
 
-🎨 気分に合わせて選べるツール
-• きれいな線のペン
-• 太くはっきり描けるマーカー
+🎨 気分に合わせて選べる10種類のブラシ
+• ペン、鉛筆、マーカー、ブラシ、蛍光ペン、万年筆
+• やわらかく質感のあるクレヨン、水彩、エアブラシ
 • すばやく直せる消しゴム
-• やわらかい表現の水彩とエアブラシ
 
-🖌️ かんたんな操作
-• すぐ使える16色
-• ブラシサイズ調整
-• なめらかな線
-• 元に戻す / やり直し
+🖌️ かんたんなクリエイティブ操作
+• すぐ使える16色とカスタムカラーピッカー
+• ブラシサイズスライダーとキャンバス背景色
+• なめらかな線の描画
+• 納得いくまで元に戻す / やり直し
+• ギャラリーの写真の上に描画
 
-📤 すぐ共有
-• 完成した絵をメッセージアプリやSNSなどに共有
-• メモ、アイデア、気軽なスケッチに便利
+💾 保存してあとで続きを描く
+• PNGまたはJPEGで、1x/2x/3x解像度を選んで端末ギャラリーに保存
+• アプリ内の作品ギャラリーに保存し、いつでも開いて続きを描けます
+• 完成した絵をメッセージアプリ、SNS、その他のAndroid共有先へ送信
 
-かんたんお絵かき — 描きたいときにすぐ開けるきれいな画面。
+かんたんお絵かき — 描いて、保存して、好きなときに続きを描けるお絵かきアプリ。
 
 ---
 
@@ -110,32 +113,33 @@ Doodle Pad — a clean canvas whenever you want to draw.
 Zeichenblock - Skizzen
 
 #### 앱 간략한 설명 (60자 이내)
-Schnell zeichnen, Farben wählen und einfach teilen.
+Mit 10 Pinseln zeichnen, speichern und später fortsetzen.
 
 #### 앱 설명 (4000자 이내)
-Zeichenblock ist eine einfache Zeichen-App für schnelle Skizzen, kleine Ideen, visuelle Notizen und lockere Zeichnungen. Öffne eine klare Zeichenfläche, wähle Pinsel und Farbe und beginne sofort zu zeichnen.
+Zeichenblock ist eine einfache Zeichen-App für schnelle Skizzen, spielerische Doodles, visuelle Notizen und alltägliche Ideen. Öffne eine saubere Zeichenfläche, wähle einen Pinsel und eine Farbe und beginne sofort zu zeichnen.
 
-Die App bleibt bewusst leicht, damit du dich auf deine Idee konzentrieren kannst.
+Die App bleibt leicht und freundlich, damit du dich auf den Moment konzentrieren kannst statt auf komplizierte Menüs.
 
 ✨ Hauptfunktionen
 
-🎨 Werkzeuge für deinen Stil
-• Stift für klare Linien
-• Marker für kräftige Striche
+🎨 10 Pinsel für jede Stimmung
+• Stift, Bleistift, Marker, Pinsel, Textmarker und Füller
+• Wachsmaler, Aquarell und Airbrush für weichere, strukturierte Stile
 • Radierer für schnelle Korrekturen
-• Aquarell und Airbrush für weiche Effekte
 
-🖌️ Einfache Steuerung
-• 16 sofort nutzbare Farben
-• Regler für die Pinselgröße
+🖌️ Einfache Kreativsteuerung
+• 16 sofort nutzbare Farben plus eigene Farbauswahl
+• Regler für Pinselgröße und Farben für den Hintergrund der Zeichenfläche
 • Glatte Strichdarstellung
-• Rückgängig und Wiederholen
+• Rückgängig und Wiederholen, wenn du etwas anpassen möchtest
+• Zeichne auf einem Foto aus deiner Galerie
 
-📤 Einfach teilen
-• Teile fertige Zeichnungen über Messenger, soziale Apps oder andere Android-Optionen
-• Ideal für schnelle Notizen, Ideen und kleine Skizzen
+💾 Speichern und später fortsetzen
+• Speichere in deiner Gerätegalerie als PNG oder JPEG mit 1x, 2x oder 3x Auflösung
+• Bewahre Zeichnungen in der App-Galerie auf und öffne sie jederzeit zum Weiterzeichnen
+• Teile fertige Zeichnungen über Messenger, soziale Apps oder andere Android-Freigaben
 
-Zeichenblock — eine klare Zeichenfläche, wenn du zeichnen möchtest.
+Zeichenblock — zeichnen, speichern und jederzeit wieder aufnehmen.
 
 ---
 
@@ -145,32 +149,33 @@ Zeichenblock — eine klare Zeichenfläche, wenn du zeichnen möchtest.
 Рисуй легко - Скетчи
 
 #### 앱 간략한 설명 (60자 이내)
-Рисуйте быстро, выбирайте цвета и делитесь.
+10 кистей: рисуйте, сохраняйте и продолжайте позже.
 
 #### 앱 설명 (4000자 이내)
-Рисуй легко — простое приложение для быстрых скетчей, идей, заметок и лёгких рисунков. Откройте чистый экран, выберите кисть и цвет, а затем начните рисовать сразу.
+Рисуй легко — простое приложение для быстрых скетчей, веселых набросков, визуальных заметок и повседневных идей. Откройте чистый холст, выберите кисть и цвет и сразу начинайте рисовать.
 
-Приложение не перегружает вас сложными меню и помогает сосредоточиться на идее.
+Приложение сохраняет процесс рисования легким и понятным, чтобы вы могли сосредоточиться на моменте, а не на сложных меню.
 
 ✨ Основные возможности
 
-🎨 Инструменты под настроение
-• Перо для чистых линий
-• Маркер для ярких штрихов
-• Ластик для быстрых правок
-• Акварель и аэрограф для мягких эффектов
+🎨 10 кистей для любого настроения
+• Перо, карандаш, маркер, кисть, хайлайтер и перьевая ручка
+• Мелок, акварель и аэрограф для мягких фактурных стилей
+• Ластик для быстрых исправлений
 
-🖌️ Простое управление
-• 16 готовых цветов
-• Настройка размера кисти
-• Плавные линии
-• Отмена и повтор
+🖌️ Простое творческое управление
+• 16 готовых цветов и выбор собственного цвета
+• Ползунок размера кисти и цвета фона холста
+• Плавная отрисовка линий
+• Отмена и повтор, когда нужно поправить рисунок
+• Рисование поверх фото из галереи
 
-📤 Быстрая отправка
+💾 Сохраняйте и возвращайтесь позже
+• Сохраняйте в галерею устройства как PNG или JPEG с разрешением 1x, 2x или 3x
+• Храните рисунки во встроенной галерее работ и открывайте их в любое время, чтобы продолжить
 • Делитесь готовыми рисунками через мессенджеры, соцсети и другие варианты Android
-• Удобно для идей, заметок и небольших скетчей
 
-Рисуй легко — чистый экран, когда хочется рисовать.
+Рисуй легко — нарисуйте, сохраните и продолжайте, когда захотите.
 
 ---
 
@@ -180,32 +185,33 @@ Zeichenblock — eine klare Zeichenfläche, wenn du zeichnen möchtest.
 Bloc dessin - Croquis
 
 #### 앱 간략한 설명 (60자 이내)
-Dessinez vite, choisissez vos couleurs et partagez.
+Dessinez, enregistrez et reprenez avec 10 pinceaux.
 
 #### 앱 설명 (4000자 이내)
-Bloc dessin est une application facile pour les croquis rapides, les idées, les notes visuelles et les petits dessins du quotidien. Ouvrez une page claire, choisissez un pinceau et une couleur, puis commencez tout de suite.
+Bloc dessin est une application simple pour les croquis rapides, les doodles ludiques, les notes visuelles et les idées du quotidien. Ouvrez une toile propre, choisissez un pinceau, sélectionnez une couleur et commencez à dessiner tout de suite.
 
-L’app reste légère et agréable pour laisser plus de place à votre idée.
+L’expérience reste légère et agréable, pour vous laisser vous concentrer sur l’instant plutôt que sur des menus compliqués.
 
 ✨ Fonctions principales
 
-🎨 Des outils selon votre style
-• Stylo pour des lignes nettes
-• Marqueur pour des traits plus forts
-• Gomme pour corriger rapidement
-• Aquarelle et aérographe pour un rendu doux
+🎨 10 pinceaux pour chaque envie
+• Stylo, crayon, marqueur, pinceau, surligneur et plume
+• Crayon de cire, aquarelle et aérographe pour des styles plus doux et texturés
+• Gomme pour des retouches rapides
 
-🖌️ Contrôle simple
-• 16 couleurs prêtes à utiliser
-• Taille de pinceau réglable
-• Traits fluides
-• Annuler et rétablir
+🖌️ Commandes créatives faciles
+• 16 couleurs prêtes à utiliser et un sélecteur de couleur personnalisée
+• Réglage de la taille du pinceau et couleurs de fond de toile
+• Rendu de trait fluide
+• Annuler et rétablir pour ajuster votre dessin
+• Dessiner par-dessus une photo de votre galerie
 
-📤 Partage facile
-• Partagez vos dessins via messageries, réseaux sociaux ou autres options Android
-• Idéal pour notes rapides, idées et croquis simples
+💾 Enregistrer et reprendre plus tard
+• Enregistrez dans la galerie de l’appareil en PNG ou JPEG, en résolution 1x, 2x ou 3x
+• Gardez vos dessins dans la galerie d’œuvres intégrée et rouvrez-les quand vous voulez
+• Partagez vos dessins terminés via messageries, réseaux sociaux ou autres options Android
 
-Bloc dessin — une page claire dès que vous voulez dessiner.
+Bloc dessin — dessinez, enregistrez et reprenez votre idée quand vous voulez.
 
 ---
 
@@ -215,32 +221,33 @@ Bloc dessin — une page claire dès que vous voulez dessiner.
 Dibujo Fácil - Bocetos
 
 #### 앱 간략한 설명 (60자 이내)
-Dibuja rápido, elige colores y comparte fácil.
+Dibuja, guarda y retoma con 10 pinceles y colores.
 
 #### 앱 설명 (4000자 이내)
-Dibujo Fácil es una app sencilla para bocetos rápidos, ideas, notas visuales y dibujos casuales. Abre una pantalla limpia, elige un pincel y un color, y empieza a dibujar al instante.
+Dibujo Fácil es una app sencilla para bocetos rápidos, garabatos divertidos, notas visuales e ideas cotidianas. Abre un lienzo limpio, elige un pincel, selecciona un color y empieza a dibujar al instante.
 
-La experiencia es ligera y amable para que puedas concentrarte en tu idea.
+La experiencia es ligera y agradable, para que puedas concentrarte en el momento en lugar de perderte en menús complicados.
 
 ✨ Funciones principales
 
-🎨 Herramientas para cada estilo
-• Lápiz para líneas limpias
-• Marcador para trazos más fuertes
-• Borrador para correcciones rápidas
-• Acuarela y aerógrafo para efectos suaves
+🎨 10 pinceles para cada estado de ánimo
+• Pluma, lápiz, marcador, pincel, resaltador y pluma fuente
+• Crayón, acuarela y aerógrafo para estilos más suaves y con textura
+• Borrador para retoques rápidos
 
-🖌️ Control fácil
-• 16 colores listos para usar
-• Ajuste de tamaño del pincel
+🖌️ Controles creativos sencillos
+• 16 colores listos para usar y selector de color personalizado
+• Control de tamaño del pincel y colores de fondo del lienzo
 • Trazos suaves
-• Deshacer y rehacer
+• Deshacer y rehacer cuando quieras ajustar el dibujo
+• Dibuja encima de una foto de tu galería
 
-📤 Comparte tus dibujos
-• Comparte tus dibujos con apps de mensajería, redes sociales u otras opciones de Android
-• Útil para notas rápidas, ideas y bocetos simples
+💾 Guarda y vuelve más tarde
+• Guarda en la galería del dispositivo como PNG o JPEG en resolución 1x, 2x o 3x
+• Conserva dibujos en la galería de obras de la app y vuelve a abrirlos cuando quieras
+• Comparte dibujos terminados con apps de mensajería, redes sociales u otras opciones de Android
 
-Dibujo Fácil — una pantalla limpia cuando quieras dibujar.
+Dibujo Fácil — dibuja, guarda y continúa cuando quieras.
 
 ---
 
@@ -250,32 +257,33 @@ Dibujo Fácil — una pantalla limpia cuando quieras dibujar.
 Tela Fácil - Esboços
 
 #### 앱 간략한 설명 (60자 이내)
-Desenhe rápido, escolha cores e compartilhe fácil.
+Desenhe, salve e retome com 10 pincéis e cores.
 
 #### 앱 설명 (4000자 이내)
-Tela Fácil é um app simples para esboços rápidos, ideias, notas visuais e desenhos casuais do dia a dia. Abra uma tela limpa, escolha um pincel e uma cor, e comece a desenhar na hora.
+Tela Fácil é um app simples para esboços rápidos, doodles divertidos, notas visuais e ideias do dia a dia. Abra uma tela limpa, escolha um pincel, selecione uma cor e comece a desenhar na hora.
 
-A experiência é leve e direta, para você focar no que quer criar.
+A experiência é leve e amigável, para você focar no momento em vez de menus complicados.
 
 ✨ Principais recursos
 
-🎨 Ferramentas para cada estilo
-• Caneta para linhas limpas
-• Marcador para traços fortes
-• Borracha para correções rápidas
-• Aquarela e aerógrafo para efeitos suaves
+🎨 10 pincéis para cada clima
+• Caneta, lápis, marcador, pincel, marca-texto e caneta-tinteiro
+• Giz de cera, aquarela e aerógrafo para estilos mais suaves e texturizados
+• Borracha para ajustes rápidos
 
-🖌️ Controle fácil
-• 16 cores prontas para usar
-• Ajuste de tamanho do pincel
+🖌️ Controles criativos fáceis
+• 16 cores prontas para usar e seletor de cor personalizada
+• Controle de tamanho do pincel e cores de fundo da tela
 • Traços suaves
-• Desfazer e refazer
+• Desfazer e refazer quando quiser ajustar o desenho
+• Desenhe sobre uma foto da sua galeria
 
-📤 Compartilhe seus desenhos
-• Compartilhe por apps de mensagem, redes sociais ou outras opções do Android
-• Bom para notas rápidas, ideias e pequenos esboços
+💾 Salve e volte depois
+• Salve na galeria do dispositivo como PNG ou JPEG em resolução 1x, 2x ou 3x
+• Guarde desenhos na galeria de obras do app e reabra quando quiser continuar
+• Compartilhe desenhos finalizados por apps de mensagem, redes sociais ou outras opções do Android
 
-Tela Fácil — uma tela limpa sempre que quiser desenhar.
+Tela Fácil — desenhe, salve e continue quando quiser.
 
 ---
 
@@ -285,32 +293,33 @@ Tela Fácil — uma tela limpa sempre que quiser desenhar.
 Gambar Mudah - Sketsa
 
 #### 앱 간략한 설명 (60자 이내)
-Gambar cepat, pilih warna, dan bagikan dengan mudah.
+Gambar, simpan, dan lanjutkan dengan 10 kuas.
 
 #### 앱 설명 (4000자 이내)
-Gambar Mudah adalah aplikasi menggambar sederhana untuk sketsa cepat, ide, catatan visual, dan gambar santai sehari-hari. Buka layar bersih, pilih kuas dan warna, lalu mulai menggambar.
+Gambar Mudah adalah aplikasi menggambar sederhana untuk sketsa cepat, coretan santai, catatan visual, dan ide sehari-hari. Buka kanvas bersih, pilih kuas, pilih warna, lalu mulai menggambar saat itu juga.
 
-Pengalaman dibuat ringan dan mudah agar kamu bisa fokus pada ide.
+Pengalaman menggambar dibuat ringan dan ramah, sehingga kamu bisa fokus pada momen tanpa menu yang rumit.
 
 ✨ Fitur utama
 
-🎨 Alat untuk berbagai gaya
-• Pena untuk garis rapi
-• Marker untuk garis tebal
-• Penghapus untuk koreksi cepat
-• Cat air dan airbrush untuk efek lembut
+🎨 10 kuas untuk setiap suasana
+• Pena, pensil, marker, kuas, highlighter, dan pena tinta
+• Krayon, cat air, dan airbrush untuk gaya yang lebih lembut dan bertekstur
+• Penghapus untuk perbaikan cepat
 
-🖌️ Kontrol mudah
-• 16 warna siap pakai
-• Pengatur ukuran kuas
-• Garis halus
-• Undo dan redo
+🖌️ Kontrol kreatif yang mudah
+• 16 warna siap pakai dan pemilih warna kustom
+• Slider ukuran kuas dan warna latar kanvas
+• Goresan halus
+• Undo dan redo saat ingin menyesuaikan gambar
+• Gambar di atas foto dari galeri
 
-📤 Bagikan gambar
-• Bagikan ke aplikasi pesan, media sosial, atau opsi berbagi Android lainnya
-• Cocok untuk catatan cepat, ide, dan sketsa santai
+💾 Simpan dan lanjutkan nanti
+• Simpan ke galeri perangkat sebagai PNG atau JPEG pada resolusi 1x, 2x, atau 3x
+• Simpan gambar di galeri karya dalam app dan buka lagi kapan saja untuk melanjutkan
+• Bagikan gambar selesai ke aplikasi pesan, media sosial, atau opsi berbagi Android lainnya
 
-Gambar Mudah — layar bersih kapan pun kamu ingin menggambar.
+Gambar Mudah — gambar, simpan, lalu lanjutkan lagi kapan pun kamu mau.
 
 ---
 
@@ -320,32 +329,33 @@ Gambar Mudah — layar bersih kapan pun kamu ingin menggambar.
 简易画板 - 绘画速写
 
 #### 앱 간략한 설명 (60자 이내)
-快速涂鸦，选择颜色，并轻松分享。
+用10种画笔绘画、保存，并随时继续创作。
 
 #### 앱 설명 (4000자 이내)
-简易画板是一款简单的绘画应用，适合快速草图、灵感记录、视觉笔记和日常小画。打开干净的画面，选择画笔和颜色，就能马上开始创作。
+简易画板是一款简单的绘画应用，适合快速草图、趣味涂鸦、视觉笔记和日常灵感。打开干净的画布，选择画笔和颜色，就能马上开始创作。
 
-应用保持轻巧易用，让你把注意力放在想画的内容上。
+应用保持轻巧友好，让你专注于当下的想法，而不是复杂菜单。
 
 ✨ 主要功能
 
-🎨 适合不同风格的工具
-• 画笔绘制清晰线条
-• 马克笔绘制粗线
-• 橡皮快速修正
-• 水彩和喷枪带来柔和效果
+🎨 适合不同心情的10种画笔
+• 钢笔、铅笔、马克笔、画刷、荧光笔和钢笔刷
+• 蜡笔、水彩和喷枪，适合更柔和、有纹理的风格
+• 橡皮擦用于快速修正
 
-🖌️ 简单控制
-• 16 种可直接使用的颜色
-• 画笔大小滑块
-• 平滑笔触
-• 撤销和重做
+🖌️ 简单易用的创作控制
+• 16种可直接使用的颜色和自定义取色器
+• 画笔大小滑块和画布背景颜色
+• 平滑笔触渲染
+• 可随时撤销和重做，调整你的作品
+• 在相册照片上继续绘画
 
-📤 轻松分享
-• 可通过聊天应用、社交应用或其他 Android 分享选项发送作品
-• 适合快速笔记、灵感草图和轻松涂鸦
+💾 保存并稍后继续
+• 以PNG或JPEG格式保存到设备相册，可选择1x、2x或3x分辨率
+• 将作品保存在应用内作品库，随时重新打开继续绘画
+• 通过聊天应用、社交应用或其他Android分享选项发送完成的作品
 
-简易画板 — 想画的时候，马上打开的干净画面。
+简易画板 — 画下来，保存好，想继续时随时打开。
 
 ---
 
@@ -355,29 +365,30 @@ Gambar Mudah — layar bersih kapan pun kamu ingin menggambar.
 الرسم السهل - اسكتشات
 
 #### 앱 간략한 설명 (60자 이내)
-ارسم بسرعة، اختر الألوان، وشارك بسهولة.
+ارسم واحفظ وتابع لاحقًا مع 10 فرش.
 
 #### 앱 설명 (4000자 이내)
-الرسم السهل هو تطبيق رسم بسيط للرسومات السريعة والأفكار والملاحظات البصرية والرسومات الخفيفة اليومية. افتح شاشة نظيفة، اختر الفرشاة واللون، وابدأ الرسم فورًا.
+الرسم السهل هو تطبيق رسم بسيط للرسومات السريعة والخربشات الممتعة والملاحظات البصرية والأفكار اليومية. افتح لوحة نظيفة، اختر فرشاة ولونًا، وابدأ الرسم فورًا.
 
-تم تصميم التجربة لتكون خفيفة وسهلة حتى تركز على فكرتك.
+تبقى تجربة الرسم خفيفة وودية حتى تركز على اللحظة بدلًا من القوائم المعقدة.
 
 ✨ المزايا الرئيسية
 
-🎨 أدوات تناسب أسلوبك
-• قلم لخطوط واضحة
-• قلم تحديد لخطوط قوية
-• ممحاة للتعديل السريع
-• ألوان مائية وبخاخ لتأثيرات ناعمة
+🎨 10 فرش لكل مزاج
+• قلم، قلم رصاص، ماركر، فرشاة، قلم تمييز، وقلم حبر
+• ألوان شمعية، ألوان مائية، وبخاخ لأساليب أنعم وذات ملمس
+• ممحاة للتعديلات السريعة
 
-🖌️ تحكم بسيط
-• 16 لونًا جاهزًا للاستخدام
-• شريط حجم الفرشاة
-• خطوط ناعمة
-• تراجع وإعادة
+🖌️ أدوات تحكم إبداعية سهلة
+• 16 لونًا جاهزًا للاستخدام مع منتقي لون مخصص
+• شريط حجم الفرشاة وألوان خلفية اللوحة
+• رسم خطوط ناعم
+• تراجع وإعادة عندما تريد تعديل الرسم
+• الرسم فوق صورة من معرضك
 
-📤 مشاركة سهلة
-• شارك الرسومات عبر تطبيقات الرسائل أو التطبيقات الاجتماعية أو خيارات مشاركة Android
-• مناسب للملاحظات السريعة والأفكار والرسومات الخفيفة
+💾 احفظ وعد لاحقًا
+• احفظ في معرض الجهاز بصيغة PNG أو JPEG بدقة 1x أو 2x أو 3x
+• احتفظ بالرسومات في معرض الأعمال داخل التطبيق وافتحها في أي وقت لمتابعة الرسم
+• شارك الرسومات المكتملة عبر تطبيقات الرسائل أو التطبيقات الاجتماعية أو خيارات مشاركة Android الأخرى
 
-الرسم السهل — شاشة نظيفة كلما أردت الرسم.
+الرسم السهل — ارسمه، احفظه، وتابع من حيث توقفت متى أردت.

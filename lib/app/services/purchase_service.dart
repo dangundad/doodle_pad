@@ -52,6 +52,20 @@ class PurchaseService extends GetxService {
   @override
   void onInit() {
     super.onInit();
+    // Premium 캐시를 동기적으로 prime한다. AppBinding._ensureDependencyServices가
+    // 직후에 광고 매니저를 등록하기 때문에, async initialize 결과를 기다리면
+    // 캐시 Premium 사용자라도 첫 onInit에서 광고 매니저 loadAd가 슬쩍 통과한다.
+    // Hive get 자체는 sync 호출이므로 prime은 비용이 거의 없다.
+    try {
+      isPremium.value =
+          HiveService.to.getSetting<bool>(
+            HiveKeys.IS_PREMIUM,
+            defaultValue: false,
+          ) ??
+          false;
+    } catch (_) {
+      // 캐시 prime 실패는 무시. initialize가 다시 시도한다.
+    }
     unawaited(initialize());
   }
 
