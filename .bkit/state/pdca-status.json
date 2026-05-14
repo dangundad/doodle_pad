@@ -1,6 +1,6 @@
 {
   "version": "3.0",
-  "lastUpdated": "2026-05-08T00:00:00.000Z",
+  "lastUpdated": "2026-05-14T00:00:00.000Z",
   "activeFeatures": [],
   "primaryFeature": null,
   "features": {
@@ -11,6 +11,14 @@
       "startedAt": "2026-05-08T00:00:00.000Z",
       "archivedAt": "2026-05-08T00:00:00.000Z",
       "archivedTo": "docs/archive/2026-05/brush-overhaul/"
+    },
+    "competitor-improvements": {
+      "phase": "archived",
+      "matchRate": 99.6,
+      "iterationCount": 2,
+      "startedAt": "2026-05-14T00:00:00.000Z",
+      "archivedAt": "2026-05-14T00:00:00.000Z",
+      "archivedTo": "docs/archive/2026-05/competitor-improvements/"
     }
   },
   "pipeline": {
