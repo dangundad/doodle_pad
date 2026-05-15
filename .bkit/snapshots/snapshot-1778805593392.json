@@ -1,0 +1,55 @@
+{
+  "timestamp": "2026-05-15T00:39:53.389Z",
+  "reason": "compaction",
+  "status": {
+    "version": "3.0",
+    "lastUpdated": "2026-05-14T00:00:00.000Z",
+    "activeFeatures": [],
+    "primaryFeature": null,
+    "features": {
+      "brush-overhaul": {
+        "phase": "archived",
+        "matchRate": 95.5,
+        "iterationCount": 1,
+        "startedAt": "2026-05-08T00:00:00.000Z",
+        "archivedAt": "2026-05-08T00:00:00.000Z",
+        "archivedTo": "docs/archive/2026-05/brush-overhaul/"
+      },
+      "competitor-improvements": {
+        "phase": "archived",
+        "matchRate": 99.6,
+        "iterationCount": 2,
+        "startedAt": "2026-05-14T00:00:00.000Z",
+        "archivedAt": "2026-05-14T00:00:00.000Z",
+        "archivedTo": "docs/archive/2026-05/competitor-improvements/"
+      }
+    },
+    "pipeline": {
+      "currentPhase": 1,
+      "level": "Dynamic",
+      "phaseHistory": []
+    },
+    "session": {
+      "startedAt": "2026-03-16T05:47:38.420Z",
+      "onboardingCompleted": false,
+      "lastActivity": "2026-05-06T00:37:12.094Z"
+    },
+    "history": [],
+    "stateMachine": {
+      "defaultWorkflow": "default",
+      "activeWorkflows": {},
+      "totalTransitions": 0
+    },
+    "automation": {
+      "globalLevel": 2,
+      "trustScore": 40,
+      "pendingApprovals": 0,
+      "lastGateResult": null
+    },
+    "team": {
+      "enabled": true,
+      "stateFile": ".bkit/runtime/agent-state.json",
+      "eventsFile": ".bkit/runtime/agent-events.jsonl"
+    }
+  }
+}

@@ -2,7 +2,7 @@
 
 > 문서: `CLAUDE.md`
 > This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-> 최종 업데이트: 2026-05-13
+> 최종 업데이트: 2026-05-15
 > 기준: 현재 앱 저장소 스캔 + `C:\Flutter_WorkSpace\Flutter_Plan\AGENTS.md` 포트폴리오 상태표
 
 ## 프로젝트 요약
@@ -40,7 +40,7 @@ flutter run
 
 ## 현재 의존성 하이라이트
 - 기반: `get` ^4.7.3, `hive_ce` ^2.19.3, `hive_ce_flutter` ^2.3.4, `path_provider` ^2.1.5, `shared_preferences` ^2.5.5
-- 드로잉/이미지: `perfect_freehand` ^2.5.2, `image_picker` ^1.1.2, `flutter_colorpicker` ^1.1.0, `gal` ^2.3.1, `sensors_plus` ^7.0.0
+- 드로잉/이미지: `perfect_freehand` ^2.5.2, `image_picker` ^1.1.2, `flutter_colorpicker` ^1.1.0, `gal` ^2.3.2, `image` ^4.5.4, `sensors_plus` ^7.0.0
 - UI/UX: `flutter_screenutil` ^5.9.3, `flex_color_scheme` ^8.4.0, `google_fonts` ^8.1.0, `lucide_icons_flutter` ^3.1.13, `toastification` ^3.2.0
 - 수익화/운영: `google_mobile_ads` ^8.0.0, `gma_mediation_applovin` ^2.5.2, `gma_mediation_pangle` ^3.5.3, `gma_mediation_unity` ^1.6.5, `in_app_purchase` ^3.2.3, `in_app_purchase_android` ^0.4.0+10, `in_app_review` ^2.0.11, `rate_my_app` ^2.4.0, `firebase_core` ^4.8.0, `firebase_analytics` ^12.4.0, `firebase_crashlytics` ^5.2.1, `device_info_plus` ^13.1.0, `share_plus` ^13.1.0, `url_launcher` ^6.3.2, `vibration` ^3.1.8
 - 로컬라이제이션: `flutter_localizations` (SDK)
@@ -56,9 +56,12 @@ flutter run
 - `services`: `app_rating_service.dart`, `artwork_repository.dart`, `export_service.dart`, `hive_service.dart`, `purchase_service.dart`
 - 기능 중심 서비스: `artwork_repository` (작품 영속화 + 썸네일 IO)
 - `pages`: `draw`, `gallery`, `home`, `premium`, `settings`
+  - `pages/draw`: `draw_page.dart`
   - `pages/draw/widgets`: `canvas_painter.dart`, `save_options_sheet.dart`
   - `pages/gallery`: `gallery_binding.dart`, `gallery_page.dart`
+  - `pages/home`: `home_page.dart`
   - `pages/premium`: `premium_binding.dart`, `premium_page.dart`
+  - `pages/settings`: `settings_page.dart`
 - `widgets`: `exit_bottom_sheet.dart`
 - `mixins`: `shake_detector_mixin.dart`
 - `utils`: `app_constants.dart`, `app_toast.dart`, `share_file_cleanup.dart`
@@ -70,9 +73,10 @@ flutter run
 - `data/constants`: 없음
 - `data` 루트 파일: 없음
 - 진입점: `lib/main.dart` (Firebase / Hive 초기화 실패 시 `_StartupFailureScreen` fallback)
+- Firebase 설정: `lib/firebase_options.dart` (FlutterFire CLI 생성)
 - Hive 어댑터 레지스트라: `lib/hive_registrar.g.dart` (build_runner 생성, `HiveService.init`에서 `Hive.registerAdapters()` 호출)
 - `assets`: `fonts`, `images`
-- `tests`: `test/app/controllers/{setting,doodle,premium,gallery}_controller_test.dart`, `test/app/services/{purchase_service,export_service,artwork_repository}_test.dart`, `test/app/admob/{ads_helper,ads_loading}_test.dart`, `test/app/data/brushes/brush_presets_test.dart`, `test/app/helpers/fake_purchase_service.dart`, `test/app/pages/{draw,home,settings}/*_page_test.dart`, `test/app/pages/draw/widgets/save_options_sheet_test.dart`, `test/app/mixins/shake_detector_mixin_test.dart`, `test/app/theme/app_theme_test.dart`, `test/app/utils/{app_toast,share_file_cleanup}_test.dart`, `test/ui/no_gradient_usage_test.dart`, `test/widget_test.dart`
+- `tests`: `test/app/controllers/{setting,doodle,premium,gallery}_controller_test.dart`, `test/app/controllers/brush_type_persistence_test.dart`, `test/app/services/{purchase_service,export_service,artwork_repository}_test.dart`, `test/app/admob/{ads_helper,ads_loading}_test.dart`, `test/app/data/brushes/brush_presets_test.dart`, `test/app/helpers/fake_purchase_service.dart`, `test/app/bindings/app_binding_shake_order_test.dart`, `test/app/pages/{draw,home,settings}/*_page_test.dart`, `test/app/pages/gallery/gallery_page_test.dart`, `test/app/pages/draw/widgets/save_options_sheet_test.dart`, `test/app/mixins/shake_detector_mixin_test.dart`, `test/app/theme/app_theme_test.dart`, `test/app/utils/{app_toast,share_file_cleanup}_test.dart`, `test/translate_consistency_test.dart`, `test/ui/no_gradient_usage_test.dart`, `test/widget_test.dart`
 
 ## 문서 유지 규칙
 - 새 페이지나 바인딩을 추가하면 이 문서의 `pages`/`bindings` 요약도 함께 갱신합니다.
