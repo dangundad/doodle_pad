@@ -157,10 +157,8 @@ class _HomePageState extends State<HomePage>
       child: Scaffold(
         backgroundColor: cs.surface,
         appBar: AppBar(
-          elevation: 0,
           title: Text(
             'app_name'.tr,
-            style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w800),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
