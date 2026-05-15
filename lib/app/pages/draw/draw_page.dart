@@ -1056,19 +1056,39 @@ class _ColorSwatch extends StatelessWidget {
         width: selected ? 40.r : 32.r,
         height: selected ? 40.r : 32.r,
         margin: EdgeInsets.symmetric(
-          horizontal: 3.w,
+          horizontal: 4.w,
           vertical: selected ? 0 : 4.r,
         ),
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
+          // 선택 시 흰 링(inner) + primary 외곽선 + glow 그림자로 명확히 강조.
           border: Border.all(
             color: selected ? cs.primary : cs.outlineVariant,
-            width: selected ? 3 : 1,
+            width: selected ? 4 : 1,
           ),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: cs.primary.withValues(alpha: 0.45),
+                    blurRadius: 10,
+                    spreadRadius: 1,
+                  ),
+                ]
+              : null,
         ),
         child: selected
-            ? Icon(LucideIcons.check, size: 18.r, color: checkColor)
+            ? Container(
+                margin: EdgeInsets.all(2.r),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: checkColor.withValues(alpha: 0.9),
+                    width: 1.5,
+                  ),
+                ),
+                child: Icon(LucideIcons.check, size: 18.r, color: checkColor),
+              )
             : null,
       ),
     );
@@ -1100,7 +1120,7 @@ class _CustomColorSlot extends StatelessWidget {
         width: selected ? 40.r : 32.r,
         height: selected ? 40.r : 32.r,
         margin: EdgeInsets.symmetric(
-          horizontal: 3.w,
+          horizontal: 4.w,
           vertical: selected ? 0 : 4.r,
         ),
         decoration: BoxDecoration(
@@ -1108,8 +1128,17 @@ class _CustomColorSlot extends StatelessWidget {
           shape: BoxShape.circle,
           border: Border.all(
             color: selected ? cs.primary : cs.outline,
-            width: selected ? 3 : 1.5,
+            width: selected ? 4 : 1.5,
           ),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: cs.primary.withValues(alpha: 0.45),
+                    blurRadius: 10,
+                    spreadRadius: 1,
+                  ),
+                ]
+              : null,
         ),
         child: Icon(
           selected ? LucideIcons.check : LucideIcons.plus,
