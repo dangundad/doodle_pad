@@ -40,12 +40,13 @@
 - **flex_color_scheme**: Material 3 테마
 - **lucide_icons_flutter**: 아이콘
 - **gal**: 기기 갤러리 저장
-- **image**: JPEG 인코딩
+- **image**: PNG/JPEG 인코딩 (저장 해상도 선택)
 - **image_picker**: 참조 사진 선택
 - **sensors_plus**: 흔들어 지우기 감지
 - **share_plus**: 이미지 공유
 - **google_mobile_ads**: 배너 / 보상형 광고
 - **in_app_purchase**: Premium 구매 / 복원
+- **Firebase**: Analytics + Crashlytics
 
 ## 실행
 

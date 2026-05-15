@@ -15,7 +15,7 @@
 - `pubspec` 이름: `doodle_pad`
 - Android 패키지: `com.dangundad.doodlepad`
 - 버전: `1.0.0+1`
-- 핵심 기능: `perfect_freehand` 기반 자유 드로잉, 10종 브러시(펜/연필/마커/붓/형광펜/만년필/크레용/수채화/에어브러시/지우개), 갤러리 사진 위 드로잉, 실행취소, 공유, 보상형 광고 / Premium(광고 제거 + 프리미엄 브러시)
+- 핵심 기능: `perfect_freehand` 기반 자유 드로잉, 10종 브러시(펜/연필/마커/붓/형광펜/만년필/크레파스/수채화/에어브러시/지우개), 갤러리 사진 위 드로잉, 실행취소, 공유, 보상형 광고 / Premium(광고 제거 + 프리미엄 브러시)
 
 ## 공통 작업 원칙
 - 모든 텍스트 파일은 UTF-8로 유지하고, PowerShell에서 파일을 쓸 때는 `-Encoding UTF8`을 명시합니다.
@@ -30,7 +30,7 @@
 
 ## 빠른 명령어
 ```bash
-cd C:\Flutter_WorkSpace\doodle_pad
+cd C:\Github_WorkSpace\doodle_pad
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
 flutter analyze
@@ -52,9 +52,7 @@ flutter run
 - `bindings`: `app_binding.dart`
 - `routes`: `app_pages.dart`, `app_routes.dart`
 - `controllers`: `doodle_controller.dart`, `gallery_controller.dart`, `premium_controller.dart`, `setting_controller.dart`
-- 기능 중심 컨트롤러: `doodle_controller`, `gallery_controller`
-- `services`: `app_rating_service.dart`, `artwork_repository.dart`, `export_service.dart`, `hive_service.dart`, `purchase_service.dart`
-- 기능 중심 서비스: `artwork_repository` (작품 영속화 + 썸네일 IO)
+- `services`: `app_rating_service.dart`, `artwork_repository.dart` (작품 영속화 + 썸네일 IO), `export_service.dart`, `hive_service.dart`, `purchase_service.dart`
 - `pages`: `draw`, `gallery`, `home`, `premium`, `settings`
   - `pages/draw`: `draw_page.dart`
   - `pages/draw/widgets`: `canvas_painter.dart`, `save_options_sheet.dart`
@@ -69,14 +67,11 @@ flutter run
 - `theme`: `app_theme.dart`
 - `data/brushes`: `brush_preset.dart`, `brush_presets.dart`
 - `data/models`: `drawing.dart` (+ `drawing.g.dart` — `@HiveType` Drawing/SerializableStroke, build_runner 생성)
-- `data/enums`: 없음 (빈 디렉터리)
-- `data/constants`: 없음
-- `data` 루트 파일: 없음
 - 진입점: `lib/main.dart` (Firebase / Hive 초기화 실패 시 `_StartupFailureScreen` fallback)
 - Firebase 설정: `lib/firebase_options.dart` (FlutterFire CLI 생성)
 - Hive 어댑터 레지스트라: `lib/hive_registrar.g.dart` (build_runner 생성, `HiveService.init`에서 `Hive.registerAdapters()` 호출)
 - `assets`: `fonts`, `images`
-- `tests`: `test/app/controllers/{setting,doodle,premium,gallery}_controller_test.dart`, `test/app/controllers/brush_type_persistence_test.dart`, `test/app/services/{purchase_service,export_service,artwork_repository}_test.dart`, `test/app/admob/{ads_helper,ads_loading}_test.dart`, `test/app/data/brushes/brush_presets_test.dart`, `test/app/helpers/fake_purchase_service.dart`, `test/app/bindings/app_binding_shake_order_test.dart`, `test/app/pages/{draw,home,settings}/*_page_test.dart`, `test/app/pages/gallery/gallery_page_test.dart`, `test/app/pages/draw/widgets/save_options_sheet_test.dart`, `test/app/mixins/shake_detector_mixin_test.dart`, `test/app/theme/app_theme_test.dart`, `test/app/utils/{app_toast,share_file_cleanup}_test.dart`, `test/translate_consistency_test.dart`, `test/ui/no_gradient_usage_test.dart`, `test/widget_test.dart`
+- `test/`: `app/controllers/` (doodle·gallery·premium·setting·brush_type_persistence), `app/services/` (purchase·export·artwork_repository), `app/admob/`, `app/data/brushes/`, `app/bindings/` (app_binding_shake_order), `app/pages/{draw,gallery,home,settings}/`, `app/mixins/`, `app/theme/`, `app/utils/`, `app/helpers/fake_purchase_service.dart`, `translate_consistency_test.dart`, `ui/no_gradient_usage_test.dart`, `widget_test.dart`
 
 ## 문서 유지 규칙
 - 새 페이지나 바인딩을 추가하면 이 문서의 `pages`/`bindings` 요약도 함께 갱신합니다.
