@@ -508,17 +508,14 @@ class _TopToolbar extends StatelessWidget {
             SizedBox(height: 16.h),
             Obx(() {
               final current = ctrl.canvasColor.value;
-              return Wrap(
-                spacing: 12.w,
-                runSpacing: 12.h,
-                children: DoodleController.canvasColorPresets.map((c) {
-                  final selected = current == c;
-                  final color = Color(c);
-                  final luminance = color.computeLuminance();
-                  final checkColor = luminance > 0.6
-                      ? Colors.black
-                      : Colors.white;
-                  return GestureDetector(
+              final presets = DoodleController.canvasColorPresets;
+              final isPresetSelected = presets.contains(current);
+              final swatches = <Widget>[
+                for (final c in presets)
+                  _buildCanvasColorSwatch(
+                    cs: cs,
+                    colorValue: c,
+                    selected: current == c,
                     onTap: () {
                       if (settingCtrl.hapticEnabled.value) {
                         ctrl.hapticSelection();
@@ -526,34 +523,158 @@ class _TopToolbar extends StatelessWidget {
                       ctrl.setCanvasColor(c);
                       Get.back();
                     },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 150),
-                      width: 56.r,
-                      height: 56.r,
-                      decoration: BoxDecoration(
-                        color: color,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: selected ? cs.primary : cs.outlineVariant,
-                          width: selected ? 3 : 1,
-                        ),
-                      ),
-                      child: selected
-                          ? Icon(
-                              LucideIcons.check,
-                              size: 22.r,
-                              color: checkColor,
-                            )
-                          : null,
-                    ),
-                  );
-                }).toList(),
+                  ),
+                _buildCanvasCustomSlot(
+                  cs: cs,
+                  customColor: isPresetSelected ? null : current,
+                  selected: !isPresetSelected,
+                  onTap: () => _openCanvasCustomColorPicker(
+                    context,
+                    settingCtrl,
+                  ),
+                ),
+              ];
+              return Wrap(
+                spacing: 12.w,
+                runSpacing: 12.h,
+                children: swatches,
               );
             }),
           ],
         ),
       ),
       isScrollControlled: false,
+    );
+  }
+
+  Widget _buildCanvasColorSwatch({
+    required ColorScheme cs,
+    required int colorValue,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    final color = Color(colorValue);
+    final luminance = color.computeLuminance();
+    final checkColor = luminance > 0.6 ? Colors.black : Colors.white;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        width: 56.r,
+        height: 56.r,
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: selected ? cs.primary : cs.outlineVariant,
+            width: selected ? 3 : 1,
+          ),
+        ),
+        child: selected
+            ? Icon(LucideIcons.check, size: 22.r, color: checkColor)
+            : null,
+      ),
+    );
+  }
+
+  /// 캔버스 배경에 사용할 커스텀 색상 슬롯.
+  /// 현재 캔버스 색상이 프리셋에 없으면 그 색상을 미리보기로 표시한다.
+  Widget _buildCanvasCustomSlot({
+    required ColorScheme cs,
+    required int? customColor,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    final hasCustom = customColor != null;
+    final color = hasCustom ? Color(customColor) : cs.surfaceContainerHigh;
+    final luminance = color.computeLuminance();
+    final fgColor = luminance > 0.6 ? Colors.black : Colors.white;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        width: 56.r,
+        height: 56.r,
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: selected ? cs.primary : cs.outline,
+            width: selected ? 3 : 1.5,
+          ),
+        ),
+        child: Icon(
+          selected ? LucideIcons.check : LucideIcons.plus,
+          size: 22.r,
+          color: hasCustom ? fgColor : cs.onSurfaceVariant,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openCanvasCustomColorPicker(
+    BuildContext context,
+    SettingController settingCtrl,
+  ) async {
+    if (settingCtrl.hapticEnabled.value) {
+      ctrl.hapticSelection();
+    }
+    final cs = Get.theme.colorScheme;
+    Color picked = Color(ctrl.canvasColor.value);
+
+    await Get.dialog(
+      Dialog(
+        backgroundColor: cs.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 12.h),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'pick_color'.tr,
+                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
+              ),
+              SizedBox(height: 12.h),
+              ColorPicker(
+                pickerColor: picked,
+                onColorChanged: (c) => picked = c,
+                enableAlpha: false,
+                labelTypes: const [],
+                pickerAreaHeightPercent: 0.6,
+                displayThumbColor: true,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: Get.back,
+                      child: Text('cancel'.tr),
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () {
+                        // 알파 채널은 항상 0xFF 로 강제.
+                        // ignore: deprecated_member_use
+                        final argb = picked.value | 0xFF000000;
+                        ctrl.setCanvasColor(argb);
+                        // bottomSheet 도 닫는다 (다이얼로그 -> 시트 순).
+                        Get.back();
+                        if (Get.isBottomSheetOpen ?? false) Get.back();
+                      },
+                      child: Text('confirm'.tr),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
