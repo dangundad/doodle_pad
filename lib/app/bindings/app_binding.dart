@@ -16,6 +16,25 @@ class AppBinding implements Bindings {
   static const List<String> _legacyBoxNames = ['phase1_activity_log'];
   static const String _legacyPurgeFlagKey = 'legacy_boxes_purged_v1';
   static const String _settingsBoxName = 'doodle_settings_v1';
+  // Item 3: 첫 실행에서만 HomePage(=온보딩) 노출.
+  // 이후 실행은 DrawPage로 직진입한다.
+  static const String _onboardingSeenKey = 'onboarding_seen_v1';
+
+  /// 사용자가 한 번이라도 그리기 화면에 진입했는지 여부.
+  /// HiveService 초기화 이후에 호출해야 한다. 박스가 열려있지 않으면 false 반환.
+  static bool isOnboardingSeen() {
+    if (!Hive.isBoxOpen(_settingsBoxName)) return false;
+    final box = Hive.box(_settingsBoxName);
+    return box.get(_onboardingSeenKey) == true;
+  }
+
+  /// 그리기 화면 최초 진입 시 호출. 이후 실행에서 INITIAL을 DrawPage로 라우팅한다.
+  static Future<void> markOnboardingSeen() async {
+    if (!Hive.isBoxOpen(_settingsBoxName)) return;
+    final box = Hive.box(_settingsBoxName);
+    if (box.get(_onboardingSeenKey) == true) return;
+    await box.put(_onboardingSeenKey, true);
+  }
 
   static Future<void> initializeCoreServices() async {
     if (!Get.isRegistered<HiveService>()) {

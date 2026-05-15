@@ -195,7 +195,8 @@ void main() {
     await tester.pumpWidget(const _AppShell(home: DrawPage()));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('Back'));
+    // Item 3: DRAW의 leading은 'Home' 아이콘이지만 동일하게 discard 확인 다이얼로그를 띄운다.
+    await tester.tap(find.byTooltip('Home'));
     await tester.pumpAndSettle();
 
     expect(find.text('Discard drawing?'), findsOneWidget);

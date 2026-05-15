@@ -10,7 +10,9 @@ import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/data/brushes/brush_presets.dart';
 import 'package:doodle_pad/app/pages/draw/widgets/canvas_painter.dart';
 import 'package:doodle_pad/app/pages/draw/widgets/save_options_sheet.dart';
+import 'package:doodle_pad/app/routes/app_pages.dart';
 import 'package:doodle_pad/app/services/export_service.dart';
+import 'package:doodle_pad/app/widgets/exit_bottom_sheet.dart';
 
 class DrawPage extends GetView<DoodleController> {
   const DrawPage({super.key});
@@ -126,8 +128,13 @@ class DrawPage extends GetView<DoodleController> {
           controller,
           settingCtrl,
         );
-        if (shouldPop) {
-          controller.clearCanvas();
+        if (!shouldPop) return;
+        controller.clearCanvas();
+        // Item 3: DRAW가 루트인 경우(=온보딩 이후) 시스템 백은 ExitBottomSheet.
+        // 그 외는 일반 Get.back() — 호환을 위해 분기.
+        if (Get.previousRoute.isEmpty) {
+          ExitBottomSheet.show();
+        } else {
           Get.back();
         }
       },
@@ -283,19 +290,25 @@ class _TopToolbar extends StatelessWidget {
         return Row(
           children: [
             IconButton(
-              icon: const Icon(LucideIcons.arrowLeft),
+              // Item 3: DRAW가 루트가 되었으므로 leading은 홈 진입점.
+              // 설정/갤러리/프리미엄은 HomePage를 거쳐 이동한다.
+              icon: const Icon(LucideIcons.house),
               onPressed: () async {
                 _maybeHaptic(settingCtrl);
                 final shouldPop = await DrawPage._confirmDiscardIfNeeded(
                   ctrl,
                   settingCtrl,
                 );
-                if (shouldPop) {
-                  ctrl.clearCanvas();
+                if (!shouldPop) return;
+                ctrl.clearCanvas();
+                if (Get.previousRoute.isEmpty) {
+                  // 스택 교체 — Home으로 이동해도 다시 Draw로 돌아오게 한다.
+                  await Get.offAllNamed(Routes.HOME);
+                } else {
                   Get.back();
                 }
               },
-              tooltip: 'back'.tr,
+              tooltip: 'home'.tr,
             ),
             Expanded(
               child: SingleChildScrollView(

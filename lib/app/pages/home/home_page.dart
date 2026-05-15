@@ -6,6 +6,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:doodle_pad/app/admob/ads_banner.dart';
 import 'package:doodle_pad/app/admob/ads_helper.dart';
+import 'package:doodle_pad/app/bindings/app_binding.dart';
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/data/models/drawing.dart';
@@ -25,7 +26,9 @@ Future<void> _enterDrawing(SettingController settingCtrl) async {
 
   if (!ctrl.hasDrawableContent) {
     ctrl.clearCanvas();
-    await Get.toNamed(Routes.DRAW);
+    // Item 3: 온보딩 완료 표시 + 스택 교체 — 이후 back은 ExitBottomSheet로 흐른다.
+    await AppBinding.markOnboardingSeen();
+    await Get.offAllNamed(Routes.DRAW);
     return;
   }
 
@@ -100,7 +103,9 @@ Future<void> _enterDrawing(SettingController settingCtrl) async {
   if (!continueExisting) {
     ctrl.clearCanvas();
   }
-  await Get.toNamed(Routes.DRAW);
+  // Item 3: 온보딩 완료 표시 + 스택 교체.
+  await AppBinding.markOnboardingSeen();
+  await Get.offAllNamed(Routes.DRAW);
 }
 
 class HomePage extends StatefulWidget {
