@@ -6,7 +6,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/services/export_service.dart';
 
-/// 갤러리 저장 시 해상도/포맷을 선택하는 BottomSheet.
+/// 갤러리 저장 시 포맷을 선택하는 BottomSheet.
 /// Design Ref: §5.2 — 마지막 선택은 SettingController에 persist.
 class SaveOptionsSheet extends StatefulWidget {
   const SaveOptionsSheet({
@@ -16,7 +16,7 @@ class SaveOptionsSheet extends StatefulWidget {
     required this.onConfirm,
   });
 
-  final int initialResolution; // 1 / 2 / 3
+  final int initialResolution; // controller persisted (UI hidden)
   final ExportImageFormat initialFormat;
 
   /// 사용자가 "저장" 누르면 호출. 시트 닫힘은 호출자가 책임진다.
@@ -48,13 +48,11 @@ class SaveOptionsSheet extends StatefulWidget {
 }
 
 class _SaveOptionsSheetState extends State<SaveOptionsSheet> {
-  late int _resolution;
   late ExportImageFormat _format;
 
   @override
   void initState() {
     super.initState();
-    _resolution = widget.initialResolution;
     _format = widget.initialFormat;
   }
 
@@ -88,20 +86,10 @@ class _SaveOptionsSheetState extends State<SaveOptionsSheet> {
           ),
           SizedBox(height: 16.h),
           Text(
-            'save_resolution_label'.tr,
-            style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
-          ),
-          SizedBox(height: 6.h),
-          _ResolutionPicker(
-            current: _resolution,
-            onChanged: (v) => setState(() => _resolution = v),
-          ),
-          SizedBox(height: 16.h),
-          Text(
             'save_format_label'.tr,
             style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
           ),
-          SizedBox(height: 6.h),
+          SizedBox(height: 8.h),
           _FormatPicker(
             current: _format,
             onChanged: (f) => setState(() => _format = f),
@@ -121,7 +109,7 @@ class _SaveOptionsSheetState extends State<SaveOptionsSheet> {
                   icon: Icon(LucideIcons.download, size: 16.r),
                   label: Text('save'.tr),
                   onPressed: () {
-                    widget.onConfirm(_resolution, _format);
+                    widget.onConfirm(widget.initialResolution, _format);
                     Get.back();
                   },
                 ),
@@ -134,43 +122,8 @@ class _SaveOptionsSheetState extends State<SaveOptionsSheet> {
   }
 }
 
-class _ResolutionPicker extends StatelessWidget {
-  const _ResolutionPicker({required this.current, required this.onChanged});
-
-  final int current;
-  final ValueChanged<int> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: const [1, 2, 3].map((value) {
-        final selected = current == value;
-        return RadioListTile<int>(
-          dense: true,
-          contentPadding: EdgeInsets.zero,
-          value: value,
-          // ignore: deprecated_member_use — v3.32 RadioGroup 마이그레이션은 별도 작업.
-          groupValue: current,
-          // ignore: deprecated_member_use
-          onChanged: (v) {
-            if (v != null) onChanged(v);
-          },
-          title: Text(
-            value == 1
-                ? 'save_resolution_1x'.tr
-                : value == 2
-                ? 'save_resolution_2x'.tr
-                : 'save_resolution_3x'.tr,
-            style: TextStyle(
-              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
+/// 포맷 선택: 두 버튼이 바텀시트 가로폭을 균등 분할해 채운다.
+/// Design Ref: §5.2 — 큰 탭 타깃으로 한 손 조작 시 오선택을 줄인다.
 class _FormatPicker extends StatelessWidget {
   const _FormatPicker({required this.current, required this.onChanged});
 
@@ -179,21 +132,86 @@ class _FormatPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SegmentedButton<ExportImageFormat>(
-      segments: [
-        ButtonSegment(
-          value: ExportImageFormat.png,
-          label: Text('save_format_png'.tr),
+    return Row(
+      children: [
+        Expanded(
+          child: _FormatOption(
+            label: 'save_format_png'.tr,
+            icon: LucideIcons.fileImage,
+            selected: current == ExportImageFormat.png,
+            onTap: () => onChanged(ExportImageFormat.png),
+          ),
         ),
-        ButtonSegment(
-          value: ExportImageFormat.jpeg,
-          label: Text('save_format_jpeg'.tr),
+        SizedBox(width: 10.w),
+        Expanded(
+          child: _FormatOption(
+            label: 'save_format_jpeg'.tr,
+            icon: LucideIcons.image,
+            selected: current == ExportImageFormat.jpeg,
+            onTap: () => onChanged(ExportImageFormat.jpeg),
+          ),
         ),
       ],
-      selected: {current},
-      onSelectionChanged: (s) {
-        if (s.isNotEmpty) onChanged(s.first);
-      },
+    );
+  }
+}
+
+class _FormatOption extends StatelessWidget {
+  const _FormatOption({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Get.theme.colorScheme;
+    return Material(
+      color: selected ? cs.primaryContainer : cs.surfaceContainerLow,
+      borderRadius: BorderRadius.circular(14.r),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14.r),
+        onTap: onTap,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14.r),
+            border: Border.all(
+              color: selected ? cs.primary : cs.outlineVariant,
+              width: selected ? 2 : 1,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 18.r,
+                color: selected ? cs.primary : cs.onSurfaceVariant,
+              ),
+              SizedBox(width: 8.w),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w700,
+                    color: selected ? cs.onPrimaryContainer : cs.onSurface,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

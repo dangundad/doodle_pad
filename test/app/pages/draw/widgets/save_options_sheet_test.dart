@@ -20,7 +20,7 @@ Widget _harness(Widget child) {
 }
 
 void main() {
-  testWidgets('초기 prefill: 2x + PNG가 선택 상태로 렌더된다', (tester) async {
+  testWidgets('포맷 옵션과 Save 버튼이 표시된다', (tester) async {
     await tester.pumpWidget(
       _harness(
         SaveOptionsSheet(
@@ -32,11 +32,6 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // 2x 라디오는 선택, 1x/3x는 미선택
-    expect(find.text('1x  Standard'), findsOneWidget);
-    expect(find.text('2x  HD'), findsOneWidget);
-    expect(find.text('3x  Ultra HD'), findsOneWidget);
-
     // PNG/JPEG 토글 라벨 존재
     expect(find.text('PNG'), findsOneWidget);
     expect(find.text('JPEG'), findsOneWidget);
@@ -45,7 +40,9 @@ void main() {
     expect(find.text('Save'), findsOneWidget);
   });
 
-  testWidgets('Save 누르면 onConfirm에 현재 선택값이 전달된다', (tester) async {
+  testWidgets('Save 누르면 onConfirm에 현재 포맷과 prefill 해상도가 전달된다', (
+    tester,
+  ) async {
     int? capturedResolution;
     ExportImageFormat? capturedFormat;
 
@@ -63,10 +60,6 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // 3x로 변경
-    await tester.tap(find.text('3x  Ultra HD'));
-    await tester.pumpAndSettle();
-
     // JPEG로 변경
     await tester.tap(find.text('JPEG'));
     await tester.pumpAndSettle();
@@ -75,7 +68,8 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'Save'));
     await tester.pumpAndSettle();
 
-    expect(capturedResolution, 3);
+    // 해상도는 prefill 값을 그대로 콜백에 전달한다 (UI는 제거됨).
+    expect(capturedResolution, 2);
     expect(capturedFormat, ExportImageFormat.jpeg);
   });
 }
