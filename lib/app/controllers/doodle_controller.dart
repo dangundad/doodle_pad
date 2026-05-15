@@ -595,6 +595,54 @@ class DoodleController extends GetxController
     _currentStroke = null;
   }
 
+  /// 진행 중인 스트로크를 즉시 제거한다.
+  /// 한 손가락 그리기 도중 두 번째 손가락이 내려와 핀치 줌으로 전환될 때
+  /// 의도하지 않은 선분을 캔버스에서 지우는 용도.
+  void cancelCurrentStroke() {
+    if (_currentStroke == null) return;
+    strokes.remove(_currentStroke);
+    _currentStroke = null;
+  }
+
+  // 핀치 줌(2손가락) 상태 — 그리기와 동일한 GestureDetector에서 onScale*로 처리한다.
+  // InteractiveViewer의 ScaleGestureRecognizer는 자식 GestureDetector와의
+  // 아레나 경쟁에서 항상 패배하므로, 핀치를 우리가 직접 transformController에 적용한다.
+  Matrix4? _pinchBaseMatrix;
+  Offset _pinchBaseFocal = Offset.zero;
+  double _pinchMinScale = 0.5;
+  double _pinchMaxScale = 5.0;
+
+  bool get isPinching => _pinchBaseMatrix != null;
+
+  void beginPinch(Offset focal, {double minScale = 0.5, double maxScale = 5.0}) {
+    _pinchBaseMatrix = transformController.value.clone();
+    _pinchBaseFocal = focal;
+    _pinchMinScale = minScale;
+    _pinchMaxScale = maxScale;
+  }
+
+  void updatePinch(double scale, Offset focal) {
+    final base = _pinchBaseMatrix;
+    if (base == null) return;
+    // 현재 누적 스케일 한도 확인 — base에 이미 적용된 scale × 새로운 scale 이
+    // [min, max] 안에 들도록 클램프.
+    final baseScale = base.getMaxScaleOnAxis();
+    final targetTotalScale = (baseScale * scale).clamp(
+      _pinchMinScale,
+      _pinchMaxScale,
+    );
+    final clampedScale = baseScale == 0 ? scale : targetTotalScale / baseScale;
+    final translation = focal - _pinchBaseFocal;
+    final m = Matrix4.identity()
+      ..translateByDouble(translation.dx, translation.dy, 0, 1)
+      ..scaleByDouble(clampedScale, clampedScale, 1, 1);
+    transformController.value = m * base;
+  }
+
+  void endPinch() {
+    _pinchBaseMatrix = null;
+  }
+
   void undo() {
     if (strokes.isEmpty) return;
     final stroke = strokes.removeLast();

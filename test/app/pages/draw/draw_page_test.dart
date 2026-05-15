@@ -148,9 +148,11 @@ void main() {
     final viewer = tester.widget<InteractiveViewer>(
       find.byType(InteractiveViewer),
     );
-    // panEnabled=false라야 한 손가락 그리기가 GestureDetector로 전달된다.
+    // Item 7 회귀 가드: 자식 GestureDetector가 onScale*로 그리기·핀치를 함께
+    // 처리하므로 InteractiveViewer 자체 제스처(pan/scale)는 모두 비활성.
+    // transformController에 대한 매트릭스 적용은 컨트롤러가 직접 수행한다.
     expect(viewer.panEnabled, isFalse);
-    expect(viewer.scaleEnabled, isTrue);
+    expect(viewer.scaleEnabled, isFalse);
     expect(viewer.minScale, 0.5);
     expect(viewer.maxScale, 5.0);
   });

@@ -149,25 +149,52 @@ class DrawPage extends GetView<DoodleController> {
             Positioned.fill(
               child: InteractiveViewer(
                 transformationController: controller.transformController,
-                // panEnabled=false: 한 손가락 pan은 InteractiveViewer가 거부 →
-                // 아래 GestureDetector가 그리기 제스처를 잡는다.
+                // 자식 GestureDetector가 onScale*로 그리기/핀치를 모두 처리한다.
+                // Flutter 제스처 아레나에서 자식 ScaleGestureRecognizer가
+                // 부모 InteractiveViewer의 그것을 이기기 때문에 부모는
+                // transformController의 적용만 담당하고 자체 제스처는 모두 끈다.
                 panEnabled: false,
-                scaleEnabled: true,
+                scaleEnabled: false,
                 minScale: 0.5,
                 maxScale: 5.0,
                 child: RepaintBoundary(
                   key: controller.canvasKey,
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
-                    onPanStart: (d) {
-                      if (settingCtrl.hapticEnabled.value) {
-                        controller.hapticSelection();
+                    onScaleStart: (d) {
+                      if (d.pointerCount >= 2) {
+                        // 두 손가락: 핀치 시작. 진행 중 스트로크는 취소.
+                        controller.cancelCurrentStroke();
+                        controller.beginPinch(d.localFocalPoint);
+                      } else {
+                        if (settingCtrl.hapticEnabled.value) {
+                          controller.hapticSelection();
+                        }
+                        controller.startStroke(d.localFocalPoint);
                       }
-                      controller.startStroke(d.localPosition);
                     },
-                    onPanUpdate: (d) =>
-                        controller.continueStroke(d.localPosition),
-                    onPanEnd: (_) => controller.endStroke(),
+                    onScaleUpdate: (d) {
+                      if (d.pointerCount >= 2) {
+                        // 단일 → 멀티 전환: 그리던 선을 지우고 핀치 모드로.
+                        if (!controller.isPinching) {
+                          controller.cancelCurrentStroke();
+                          controller.beginPinch(d.localFocalPoint);
+                        }
+                        controller.updatePinch(d.scale, d.localFocalPoint);
+                      } else {
+                        // 멀티 → 단일 전환 중에는 그리기를 재개하지 않는다
+                        // (사용자가 핀치를 끝내며 한 손가락이 먼저 떨어진 직후).
+                        if (controller.isPinching) return;
+                        controller.continueStroke(d.localFocalPoint);
+                      }
+                    },
+                    onScaleEnd: (_) {
+                      if (controller.isPinching) {
+                        controller.endPinch();
+                      } else {
+                        controller.endStroke();
+                      }
+                    },
                     // Plan FR-04: 더블탭 시 Fit-to-screen으로 복귀.
                     onDoubleTap: () {
                       if (settingCtrl.hapticEnabled.value) {
