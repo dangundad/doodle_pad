@@ -876,7 +876,11 @@ class DoodleController extends GetxController
       }
 
       final serial = strokes.map(_serializeStroke).toList();
-      final id = 'artwork_${DateTime.now().millisecondsSinceEpoch}';
+      // timestamp 단독은 빠른 연속 저장 시 ms 단위 충돌 가능 → random suffix로 안전화.
+      final suffix = (math.Random().nextInt(1 << 20))
+          .toRadixString(36)
+          .padLeft(4, '0');
+      final id = 'artwork_${DateTime.now().millisecondsSinceEpoch}_$suffix';
       final repo = repository ?? ArtworkRepository.instance;
       try {
         final saved = await repo.save(

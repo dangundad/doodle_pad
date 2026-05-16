@@ -128,11 +128,41 @@ class GalleryPage extends GetView<GalleryController> {
     if (settings.hapticEnabled.value) {
       DoodleController.to.hapticSelection();
     }
+
+    // 현재 캔버스에 작업물이 있으면 사용자 명시 확인 없이 덮어쓰지 않는다.
+    // 홈 진입의 "이어 그리기 / 새로 시작" 다이얼로그와 같은 손실 방어 원칙.
+    final ctrl = DoodleController.to;
+    if (ctrl.hasDrawableContent) {
+      final proceed = await Get.dialog<bool>(
+        AlertDialog(
+          title: Text('continue_or_new_title'.tr),
+          content: Text(
+            'continue_or_new_desc'.tr,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(result: false),
+              child: Text('cancel'.tr),
+            ),
+            FilledButton(
+              onPressed: () => Get.back(result: true),
+              child: Text('confirm'.tr),
+            ),
+          ],
+        ),
+        barrierDismissible: true,
+      );
+      if (proceed != true) return;
+      if (!context.mounted) return;
+    }
+
     // Design Ref: §6.2 — 재오픈 시 현재 화면 크기를 viewport로 전달해
     // 저장 시점과 비율이 다른 기기/회전에서도 letterbox 스케일로 좌표를 흡수한다.
     // DrawPage 캔버스는 Positioned.fill이므로 화면 크기를 근사값으로 사용.
     final viewport = MediaQuery.sizeOf(context);
-    DoodleController.to.loadArtwork(artwork, viewport: viewport);
+    ctrl.loadArtwork(artwork, viewport: viewport);
     await Get.toNamed(Routes.DRAW);
   }
 
