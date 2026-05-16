@@ -96,10 +96,15 @@ Future<void> _enterDrawing(SettingController settingCtrl) async {
         ),
       ),
     ),
-    barrierDismissible: false,
+    // 사용자가 결정을 보류하고 싶을 때 바깥 탭/뒤로 가기로 다이얼로그를 닫을 수 있도록 허용.
+    // 닫힌 경우(continueExisting == null) 진입 흐름을 안전하게 취소한다.
+    barrierDismissible: true,
   );
 
-  if (continueExisting == null) return;
+  if (continueExisting == null) {
+    // 사용자가 다이얼로그를 닫음 — 현재 작품과 화면 상태를 그대로 유지하고 진입 취소.
+    return;
+  }
   if (!continueExisting) {
     ctrl.clearCanvas();
   }

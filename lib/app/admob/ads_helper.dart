@@ -221,8 +221,18 @@ class AdHelper {
   static String _configuredReleaseAdUnit({
     required String envValue,
     String? override,
+    String? slot,
   }) {
-    return (override ?? envValue).trim();
+    final resolved = (override ?? envValue).trim();
+    if (resolved.isEmpty) {
+      // 릴리스 빌드인데 DOODLE_PAD_ADMOB_* 환경변수가 비어 있으면
+      // 광고가 조용히 실패한다. CI/CD에서 환경변수 주입 누락을 즉시 발견할 수 있도록 경고.
+      debugPrint(
+        'AdHelper: release ad unit id is empty for slot=${slot ?? 'unknown'}. '
+        'Did you forget to pass --dart-define=DOODLE_PAD_ADMOB_* at build time?',
+      );
+    }
+    return resolved;
   }
 
   static String get bannerAdUnitId {
@@ -232,6 +242,7 @@ class AdHelper {
           : _configuredReleaseAdUnit(
               envValue: _bannerAdUnitIdAndroidEnv,
               override: releaseBannerAdUnitIdAndroidOverride,
+              slot: 'banner-android',
             );
     } else if (_targetPlatform == TargetPlatform.iOS) {
       return _isDebugMode
@@ -249,6 +260,7 @@ class AdHelper {
           : _configuredReleaseAdUnit(
               envValue: _interstitialAdUnitIdAndroidEnv,
               override: releaseInterstitialAdUnitIdAndroidOverride,
+              slot: 'interstitial-android',
             );
     } else if (_targetPlatform == TargetPlatform.iOS) {
       return _isDebugMode ? 'ca-app-pub-3940256099942544/4411468910' : '';
@@ -264,6 +276,7 @@ class AdHelper {
           : _configuredReleaseAdUnit(
               envValue: _rewardedAdUnitIdAndroidEnv,
               override: releaseRewardedAdUnitIdAndroidOverride,
+              slot: 'rewarded-android',
             );
     } else if (_targetPlatform == TargetPlatform.iOS) {
       return _isDebugMode ? 'ca-app-pub-3940256099942544/1712485313' : '';
