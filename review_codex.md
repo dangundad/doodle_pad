@@ -425,3 +425,40 @@ Android 우선 프로젝트라 출시 차단은 아니지만, `APP_STORE_ID = '0
 4. README/스토어 문서를 실제 기능 기준으로 정리.
 
 이 네 가지를 끝내면 Doodle Pad는 “빠르게 그리고, 저장하고, 다시 열고, 공유하는 캐주얼 드로잉 앱”으로 더 정직하게 출시할 수 있다.
+
+---
+
+## 11. Sprint 처리 결과 (2026-05-16 결산)
+
+> 본 리뷰 발견을 `pre-release-followup` sprint로 처리한 결과 추적. 리뷰 작성(2026-05-14)부터 이 결산까지의 약 2일 사이 코드가 진화했다.
+
+### P0 / P1 / P2 항목 대조
+
+| Codex ID | 항목 | 현 상태 | 근거 |
+|----------|------|---------|------|
+| P0 | `shake_to_clear` 바인딩 순서 | ✅ **이미 수정됨** | `app_binding.dart:98-122` `_ensureDependencyServices()` 에서 `SettingController`를 `DoodleController` **전에** 등록, 명시 주석 포함 |
+| P0 | `gallery_page_test.dart` hang | ✅ **이미 안정화됨** | `runAsync`로 FakeAsync 회피 (`test/app/pages/gallery/gallery_page_test.dart:94`). 현 환경 94/94 통과 |
+| P1 | JPEG 가짜 인코딩 | ✅ **이미 수정됨** | `export_service.dart:166-181` `image` 패키지로 실제 JPEG 인코딩 (quality=92) |
+| P1 | Premium 광고 매니저 race | ✅ **이미 수정됨** | `ads_rewarded.dart:36-41`, `ads_interstitial.dart:35-40` `loadAd()` 진입부에 `PurchaseService.isPremiumActive` 가드 |
+| P1 | 참조 이미지 영속 복사 누락 | ✅ **이미 수정됨** | `artwork_repository.dart:68-85` `_persistReferenceImage()` + 삭제 시 references 디렉터리만 정리 |
+| P1 | README / 스토어 문서 불일치 | ✅ **이미 갱신됨** | `README.md` 10종 브러시·갤러리·참조 사진 복사·history/stats 부재 명시. `docs/store/*` 4종 모두 동기화 완료 |
+| P2 | 작품 저장 중복 클릭 가드 | ✅ **이미 수정됨** | `doodle_controller.dart` `isSavingArtwork` RxBool 활용, `draw_page.dart:431-448` UI disable |
+| P2 | iOS placeholder + 미사용 매니저 | ✅ 직전 sprint 처리 | `app_constants.dart:55-57` iOS-only 정책 주석, 커밋 `9e2418c` |
+| 권장 | 갤러리 진입 시 작품 손실 방어 | ✅ **본 sprint F1** | `gallery_page.dart` `_openArtwork` 확인 다이얼로그 추가, 커밋 `0025af2` |
+| 권장 | 작품 ID timestamp 단독 충돌 | ✅ **본 sprint F2** | `doodle_controller.dart:879-883` base36 4자리 random suffix, 커밋 `0025af2` |
+
+### 정량 결과
+
+- **본 sprint 실수정**: 2건 (F1, F2). 나머지는 모두 사전 처리 완료된 항목을 검증한 결과.
+- **flutter analyze**: 0 issue
+- **flutter test**: 94/94 PASS (Codex 환경에서 보고된 hang은 본 환경에서 재현되지 않음)
+- **배포 판단**: 🟢 1.0.0 출시 안전
+
+### 메타 인사이트 — 두 AI 리뷰 교차 검증의 가치
+
+- Codex는 **동적 동작 추론(바인딩 순서, 가짜 인코딩, race condition)** 에 강했고, Claude 리뷰가 놓친 진짜 P0/P1 버그를 정확히 짚었다.
+- Claude 리뷰는 **정적 패턴 감사(스토어 ID TODO, env fallback 추정)** 에 강했지만 false positive 비율이 더 높았다.
+- 두 리뷰가 서로 보완 관계로 작용해, 코드의 진짜 상태(이미 견고)를 확인하는 효과가 컸다.
+- 정적 리뷰는 항상 "리뷰 시점 코드"를 가리키므로, 후속 작업 전에 현재 코드와의 차이를 먼저 확인하는 것이 효율적이다.
+
+상세: `docs/04-report/sprints/pre-release-followup/report.md`

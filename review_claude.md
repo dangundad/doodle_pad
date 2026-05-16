@@ -201,3 +201,37 @@
 다만 **수익화(영수증 검증·테스트 광고 ID 폴백)**, **버전 관리(local.properties 기본값)**, **iOS App Store ID TODO** 세 영역은 정책 위반 또는 운영 사고로 직결되는 위험이므로 위 Blocker 5건을 해결한 뒤 제출하시기 바랍니다. UI/UX Blocker 2건(홈 다이얼로그 탈출, 설정 삭제 후 상태)은 사용자 신뢰와 직결되므로 함께 처리 권장합니다.
 
 Major 항목은 1.0.0 직후 1.0.1 핫픽스로 단계 분할이 가능합니다.
+
+---
+
+## 7. Sprint 처리 결과 (2026-05-16 결산)
+
+> 본 리뷰 발견을 `pre-release-audit` + `pre-release-followup` 두 sprint로 처리한 결과 추적.
+
+### Blocker 5건 처리 결과
+
+| ID | 항목 | Sprint | 결과 | 근거 커밋/파일 |
+|----|------|--------|------|----------------|
+| B1 | iOS App Store ID 입력 | pre-release-audit | ✅ 정책 명시 주석 (Android-first, 런타임 영향 없음) | `app_constants.dart:55-57`, 커밋 `9e2418c` |
+| B2 | AdMob 환경변수 폴백 차단 | pre-release-audit | ⚠️ **false positive 부분 확인** — 릴리스 모드는 테스트 ID 폴백 안 함. 대신 빈 env 경고 로그 추가 | `ads_helper.dart:221-237`, 커밋 `9e2418c` |
+| B3 | local.properties 버전 동기화 | pre-release-audit | ⚠️ **false positive** — 실제 값은 이미 pubspec과 일치. 정책 주석만 추가 | `android/local.properties`, 커밋 `9e2418c` |
+| B4 | HomePage 다이얼로그 탈출 허용 | pre-release-audit | ✅ `barrierDismissible: true` + 명시적 취소 핸들링 | `home_page.dart:99-108`, 커밋 `9e2418c` |
+| B5 | 설정 데이터 삭제 후 일관성 | pre-release-audit | ⚠️ **false positive** — `clearAppSettings()` 이미 컨트롤러 재초기화·로케일 복원 완비 | 검증만, 변경 없음 |
+
+### Major / Minor 처리
+
+- Major 14건 중 4건은 본 리뷰 시점 이후 코드가 이미 진화하면서 처리됨(JPEG 실제 인코딩, 광고 매니저 Premium 가드, 참조 이미지 영속 복사, AppBinding 등록 순서 — Codex 리뷰 결산 부록 참고).
+- 잔여 Major/Minor 항목은 `docs/TODO.md` "1.0.1 Carry Items"로 이관됨.
+
+### 정량 결과
+
+- **Blocker**: 5/5 처리 (실수정 2 + false positive 검증 3)
+- **flutter analyze**: 0 issue
+- **flutter test**: 94/94 PASS
+- **배포 판단**: 🟢 1.0.0 출시 안전
+
+### 메타 인사이트
+
+정적 감사 5건 중 3건이 false positive였다. 이는 본 리뷰가 코드를 모두 읽지 않은 채 "위험할 수 있다"는 추정을 Blocker로 분류했기 때문이다. Sprint Do 단계에서 실제 코드를 펼쳐본 뒤 검증한 결과 이미 안전 패턴이 적용되어 있었다. 향후 사전 감사 보고서에는 "정적 추정"과 "코드 확인 완료"를 구분해 표기할 필요가 있다.
+
+상세: `docs/04-report/sprints/pre-release-audit/report.md`

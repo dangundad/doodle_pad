@@ -2,20 +2,20 @@
 
 > 문서: `CLAUDE.md`
 > This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-> 최종 업데이트: 2026-05-15
+> 최종 업데이트: 2026-05-16
 > 기준: 현재 앱 저장소 스캔 + `C:\Flutter_WorkSpace\Flutter_Plan\AGENTS.md` 포트폴리오 상태표
 
 ## 프로젝트 요약
 - 앱 번호: 40
 - Phase: 4
-- 상태: ✅ 기능구현
+- 상태: ✅ 출시 후보 (review_claude.md / review_codex.md 교차 검증, pre-release-audit + pre-release-followup sprint 완료)
 - 난이도: ★★☆
 - 광고 등급: 중상
 - 프로젝트 폴더: `doodle_pad`
 - `pubspec` 이름: `doodle_pad`
 - Android 패키지: `com.dangundad.doodlepad`
 - 버전: `1.0.0+1`
-- 핵심 기능: `perfect_freehand` 기반 자유 드로잉, 10종 브러시(펜/연필/마커/붓/형광펜/만년필/크레파스/수채화/에어브러시/지우개), 갤러리 사진 위 드로잉, 실행취소, 공유, 보상형 광고 / Premium(광고 제거 + 프리미엄 브러시)
+- 핵심 기능: `perfect_freehand` 기반 자유 드로잉, 10종 브러시(펜/연필/마커/붓/형광펜/만년필/크레파스/수채화/에어브러시/지우개), 갤러리 사진 위 드로잉(앱 내부로 영속 복사), 앱 내 작품 보관함(저장·재오픈·삭제), 실행취소, 공유, 흔들어 지우기, 보상형 광고 / Premium(광고 제거 + 프리미엄 브러시)
 
 ## 공통 작업 원칙
 - 모든 텍스트 파일은 UTF-8로 유지하고, PowerShell에서 파일을 쓸 때는 `-Encoding UTF8`을 명시합니다.
