@@ -1,0 +1,125 @@
+{
+  "id": "pre-release-audit",
+  "name": "Doodle Pad Pre-Release Audit",
+  "version": "1.1",
+  "phase": "archived",
+  "status": "archived",
+  "context": {
+    "WHY": "",
+    "WHO": "",
+    "RISK": "",
+    "SUCCESS": "",
+    "SCOPE": ""
+  },
+  "features": [],
+  "config": {
+    "budget": 1000000,
+    "phaseTimeoutHours": 4,
+    "maxIterations": 5,
+    "matchRateTarget": 100,
+    "matchRateMinAcceptable": 90,
+    "dashboardMode": "session-start",
+    "manual": false
+  },
+  "autoRun": {
+    "enabled": true,
+    "scope": null,
+    "trustLevelAtStart": "L3",
+    "startedAt": null,
+    "lastAutoAdvanceAt": null
+  },
+  "autoPause": {
+    "armed": [
+      "QUALITY_GATE_FAIL",
+      "ITERATION_EXHAUSTED",
+      "BUDGET_EXCEEDED",
+      "PHASE_TIMEOUT"
+    ],
+    "lastTrigger": null,
+    "pauseHistory": []
+  },
+  "phaseHistory": [],
+  "iterateHistory": [],
+  "docs": {
+    "masterPlan": null,
+    "prd": null,
+    "plan": null,
+    "design": null,
+    "iterate": null,
+    "qa": null,
+    "report": null
+  },
+  "featureMap": {},
+  "qualityGates": {
+    "M1_matchRate": {
+      "current": null,
+      "threshold": 90,
+      "passed": null
+    },
+    "M2_codeQualityScore": {
+      "current": null,
+      "threshold": 80,
+      "passed": null
+    },
+    "M3_criticalIssueCount": {
+      "current": 0,
+      "threshold": 0,
+      "passed": true
+    },
+    "M4_apiComplianceRate": {
+      "current": null,
+      "threshold": 95,
+      "passed": null
+    },
+    "M7_conventionCompliance": {
+      "current": null,
+      "threshold": 90,
+      "passed": null
+    },
+    "M8_designCompleteness": {
+      "current": null,
+      "threshold": 85,
+      "passed": null
+    },
+    "M10_pdcaCycleTimeHours": {
+      "current": null,
+      "threshold": 40,
+      "passed": null
+    },
+    "S1_dataFlowIntegrity": {
+      "current": null,
+      "threshold": 100,
+      "passed": null
+    },
+    "S2_featureCompletion": {
+      "current": 0,
+      "threshold": 100,
+      "passed": false
+    },
+    "S3_velocity": {
+      "current": null,
+      "threshold": null,
+      "passed": null
+    },
+    "S4_archiveReadiness": {
+      "current": false,
+      "threshold": true,
+      "passed": false
+    }
+  },
+  "kpi": {
+    "matchRate": null,
+    "criticalIssues": 0,
+    "qaPassRate": null,
+    "dataFlowIntegrity": null,
+    "featuresTotal": 0,
+    "featuresCompleted": 0,
+    "featureCompletionRate": 0,
+    "cumulativeTokens": 0,
+    "cumulativeIterations": 0,
+    "sprintCycleHours": null
+  },
+  "createdAt": "2026-05-16T11:20:18.486Z",
+  "startedAt": null,
+  "archivedAt": "2026-05-16T13:22:13.370Z"
+}

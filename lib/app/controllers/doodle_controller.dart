@@ -400,20 +400,27 @@ class DoodleController extends GetxController
     );
   }
 
+  /// Returns true when haptic feedback is enabled in settings.
+  /// Defaults to true if SettingController is not registered yet.
+  bool get _hapticOn =>
+      Get.isRegistered<SettingController>()
+          ? SettingController.to.hapticEnabled.value
+          : true;
+
   void hapticSelection() {
-    if (_hasVibrator) Vibration.vibrate(duration: 30);
+    if (_hasVibrator && _hapticOn) Vibration.vibrate(duration: 30);
   }
 
   void hapticLight() {
-    if (_hasVibrator) Vibration.vibrate(duration: 50);
+    if (_hasVibrator && _hapticOn) Vibration.vibrate(duration: 50);
   }
 
   void hapticMedium() {
-    if (_hasVibrator) Vibration.vibrate(duration: 100);
+    if (_hasVibrator && _hapticOn) Vibration.vibrate(duration: 100);
   }
 
   void hapticHeavy() {
-    if (_hasVibrator) Vibration.vibrate(duration: 200);
+    if (_hasVibrator && _hapticOn) Vibration.vibrate(duration: 200);
   }
 
   void _loadBrushUnlockState() {
