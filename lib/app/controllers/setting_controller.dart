@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
 import 'package:doodle_pad/app/services/app_rating_service.dart';
+import 'package:doodle_pad/app/translate/translate.dart';
 import 'package:doodle_pad/app/utils/app_constants.dart';
 import 'package:doodle_pad/app/utils/app_toast.dart';
 
@@ -41,6 +42,25 @@ class SettingController extends GetxController {
   static const String _kLastExportFormatKey = 'last_export_format';
   // Design Ref: §5.5 — 흔들어 지우기 옵션. 기본 OFF로 작품 손실 방지.
   static const String _kShakeToClearEnabledKey = 'shake_to_clear_enabled';
+
+  /// `clearAppSettings()` 가 명시적으로 삭제하는 SettingController 소유 키 집합.
+  /// 같은 박스에 AppBinding 의 `onboarding_seen_v1` 같은 라이프사이클 플래그가
+  /// 함께 저장되므로, `box.clear()` 로 전체를 비우면 다음 부팅 시 온보딩이
+  /// 다시 노출되거나 legacy box purge 가 재시도되는 회귀가 생긴다.
+  static const List<String> _ownedSettingKeys = <String>[
+    _kHapticKey,
+    _kShowBrushGuideKey,
+    _kAskBeforeClearKey,
+    _kLanguageKey,
+    _kLastExportResolutionKey,
+    _kLastExportFormatKey,
+    _kShakeToClearEnabledKey,
+  ];
+
+  /// 회귀 테스트에서 owned-key 집합을 참조할 수 있도록 read-only 노출.
+  @visibleForTesting
+  static List<String> get ownedSettingKeysForTest =>
+      List.unmodifiable(_ownedSettingKeys);
 
   static const int defaultExportResolution = 2; // 1x / 2x / 3x 중 HD
   static const String defaultExportFormat = 'png';
@@ -119,21 +139,17 @@ class SettingController extends GetxController {
     return defaultExportFormat;
   }
 
-  /// translate.dart 의 supportedLocales 와 동일한 화이트리스트.
-  /// 알 수 없는 코드가 저장되어 있으면 'en' 으로 폴백한다.
-  static const _supportedLanguageCodes = <String>{
-    'en',
-    'ko',
-    'ja',
-    'de',
-    'ru',
-    'fr',
-    'es',
-    'pt',
-    'id',
-    'zh',
-    'ar',
+  /// translate.dart 의 `Languages.supportedLocales` 에서 자동 derive 한
+  /// 화이트리스트. 알 수 없는 코드가 저장되어 있으면 'en' 으로 폴백한다.
+  /// translate.dart 한쪽에만 언어를 추가하고 컨트롤러를 잊는 회귀를 차단한다.
+  static final Set<String> _supportedLanguageCodes = <String>{
+    for (final locale in Languages.supportedLocales) locale.languageCode,
   };
+
+  /// 회귀 테스트에서 지원 언어 코드 집합을 참조할 수 있도록 read-only 노출.
+  @visibleForTesting
+  static Set<String> get supportedLanguageCodesForTest =>
+      Set.unmodifiable(_supportedLanguageCodes);
 
   Locale get currentLocale {
     final code = language.value;
@@ -200,7 +216,11 @@ class SettingController extends GetxController {
 
   Future<void> clearAppSettings() async {
     final box = await _openSettingBox();
-    await box.clear();
+    // `box.clear()` 는 같은 박스에 사는 `onboarding_seen_v1` /
+    // `legacy_boxes_purged_v1` 같은 AppBinding 라이프사이클 플래그까지 함께
+    // 비워, 다음 부팅 시 온보딩 재노출 / legacy box purge 재시도가 발생한다.
+    // SettingController 가 소유한 키만 정확히 지운다.
+    await box.deleteAll(_ownedSettingKeys);
     hapticEnabled.value = true;
     showBrushGuide.value = true;
     askBeforeClear.value = true;
