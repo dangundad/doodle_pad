@@ -20,7 +20,9 @@ Widget _harness(Widget child) {
 }
 
 void main() {
-  testWidgets('포맷 옵션과 Save 버튼이 표시된다', (tester) async {
+  testWidgets('해상도(1x/2x/3x)와 포맷(PNG/JPEG) 옵션, Save 버튼이 표시된다', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _harness(
         SaveOptionsSheet(
@@ -32,44 +34,85 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // PNG/JPEG 토글 라벨 존재
+    // 해상도 라벨 — 11개 언어에 키 존재, en 값은 1x/2x/3x prefix.
+    expect(find.textContaining('1x'), findsOneWidget);
+    expect(find.textContaining('2x'), findsOneWidget);
+    expect(find.textContaining('3x'), findsOneWidget);
+
+    // 포맷 옵션
     expect(find.text('PNG'), findsOneWidget);
     expect(find.text('JPEG'), findsOneWidget);
 
-    // Save 버튼 존재
+    // Save 버튼
     expect(find.text('Save'), findsOneWidget);
   });
 
-  testWidgets('Save 누르면 onConfirm에 현재 포맷과 prefill 해상도가 전달된다', (
-    tester,
-  ) async {
-    int? capturedResolution;
-    ExportImageFormat? capturedFormat;
+  testWidgets(
+    'Save 누르면 선택된 해상도/포맷이 그대로 onConfirm 에 전달된다',
+    (tester) async {
+      int? capturedResolution;
+      ExportImageFormat? capturedFormat;
 
-    await tester.pumpWidget(
-      _harness(
-        SaveOptionsSheet(
-          initialResolution: 2,
-          initialFormat: ExportImageFormat.png,
-          onConfirm: (resolution, format) {
-            capturedResolution = resolution;
-            capturedFormat = format;
-          },
+      await tester.pumpWidget(
+        _harness(
+          SaveOptionsSheet(
+            initialResolution: 2,
+            initialFormat: ExportImageFormat.png,
+            onConfirm: (resolution, format) {
+              capturedResolution = resolution;
+              capturedFormat = format;
+            },
+          ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    // JPEG로 변경
-    await tester.tap(find.text('JPEG'));
-    await tester.pumpAndSettle();
+      // 3x 해상도 선택
+      await tester.tap(find.textContaining('3x'));
+      await tester.pumpAndSettle();
 
-    // Save 탭
-    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
-    await tester.pumpAndSettle();
+      // JPEG 포맷 선택
+      await tester.tap(find.text('JPEG'));
+      await tester.pumpAndSettle();
 
-    // 해상도는 prefill 값을 그대로 콜백에 전달한다 (UI는 제거됨).
-    expect(capturedResolution, 2);
-    expect(capturedFormat, ExportImageFormat.jpeg);
-  });
+      // Save 탭
+      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+      await tester.pumpAndSettle();
+
+      expect(
+        capturedResolution,
+        3,
+        reason: '해상도 UI 가 복구되었으므로 사용자가 선택한 값이 전달돼야 한다.',
+      );
+      expect(capturedFormat, ExportImageFormat.jpeg);
+    },
+  );
+
+  testWidgets(
+    '아무 옵션도 누르지 않고 Save 하면 initial 값이 그대로 onConfirm 으로 전달된다',
+    (tester) async {
+      int? capturedResolution;
+      ExportImageFormat? capturedFormat;
+
+      await tester.pumpWidget(
+        _harness(
+          SaveOptionsSheet(
+            initialResolution: 1,
+            initialFormat: ExportImageFormat.jpeg,
+            onConfirm: (resolution, format) {
+              capturedResolution = resolution;
+              capturedFormat = format;
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+      await tester.pumpAndSettle();
+
+      expect(capturedResolution, 1);
+      expect(capturedFormat, ExportImageFormat.jpeg);
+    },
+  );
 }

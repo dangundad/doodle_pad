@@ -296,7 +296,10 @@ class GalleryPage extends GetView<GalleryController> {
                         foregroundColor: cs.onError,
                       ),
                       onPressed: () => Get.back(result: true),
-                      child: Text('clear'.tr),
+                      // 'clear' 는 캔버스 지우기 문맥에서 쓰는 단어라 작품 삭제
+                      // 확인 버튼에서는 부정확하다 (영어: Clear / 한국어: 지우기).
+                      // 'delete' 전용 키로 단건/다중 삭제 의도를 명확히 한다.
+                      child: Text('delete'.tr),
                     ),
                   ),
                 ],

@@ -11,6 +11,8 @@ class SettingsPage extends GetView<SettingController> {
 
   /// supportedLocales(translate.dart)와 1:1로 매칭되는 사용자 표시 라벨.
   /// 언어 라벨은 해당 언어의 자국어 표기(endonym)를 사용한다.
+  /// 회귀 차단을 위해 `languageOptionsForTest` 로 키셋을 노출하고,
+  /// translate_consistency_test 가 `Languages.supportedLocales` 와 일치 여부를 검증한다.
   static const Map<String, String> _languageOptions = {
     'en': 'English',
     'ko': '한국어',
@@ -24,6 +26,12 @@ class SettingsPage extends GetView<SettingController> {
     'zh': '中文',
     'ar': 'العربية',
   };
+
+  /// 테스트에서만 사용하는 read-only 접근자.
+  /// settings_page UI 언어 옵션의 키셋 일관성을 외부 테스트가 검증할 수 있게 한다.
+  @visibleForTesting
+  static Map<String, String> get languageOptionsForTest =>
+      Map.unmodifiable(_languageOptions);
 
   @override
   Widget build(BuildContext context) {

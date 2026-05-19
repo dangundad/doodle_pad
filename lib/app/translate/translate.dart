@@ -157,6 +157,7 @@ class Languages extends Translations {
       'gallery_delete_selected': 'Delete',
       'gallery_share_selected': 'Share',
       'gallery_delete_selected_confirm': ' artworks will be permanently deleted.',
+      'delete': 'Delete',
     },
     'ko': {
       'app_name': '간단 그림판',
@@ -297,6 +298,7 @@ class Languages extends Translations {
       'gallery_delete_selected': '삭제',
       'gallery_share_selected': '공유',
       'gallery_delete_selected_confirm': '개 작품이 영구적으로 삭제돼요.',
+      'delete': '삭제',
     },
     'ja': {
       'app_name': 'かんたんお絵かき',
@@ -437,6 +439,7 @@ class Languages extends Translations {
       'gallery_delete_selected': '削除',
       'gallery_share_selected': '共有',
       'gallery_delete_selected_confirm': '件の作品が完全に削除されます。',
+      'delete': '削除',
     },
     'de': {
       'app_name': 'Zeichenblock',
@@ -578,6 +581,7 @@ class Languages extends Translations {
       'gallery_delete_selected': 'Löschen',
       'gallery_share_selected': 'Teilen',
       'gallery_delete_selected_confirm': ' Werke werden endgültig gelöscht.',
+      'delete': 'Löschen',
     },
     'ru': {
       'app_name': 'Рисуй легко',
@@ -718,6 +722,7 @@ class Languages extends Translations {
       'gallery_delete_selected': 'Удалить',
       'gallery_share_selected': 'Поделиться',
       'gallery_delete_selected_confirm': ' работ будет удалено навсегда.',
+      'delete': 'Удалить',
     },
     'fr': {
       'app_name': 'Bloc dessin',
@@ -860,6 +865,7 @@ class Languages extends Translations {
       'gallery_delete_selected': 'Supprimer',
       'gallery_share_selected': 'Partager',
       'gallery_delete_selected_confirm': ' œuvres seront définitivement supprimées.',
+      'delete': 'Supprimer',
     },
     'es': {
       'app_name': 'Dibujo Fácil',
@@ -1000,6 +1006,7 @@ class Languages extends Translations {
       'gallery_delete_selected': 'Eliminar',
       'gallery_share_selected': 'Compartir',
       'gallery_delete_selected_confirm': ' obras se eliminarán permanentemente.',
+      'delete': 'Eliminar',
     },
     'pt': {
       'app_name': 'Tela Fácil',
@@ -1140,6 +1147,7 @@ class Languages extends Translations {
       'gallery_delete_selected': 'Excluir',
       'gallery_share_selected': 'Compartilhar',
       'gallery_delete_selected_confirm': ' obras serão excluídas permanentemente.',
+      'delete': 'Excluir',
     },
     'id': {
       'app_name': 'Gambar Mudah',
@@ -1280,6 +1288,7 @@ class Languages extends Translations {
       'gallery_delete_selected': 'Hapus',
       'gallery_share_selected': 'Bagikan',
       'gallery_delete_selected_confirm': ' karya akan dihapus permanen.',
+      'delete': 'Hapus',
     },
     'zh': {
       'app_name': '简易画板',
@@ -1419,6 +1428,7 @@ class Languages extends Translations {
       'gallery_delete_selected': '删除',
       'gallery_share_selected': '分享',
       'gallery_delete_selected_confirm': ' 个作品将被永久删除。',
+      'delete': '删除',
     },
     'ar': {
       'app_name': 'الرسم السهل',
@@ -1559,6 +1569,7 @@ class Languages extends Translations {
       'gallery_delete_selected': 'حذف',
       'gallery_share_selected': 'مشاركة',
       'gallery_delete_selected_confirm': ' عملاً فنياً سيُحذف نهائياً.',
+      'delete': 'حذف',
     },
   };
 }

@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:doodle_pad/app/controllers/setting_controller.dart';
+import 'package:doodle_pad/app/pages/settings/settings_page.dart';
 import 'package:doodle_pad/app/translate/translate.dart';
 
 /// 11개 언어가 모두 동일한 키셋을 갖는지 검증한다.
@@ -34,6 +36,45 @@ void main() {
         extra,
         isEmpty,
         reason: '$code 에 en에 없는 잉여 키: $extra',
+      );
+    }
+  });
+
+  test(
+    'SettingsPage 언어 옵션 키셋이 Languages.supportedLocales 와 정확히 일치',
+    () {
+      // settings_page 의 `_languageOptions` 는 별도 수동 map 이므로,
+      // translate.dart 한쪽에만 언어를 추가/삭제하면 UI 만 누락되는 회귀가
+      // 가능하다. 두 컬렉션의 키셋이 정확히 일치하는지 고정한다.
+      final localeCodes = Languages.supportedLocales
+          .map((l) => l.languageCode)
+          .toSet();
+      final uiCodes = SettingsPage.languageOptionsForTest.keys.toSet();
+      expect(
+        uiCodes,
+        localeCodes,
+        reason:
+            'settings_page._languageOptions 와 Languages.supportedLocales 의 '
+            '언어 코드 집합이 어긋났다. 한쪽만 변경된 회귀일 가능성이 높다.',
+      );
+
+      // SettingController 의 화이트리스트도 동일해야 한다 (derive 회귀 차단).
+      expect(
+        SettingController.supportedLanguageCodesForTest,
+        localeCodes,
+        reason:
+            'SettingController._supportedLanguageCodes 와 '
+            'Languages.supportedLocales 가 어긋났다.',
+      );
+    },
+  );
+
+  test('SettingsPage 언어 옵션 라벨은 비어 있지 않다 (endonym 표기 보장)', () {
+    for (final entry in SettingsPage.languageOptionsForTest.entries) {
+      expect(
+        entry.value.trim(),
+        isNotEmpty,
+        reason: '언어 ${entry.key} 의 표시 라벨이 비어 있다.',
       );
     }
   });
