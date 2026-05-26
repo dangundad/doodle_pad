@@ -40,8 +40,8 @@
 # ----- AdMob Mediation: AppLovin, Pangle, Unity -----
 -keep class com.applovin.** { *; }
 -dontwarn com.applovin.**
--keep class com.bytedance.sdk.** { *; }
--dontwarn com.bytedance.sdk.**
+-keep class com.bytedance.** { *; }
+-dontwarn com.bytedance.**
 -keep class com.unity3d.** { *; }
 -dontwarn com.unity3d.**
 
@@ -50,9 +50,8 @@
 -keep class com.android.billingclient.api.** { *; }
 -dontwarn com.android.billingclient.api.**
 
-# ----- Firebase / Crashlytics / Analytics -----
+# ----- Firebase / Crashlytics -----
 -keep class com.google.firebase.** { *; }
--keep class com.google.android.gms.measurement.** { *; }
 -dontwarn com.google.firebase.**
 -keepattributes SourceFile,LineNumberTable
 -keep public class * extends java.lang.Exception

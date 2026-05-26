@@ -6,10 +6,8 @@ environment:
   sdk: ">=3.8.0 <4.0.0"
 
 dependencies:
-  device_info_plus: ^13.1.0
-  firebase_analytics: ^12.4.0
-  firebase_core: ^4.8.0
-  firebase_crashlytics: ^5.2.1
+  firebase_core: ^4.9.0
+  firebase_crashlytics: ^5.2.2
   flex_color_scheme: ^8.4.0
   flutter:
     sdk: flutter
@@ -19,19 +17,19 @@ dependencies:
   flutter_screenutil: ^5.9.3
   gal: ^2.3.2
   get: ^4.7.3
-  gma_mediation_applovin: ^2.5.2
-  gma_mediation_pangle: ^3.5.3
-  gma_mediation_unity: ^1.6.5
+  gma_mediation_applovin: ^2.6.0
+  gma_mediation_pangle: ^3.6.0
+  gma_mediation_unity: ^1.7.0
   google_fonts: ^8.1.0
   google_mobile_ads: ^8.0.0
   hive_ce: ^2.19.3
   hive_ce_flutter: ^2.3.4
-  image: ^4.5.4
+  image: ^4.8.0
   image_picker: ^1.1.2
   in_app_purchase: ^3.2.3
-  in_app_purchase_android: ^0.4.0+10
-  in_app_review: ^2.0.11
-  lucide_icons_flutter: ^3.1.13
+  in_app_purchase_android: ^0.4.0+11
+  in_app_review: ^2.0.12
+  lucide_icons_flutter: ^3.1.14+2
   path_provider: ^2.1.5
   perfect_freehand: ^2.5.2
   rate_my_app: ^2.4.0
@@ -50,7 +48,7 @@ dev_dependencies:
   flutter_native_splash: ^2.4.7
   flutter_test:
     sdk: flutter
-  hive_ce_generator: ^1.11.1
+  hive_ce_generator: ^1.11.2
   in_app_purchase_platform_interface: ^1.4.0
   plugin_platform_interface: ^2.1.8
 

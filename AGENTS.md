@@ -1,8 +1,8 @@
 # Doodle Pad (Drawing) 개발 가이드
 
-> 문서: `CLAUDE.md`
+> 문서: `AGENTS.md`
 > This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-> 최종 업데이트: 2026-05-17
+> 최종 업데이트: 2026-05-27
 > 기준: 현재 앱 저장소 스캔 + `C:\Flutter_WorkSpace\Flutter_Plan\AGENTS.md` 포트폴리오 상태표
 
 ## 프로젝트 요약
@@ -40,11 +40,11 @@ flutter run
 
 ## 현재 의존성 하이라이트
 - 기반: `get` ^4.7.3, `hive_ce` ^2.19.3, `hive_ce_flutter` ^2.3.4, `path_provider` ^2.1.5, `shared_preferences` ^2.5.5
-- 드로잉/이미지: `perfect_freehand` ^2.5.2, `image_picker` ^1.1.2, `flutter_colorpicker` ^1.1.0, `gal` ^2.3.2, `image` ^4.5.4, `sensors_plus` ^7.0.0
-- UI/UX: `flutter_screenutil` ^5.9.3, `flex_color_scheme` ^8.4.0, `google_fonts` ^8.1.0, `lucide_icons_flutter` ^3.1.13, `toastification` ^3.2.0
-- 수익화/운영: `google_mobile_ads` ^8.0.0, `gma_mediation_applovin` ^2.5.2, `gma_mediation_pangle` ^3.5.3, `gma_mediation_unity` ^1.6.5, `in_app_purchase` ^3.2.3, `in_app_purchase_android` ^0.4.0+10, `in_app_review` ^2.0.11, `rate_my_app` ^2.4.0, `firebase_core` ^4.8.0, `firebase_analytics` ^12.4.0, `firebase_crashlytics` ^5.2.1, `device_info_plus` ^13.1.0, `share_plus` ^13.1.0, `url_launcher` ^6.3.2, `vibration` ^3.1.8
+- 드로잉/이미지: `perfect_freehand` ^2.5.2, `image_picker` ^1.1.2, `flutter_colorpicker` ^1.1.0, `gal` ^2.3.2, `image` ^4.8.0, `sensors_plus` ^7.0.0
+- UI/UX: `flutter_screenutil` ^5.9.3, `flex_color_scheme` ^8.4.0, `google_fonts` ^8.1.0, `lucide_icons_flutter` ^3.1.14+2, `toastification` ^3.2.0
+- 수익화/운영: `google_mobile_ads` ^8.0.0, `gma_mediation_applovin` ^2.6.0, `gma_mediation_pangle` ^3.6.0, `gma_mediation_unity` ^1.7.0, `in_app_purchase` ^3.2.3, `in_app_purchase_android` ^0.4.0+11, `in_app_review` ^2.0.12, `rate_my_app` ^2.4.0, `firebase_core` ^4.9.0, `firebase_crashlytics` ^5.2.2, `share_plus` ^13.1.0, `url_launcher` ^6.3.2, `vibration` ^3.1.8
 - 로컬라이제이션: `flutter_localizations` (SDK)
-- 개발 도구: `build_runner` ^2.15.0, `hive_ce_generator` ^1.11.1, `flutter_lints` ^6.0.0, `flutter_launcher_icons` ^0.14.4, `flutter_native_splash` ^2.4.7, `change_app_package_name` ^1.5.0, `in_app_purchase_platform_interface` ^1.4.0, `plugin_platform_interface` ^2.1.8
+- 개발 도구: `build_runner` ^2.15.0, `hive_ce_generator` ^1.11.2, `flutter_lints` ^6.0.0, `flutter_launcher_icons` ^0.14.4, `flutter_native_splash` ^2.4.7, `change_app_package_name` ^1.5.0, `in_app_purchase_platform_interface` ^1.4.0, `plugin_platform_interface` ^2.1.8
 
 ## 현재 코드 구조
 - `lib/app` 디렉터리: `admob`, `bindings`, `controllers`, `data`, `pages`, `routes`, `services`, `theme`, `translate`, `utils`, `widgets`
@@ -76,6 +76,7 @@ flutter run
 ## 최근 감사 이력
 - 2026-05-08 핵심 로직 + UI gradient 1차 감사 통과
 - 2026-05-16~17 Wave 3 2차 감사 (설정/광고/strings/Haptic) + release_settings_intro Card 정리
+- 2026-05-27 Phase 1~4 Wave 3B 사전배포 감사 통과. 실제 경로는 `C:\Github_WorkSpace\doodle_pad`이며 Firebase Core/Crashlytics와 `google-services.json`은 유지하고 미사용 Firebase Analytics/기기정보 직접 의존성은 제거했습니다. `flutter pub outdated --no-transitive` 기준 `image`는 최신 resolvable `4.8.0`으로 유지했고, `flutter analyze`, `flutter test` 101개, Android `processDebugResources`/`assembleDebug`를 통과했습니다.
 
 ## 문서 유지 규칙
 - 새 페이지나 바인딩을 추가하면 이 문서의 `pages`/`bindings` 요약도 함께 갱신합니다.

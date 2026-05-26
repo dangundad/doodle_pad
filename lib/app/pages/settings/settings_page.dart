@@ -319,11 +319,12 @@ class _SettingsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: cs.surfaceContainerLowest,
+    return Material(
+      color: cs.surfaceContainerLowest,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: cs.outline.withValues(alpha: 0.25)),
+        side: BorderSide(color: cs.outline.withValues(alpha: 0.25)),
       ),
       child: Column(
         children: [
