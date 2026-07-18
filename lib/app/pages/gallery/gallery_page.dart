@@ -554,9 +554,18 @@ class _ThumbnailView extends StatelessWidget {
         ),
       );
     }
+    // 2열 그리드 셀 물리 픽셀 폭으로 디코딩 크기를 제한한다.
+    // 썸네일 원본이 실제 셀보다 커도(구버전에 저장된 고해상도 썸네일 포함)
+    // 셀 크기 이상으로 비트맵을 메모리에 올리지 않게 해 스크롤 시 메모리를 아낀다.
+    final cacheWidth =
+        (MediaQuery.sizeOf(context).width /
+                2 *
+                MediaQuery.devicePixelRatioOf(context))
+            .round();
     return Image.file(
       File(path!),
       fit: BoxFit.cover,
+      cacheWidth: cacheWidth > 0 ? cacheWidth : null,
       errorBuilder: (context, error, stackTrace) => ColoredBox(
         color: cs.surfaceContainerHigh,
         child: Center(

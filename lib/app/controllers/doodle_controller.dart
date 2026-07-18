@@ -258,10 +258,17 @@ class DoodleController extends GetxController
   bool get hasDrawableContent =>
       strokes.isNotEmpty || referenceImagePath.value != null;
 
-  /// 캔버스 캡처 시 사용할 pixel ratio 상한.
+  /// 캔버스 캡처 시 사용할 pixel ratio 상한 (공유 / 갤러리 저장용).
   /// 가로 X 세로 X ratio^2 픽셀 수가 이 값을 넘지 않도록 동적으로 낮춘다.
   static const _maxCapturePixels = 8 * 1000 * 1000; // ~8MP
   static const _maxCapturePixelRatio = 3.0;
+
+  /// 작품 보관함 썸네일용 캡처 상한.
+  /// 썸네일은 2열 그리드에서 BoxFit.cover로만 표시되므로 공유/저장처럼 고해상도가
+  /// 필요 없다. 과거 공유용 _captureCanvas(최대 ~8MP)를 그대로 재사용해 작품마다
+  /// 수 MB PNG가 디스크에 쌓이던 문제를 막기 위해 훨씬 낮은 예산을 별도로 둔다.
+  static const _maxThumbnailPixels = 1500 * 1000; // ~1.5MP
+  static const _maxThumbnailPixelRatio = 2.0;
 
   @override
   void onInit() {
@@ -308,11 +315,8 @@ class DoodleController extends GetxController
         ? SettingController.to
         : null;
 
-    if (settings != null && !settings.askBeforeClear.value) {
-      // 사용자가 확인 다이얼로그를 끈 상태라도 Shake로 인한 손실은 방지.
-      // 명시적으로 한 번 더 확인을 띄운다.
-    }
-
+    // Shake는 askBeforeClear 설정과 무관하게 항상 확인 다이얼로그를 거친다.
+    // 우발적인 흔들림으로 작품이 사라지는 손실을 방지하기 위함이다.
     await Get.dialog<void>(
       Dialog(
         shape: RoundedRectangleBorder(
@@ -706,25 +710,34 @@ class DoodleController extends GetxController
     }
   }
 
-  /// 캔버스를 PNG로 캡처하여 반환.
+  /// 캔버스를 PNG로 캡처하여 반환 (공유 / 갤러리 저장용, 고해상도).
   /// pixelRatio는 캔버스 크기에 따라 동적으로 낮춰 OOM을 방지한다.
-  Future<ui.Image?> _captureCanvas() async {
+  Future<ui.Image?> _captureCanvas() =>
+      _captureCanvasWithBudget(_maxCapturePixels, _maxCapturePixelRatio);
+
+  /// 작품 보관함 썸네일 전용 저해상도 캡처.
+  Future<ui.Image?> _captureThumbnail() =>
+      _captureCanvasWithBudget(_maxThumbnailPixels, _maxThumbnailPixelRatio);
+
+  Future<ui.Image?> _captureCanvasWithBudget(
+    int maxPixels,
+    double maxRatio,
+  ) async {
     final boundary =
         canvasKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
     if (boundary == null) return null;
-    final size = boundary.size;
-    final ratio = _resolveCapturePixelRatio(size);
+    final ratio = _resolveCapturePixelRatio(boundary.size, maxPixels, maxRatio);
     return boundary.toImage(pixelRatio: ratio);
   }
 
-  double _resolveCapturePixelRatio(Size size) {
+  double _resolveCapturePixelRatio(Size size, int maxPixels, double maxRatio) {
     final w = size.width;
     final h = size.height;
-    if (w <= 0 || h <= 0) return _maxCapturePixelRatio;
-    final maxRatioByPixelBudget = math.sqrt(_maxCapturePixels / (w * h));
-    final ratio = maxRatioByPixelBudget < _maxCapturePixelRatio
+    if (w <= 0 || h <= 0) return maxRatio;
+    final maxRatioByPixelBudget = math.sqrt(maxPixels / (w * h));
+    final ratio = maxRatioByPixelBudget < maxRatio
         ? maxRatioByPixelBudget
-        : _maxCapturePixelRatio;
+        : maxRatio;
     // 너무 작아지면 1.0 까지 내림.
     return ratio < 1.0 ? 1.0 : ratio;
   }
@@ -827,7 +840,8 @@ class DoodleController extends GetxController
   }
 
   /// Plan FR-08/FR-11 — 현재 캔버스를 작품으로 저장.
-  /// canvasKey 캡처(1.0x) → PNG bytes → ArtworkRepository.save 위임.
+  /// canvasKey 캡처(썸네일 예산 ~1.5MP) → PNG bytes → ArtworkRepository.save 위임.
+  /// 썸네일은 그리드 미리보기 전용이라 공유용 고해상도가 필요 없다.
   /// Design Ref: §4.2 — 외부 IO는 모두 ArtworkRepository로 위임.
   Future<Drawing?> saveAsArtwork({
     String? name,
@@ -856,7 +870,7 @@ class DoodleController extends GetxController
             canvasKey.currentContext?.findRenderObject()
                 as RenderRepaintBoundary?;
         canvasSize = boundary?.size ?? Size.zero;
-        image = await _captureCanvas();
+        image = await _captureThumbnail();
         if (image == null) {
           AppToast.show(
             AppToastMessage.error(
@@ -936,6 +950,9 @@ class DoodleController extends GetxController
         .map((s) => _deserializeStroke(s, scale))
         .toList();
     strokes.assignAll(restored);
+    // 더블탭 Fit 애니메이션이 진행 중이면 멈춘다. 그렇지 않으면 애니메이션
+    // 리스너가 아래에서 세팅한 identity 를 다시 덮어써 로드 직후 잘못된 줌 상태가 남는다.
+    _fitAnimController?.stop();
     transformController.value = Matrix4.identity();
   }
 
