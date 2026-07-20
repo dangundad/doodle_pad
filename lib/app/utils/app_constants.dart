@@ -38,10 +38,23 @@ abstract class PurchaseConstants {
   static const String PREMIUM_MEDIUM_ANDROID = 'doodle_pad_premium_medium';
   static const String PREMIUM_LARGE_ANDROID = 'doodle_pad_premium_large';
 
+  static const String PREMIUM_SMALL_IOS =
+      'com.dangundad.doodlepad.premium.small';
+  static const String PREMIUM_MEDIUM_IOS =
+      'com.dangundad.doodlepad.premium.medium';
+  static const String PREMIUM_LARGE_IOS =
+      'com.dangundad.doodlepad.premium.large';
+
   static const List<String> ANDROID_PRODUCT_IDS = [
     PREMIUM_SMALL_ANDROID,
     PREMIUM_MEDIUM_ANDROID,
     PREMIUM_LARGE_ANDROID,
+  ];
+
+  static const List<String> IOS_PRODUCT_IDS = [
+    PREMIUM_SMALL_IOS,
+    PREMIUM_MEDIUM_IOS,
+    PREMIUM_LARGE_IOS,
   ];
 }
 

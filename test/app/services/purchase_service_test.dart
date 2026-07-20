@@ -72,6 +72,20 @@ void main() {
     });
   });
 
+  test('iOS productIds use App Store bundle-scoped identifiers', () {
+    final service = PurchaseService(
+      isAndroidPlatform: () => false,
+      isIosPlatform: () => true,
+    );
+
+    expect(service.productIdList, PurchaseConstants.IOS_PRODUCT_IDS);
+    expect(service.productIds, {
+      PurchaseConstants.PREMIUM_SMALL_IOS,
+      PurchaseConstants.PREMIUM_MEDIUM_IOS,
+      PurchaseConstants.PREMIUM_LARGE_IOS,
+    });
+  });
+
   test(
     'restorePurchases retries store initialization after an unavailable first attempt',
     () async {

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:gma_mediation_applovin/gma_mediation_applovin.dart';
@@ -99,7 +100,19 @@ class AdHelper {
     }
   }
 
-  static Future<void> _requestTrackingAuthorizationIfNeeded() async {}
+  static Future<void> _requestTrackingAuthorizationIfNeeded() async {
+    if (_targetPlatform != TargetPlatform.iOS) return;
+
+    try {
+      final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+      if (status == TrackingStatus.notDetermined) {
+        await Future<void>.delayed(const Duration(milliseconds: 250));
+        await AppTrackingTransparency.requestTrackingAuthorization();
+      }
+    } catch (e) {
+      debugPrint('ATT authorization request skipped: $e');
+    }
+  }
 
   static Future<void> _requestConsentInfoUpdateWithDefaults() {
     return _requestConsentInfoUpdate(ConsentRequestParameters());
@@ -245,9 +258,7 @@ class AdHelper {
               slot: 'banner-android',
             );
     } else if (_targetPlatform == TargetPlatform.iOS) {
-      return _isDebugMode
-          ? 'ca-app-pub-3940256099942544/2934735716' // 테스트
-          : '';
+      return 'ca-app-pub-3940256099942544/2934735716';
     }
     return 'ca-app-pub-3940256099942544/6300978111';
   }
@@ -263,7 +274,7 @@ class AdHelper {
               slot: 'interstitial-android',
             );
     } else if (_targetPlatform == TargetPlatform.iOS) {
-      return _isDebugMode ? 'ca-app-pub-3940256099942544/4411468910' : '';
+      return 'ca-app-pub-3940256099942544/4411468910';
     }
     return 'ca-app-pub-3940256099942544/1033173712';
   }
@@ -279,7 +290,7 @@ class AdHelper {
               slot: 'rewarded-android',
             );
     } else if (_targetPlatform == TargetPlatform.iOS) {
-      return _isDebugMode ? 'ca-app-pub-3940256099942544/1712485313' : '';
+      return 'ca-app-pub-3940256099942544/1712485313';
     }
     return 'ca-app-pub-3940256099942544/5224354917';
   }

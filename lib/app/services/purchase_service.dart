@@ -16,9 +16,11 @@ class PurchaseService extends GetxService {
     InAppPurchase? inAppPurchase,
     Future<List<PurchaseDetails>> Function()? pastPurchasesLoader,
     bool Function()? isAndroidPlatform,
+    bool Function()? isIosPlatform,
   }) : _inAppPurchase = inAppPurchase ?? InAppPurchase.instance,
        _pastPurchasesLoader = pastPurchasesLoader,
-       _isAndroidPlatform = isAndroidPlatform ?? (() => Platform.isAndroid);
+       _isAndroidPlatform = isAndroidPlatform ?? (() => Platform.isAndroid),
+       _isIosPlatform = isIosPlatform ?? (() => Platform.isIOS);
 
   static PurchaseService get to => Get.find();
 
@@ -29,6 +31,7 @@ class PurchaseService extends GetxService {
   final InAppPurchase _inAppPurchase;
   final Future<List<PurchaseDetails>> Function()? _pastPurchasesLoader;
   final bool Function() _isAndroidPlatform;
+  final bool Function() _isIosPlatform;
 
   final RxBool available = false.obs;
   final RxBool isPremium = false.obs;
@@ -41,13 +44,17 @@ class PurchaseService extends GetxService {
   StreamSubscription<List<PurchaseDetails>>? _purchaseSubscription;
   bool _initialized = false;
 
-  Set<String> get productIds {
+  List<String> get productIdList {
     if (_isAndroidPlatform()) {
-      return PurchaseConstants.ANDROID_PRODUCT_IDS.toSet();
+      return PurchaseConstants.ANDROID_PRODUCT_IDS;
     }
-
-    return <String>{};
+    if (_isIosPlatform()) {
+      return PurchaseConstants.IOS_PRODUCT_IDS;
+    }
+    return const <String>[];
   }
+
+  Set<String> get productIds => productIdList.toSet();
 
   @override
   void onInit() {
@@ -128,10 +135,10 @@ class PurchaseService extends GetxService {
   }
 
   String? _productId(int index) {
-    if (index < 0 || index >= PurchaseConstants.ANDROID_PRODUCT_IDS.length) {
+    if (index < 0 || index >= productIdList.length) {
       return null;
     }
-    return PurchaseConstants.ANDROID_PRODUCT_IDS[index];
+    return productIdList[index];
   }
 
   ProductDetails? getProductByIndex(int index) {
@@ -345,10 +352,9 @@ class PurchaseService extends GetxService {
   bool get hasActivePremium => isPremium.value || isDevPremium.value;
 
   String get premiumPriceWithFallback {
+    final mediumProductId = _productId(1);
     final price = products
-        .firstWhereOrNull(
-          (p) => p.id == PurchaseConstants.PREMIUM_MEDIUM_ANDROID,
-        )
+        .firstWhereOrNull((p) => p.id == mediumProductId)
         ?.price;
     return price ?? r'$5.99';
   }
