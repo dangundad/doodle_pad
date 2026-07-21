@@ -1,7 +1,7 @@
 # App Store Connect 등록정보
 
-기본 카테고리: **Graphics & Design**
-보조 카테고리: **Photo & Video**
+기본 카테고리: **Graphics & Design**  
+보조 카테고리: **Photo & Video**  
 콘텐츠 권리: 포함 브러시·아이콘·예시 이미지 라이선스 확인
 
 ## 한국어 (`ko`)
