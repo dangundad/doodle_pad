@@ -35,9 +35,7 @@ Future<void> _enterDrawing(SettingController settingCtrl) async {
   final cs = Get.theme.colorScheme;
   final continueExisting = await Get.dialog<bool>(
     Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.r),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
       clipBehavior: Clip.antiAlias,
       backgroundColor: cs.surface,
       child: Padding(
@@ -63,16 +61,12 @@ Future<void> _enterDrawing(SettingController settingCtrl) async {
               'continue_or_new_title'.tr,
               style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700),
               textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
             SizedBox(height: 8.h),
             Text(
               'continue_or_new_desc'.tr,
               style: TextStyle(fontSize: 14.sp, color: cs.onSurfaceVariant),
               textAlign: TextAlign.center,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
             ),
             SizedBox(height: 20.h),
             Row(
@@ -113,36 +107,8 @@ Future<void> _enterDrawing(SettingController settingCtrl) async {
   await Get.offAllNamed(Routes.DRAW);
 }
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _pulseCtrl;
-  late final Animation<double> _pulseAnim;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1800),
-    )..repeat(reverse: true);
-    _pulseAnim = Tween<double>(
-      begin: 1.0,
-      end: 1.03,
-    ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
-  }
-
-  @override
-  void dispose() {
-    _pulseCtrl.dispose();
-    super.dispose();
-  }
 
   static const _features = [
     (LucideIcons.pen, 'feature_pen'),
@@ -156,6 +122,7 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
 
     return PopScope(
       canPop: false,
@@ -196,13 +163,16 @@ class _HomePageState extends State<HomePage>
                   ),
                   child: Column(
                     children: [
-                      _Hero(),
-                      SizedBox(height: 26.h),
+                      _Hero(reduceMotion: reduceMotion),
+                      SizedBox(height: 38.h),
                       _TitleBlock(),
                       SizedBox(height: 30.h),
-                      _FeatureChipsCard(features: _features),
+                      _FeatureChipsCard(
+                        features: _features,
+                        reduceMotion: reduceMotion,
+                      ),
                       SizedBox(height: 28.h),
-                      _StartDrawingCta(pulseAnim: _pulseAnim),
+                      const _StartDrawingCta(),
                       SizedBox(height: 14.h),
                       const _MyArtworksCard(),
                     ],
@@ -279,7 +249,7 @@ class _MyArtworksCard extends StatelessWidget {
                         Text(
                           '${'gallery_saved_count'.tr} $count',
                           style: TextStyle(
-                            fontSize: 12.sp,
+                            fontSize: 14.sp,
                             color: cs.onSurfaceVariant,
                           ),
                           maxLines: 1,
@@ -289,7 +259,9 @@ class _MyArtworksCard extends StatelessWidget {
                     ),
                   ),
                   Icon(
-                    LucideIcons.chevronRight,
+                    Directionality.of(context) == TextDirection.rtl
+                        ? LucideIcons.chevronLeft
+                        : LucideIcons.chevronRight,
                     size: 18.r,
                     color: cs.onSurfaceVariant,
                   ),
@@ -304,12 +276,18 @@ class _MyArtworksCard extends StatelessWidget {
 }
 
 class _Hero extends StatelessWidget {
+  const _Hero({required this.reduceMotion});
+
+  final bool reduceMotion;
+
   @override
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),
-      duration: const Duration(milliseconds: 900),
+      duration: reduceMotion
+          ? Duration.zero
+          : const Duration(milliseconds: 300),
       curve: Curves.elasticOut,
       builder: (context, value, child) => Opacity(
         opacity: value.clamp(0.0, 1.0),
@@ -318,6 +296,7 @@ class _Hero extends StatelessWidget {
       child: Tooltip(
         message: 'app_subtitle'.tr,
         child: Stack(
+          key: const ValueKey('home-hero-artwork'),
           alignment: Alignment.center,
           children: [
             Container(
@@ -328,7 +307,7 @@ class _Hero extends StatelessWidget {
                 color: cs.primaryContainer,
               ),
             ),
-            Text('🎨', style: TextStyle(fontSize: 56.sp)),
+            Icon(LucideIcons.palette, size: 56.r, color: cs.onPrimaryContainer),
           ],
         ),
       ),
@@ -340,26 +319,32 @@ class _TitleBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
     return Column(
       children: [
         Text(
+          key: const ValueKey('home-title'),
           'app_name'.tr,
           style: TextStyle(
-            fontSize: 34.sp,
-            fontWeight: FontWeight.w900,
+            fontSize: isRtl ? 30.sp : 34.sp,
+            fontWeight: isRtl ? FontWeight.w800 : FontWeight.w900,
+            height: 1.25,
             color: cs.onSurface,
           ),
           textAlign: TextAlign.center,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        SizedBox(height: 8.h),
+        SizedBox(height: 12.h),
         Text(
+          key: const ValueKey('home-subtitle'),
           'app_subtitle'.tr,
-          style: TextStyle(fontSize: 15.sp, color: cs.onSurfaceVariant),
+          style: TextStyle(
+            fontSize: 15.sp,
+            height: 1.4,
+            color: cs.onSurfaceVariant,
+          ),
           textAlign: TextAlign.center,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
@@ -368,7 +353,8 @@ class _TitleBlock extends StatelessWidget {
 
 class _FeatureChipsCard extends StatelessWidget {
   final List<(IconData, String)> features;
-  const _FeatureChipsCard({required this.features});
+  final bool reduceMotion;
+  const _FeatureChipsCard({required this.features, required this.reduceMotion});
 
   @override
   Widget build(BuildContext context) {
@@ -390,7 +376,9 @@ class _FeatureChipsCard extends StatelessWidget {
           final (icon, labelKey) = entry.value;
           return TweenAnimationBuilder<double>(
             tween: Tween(begin: 0.0, end: 1.0),
-            duration: Duration(milliseconds: 380 + idx * 60),
+            duration: reduceMotion
+                ? Duration.zero
+                : Duration(milliseconds: 100 + idx * 10),
             curve: Curves.easeOutBack,
             builder: (ctx, v, child) => Transform.scale(
               scale: v,
@@ -426,15 +414,17 @@ class _FeatureChip extends StatelessWidget {
           children: [
             Icon(icon, size: 14.r, color: cs.primary),
             SizedBox(width: 5.w),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: cs.onSurfaceVariant,
-                fontWeight: FontWeight.w500,
+            Flexible(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  color: cs.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -444,39 +434,36 @@ class _FeatureChip extends StatelessWidget {
 }
 
 class _StartDrawingCta extends StatelessWidget {
-  final Animation<double> pulseAnim;
-  const _StartDrawingCta({required this.pulseAnim});
+  const _StartDrawingCta();
 
   @override
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
     final settingCtrl = SettingController.to;
 
-    return AnimatedBuilder(
-      animation: pulseAnim,
-      builder: (context, child) =>
-          Transform.scale(scale: pulseAnim.value, child: child),
-      child: Tooltip(
-        message: 'start_drawing'.tr,
-        child: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: cs.primary,
+    return Tooltip(
+      key: const ValueKey('home-start-cta'),
+      message: 'start_drawing'.tr,
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: cs.primary,
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.circular(16.r),
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(16.r),
-              onTap: () => _enterDrawing(settingCtrl),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 16.h),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(LucideIcons.brush, size: 22.r, color: cs.onPrimary),
-                    SizedBox(width: 10.w),
-                    Text(
+            onTap: () => _enterDrawing(settingCtrl),
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(LucideIcons.brush, size: 22.r, color: cs.onPrimary),
+                  SizedBox(width: 10.w),
+                  Flexible(
+                    child: Text(
                       'start_drawing'.tr,
                       style: TextStyle(
                         fontSize: 18.sp,
@@ -486,8 +473,8 @@ class _StartDrawingCta extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

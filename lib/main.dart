@@ -17,6 +17,7 @@ import 'package:doodle_pad/app/routes/app_pages.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
 import 'package:doodle_pad/app/theme/app_theme.dart';
 import 'package:doodle_pad/app/translate/translate.dart';
+import 'package:doodle_pad/app/utils/device_qa_config.dart';
 import 'package:doodle_pad/firebase_options.dart';
 
 Future<bool> _initFirebaseSafely() async {
@@ -174,7 +175,11 @@ class _DoodlePadAppState extends State<DoodlePadApp> {
               GlobalCupertinoLocalizations.delegate,
             ],
             translations: Languages(),
-            locale: Get.locale ?? Get.deviceLocale ?? const Locale('en'),
+            locale:
+                DeviceQaConfig.locale ??
+                Get.locale ??
+                Get.deviceLocale ??
+                const Locale('en'),
             fallbackLocale: const Locale('en'),
             debugShowCheckedModeBanner: false,
             defaultTransition: Transition.fadeIn,
@@ -187,7 +192,9 @@ class _DoodlePadAppState extends State<DoodlePadApp> {
             getPages: AppPages.routes,
             // Item 3: 온보딩(HomePage)은 첫 실행에서만 노출.
             // 이후 실행은 DrawPage로 직진입.
-            initialRoute: AppBinding.isOnboardingSeen()
+            initialRoute: DeviceQaConfig.route.isNotEmpty
+                ? DeviceQaConfig.route
+                : AppBinding.isOnboardingSeen()
                 ? Routes.DRAW
                 : AppPages.INITIAL,
           ),

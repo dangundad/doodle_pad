@@ -2,7 +2,7 @@
 
 > 문서: `AGENTS.md`
 > This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-> 최종 업데이트: 2026-05-27
+> 최종 업데이트: 2026-07-22
 > 기준: 현재 앱 저장소 스캔 + `C:\Flutter_WorkSpace\Flutter_Plan\AGENTS.md` 포트폴리오 상태표
 
 ## 프로젝트 요약
@@ -62,7 +62,7 @@ flutter run
   - `pages/settings`: `settings_page.dart`
 - `widgets`: `exit_bottom_sheet.dart`
 - `mixins`: `shake_detector_mixin.dart`
-- `utils`: `app_constants.dart`, `app_toast.dart`, `share_file_cleanup.dart`
+- `utils`: `app_constants.dart`, `app_toast.dart`, `device_qa_config.dart`, `share_file_cleanup.dart`
 - `translate`: `translate.dart`
 - `theme`: `app_theme.dart`
 - `data/brushes`: `brush_preset.dart`, `brush_presets.dart`
@@ -71,12 +71,13 @@ flutter run
 - Firebase 설정: `lib/firebase_options.dart` (FlutterFire CLI 생성)
 - Hive 어댑터 레지스트라: `lib/hive_registrar.g.dart` (build_runner 생성, `HiveService.init`에서 `Hive.registerAdapters()` 호출)
 - `assets`: `fonts`, `images`
-- `test/`: `app/controllers/` (doodle·gallery·premium·setting·brush_type_persistence), `app/services/` (purchase·export·artwork_repository), `app/admob/`, `app/data/brushes/`, `app/bindings/` (app_binding_shake_order), `app/pages/{draw,gallery,home,settings}/`, `app/mixins/`, `app/theme/`, `app/utils/`, `app/helpers/fake_purchase_service.dart`, `translate_consistency_test.dart`, `ui/no_gradient_usage_test.dart`, `widget_test.dart`
+- `test/`: `app/controllers/` (doodle·gallery·premium·setting·brush_type_persistence), `app/services/` (purchase·export·artwork_repository), `app/admob/`, `app/data/brushes/`, `app/bindings/` (app_binding_shake_order), `app/pages/{draw,gallery,home,premium,settings}/` (11개 언어·320dp·130% 글자 레이아웃 포함), `app/mixins/`, `app/theme/`, `app/utils/`, `app/helpers/fake_purchase_service.dart`, `ios_release_config_test.dart`, `translate_consistency_test.dart`, `ui/no_gradient_usage_test.dart`, `widget_test.dart`
 
 ## 최근 감사 이력
 - 2026-05-08 핵심 로직 + UI gradient 1차 감사 통과
 - 2026-05-16~17 Wave 3 2차 감사 (설정/광고/strings/Haptic) + release_settings_intro Card 정리
 - 2026-05-27 Phase 1~4 Wave 3B 사전배포 감사 통과. 실제 경로는 `C:\Github_WorkSpace\doodle_pad`이며 Firebase Core/Crashlytics와 `google-services.json`은 유지하고 미사용 Firebase Analytics/기기정보 직접 의존성은 제거했습니다. `flutter pub outdated --no-transitive` 기준 `image`는 최신 resolvable `4.8.0`으로 유지했고, `flutter analyze`, `flutter test` 101개, Android `processDebugResources`/`assembleDebug`를 통과했습니다.
+- 2026-07-22 iPhone 12 Pro Max(iOS 26.5.2) 릴리즈 실기기 감사 완료. 릴리즈 AdMob 앱 ID 누락을 Xcode 빌드 단계에서 차단하고, 홈·그리기·설정·프리미엄·작품함을 영어/한국어/독일어/아랍어 RTL로 캡처했습니다. 한국어 조사 고아 줄, RTL 방향 아이콘, Arabic Hero 글리프 간격, 44dp 도구 터치 영역·VoiceOver 선택/잠금/tap semantics, 모션 감소 설정을 보강했으며 11개 지원 언어의 320dp·130% 글자 레이아웃을 포함해 `flutter analyze`와 `flutter test` 117개를 통과했습니다.
 
 ## 문서 유지 규칙
 - 새 페이지나 바인딩을 추가하면 이 문서의 `pages`/`bindings` 요약도 함께 갱신합니다.

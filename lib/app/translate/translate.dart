@@ -139,7 +139,8 @@ class Languages extends Translations {
       'save_failed': "We couldn't save your drawing.",
       'save_permission_denied': 'Gallery permission required',
       'shake_to_clear_title': 'Shake to clear',
-      'shake_to_clear_desc': 'Shake the device to clear the canvas (always asks first).',
+      'shake_to_clear_desc':
+          'Shake the device to clear the canvas (always asks first).',
       'artwork_title': 'Artwork',
       'artwork_save_action': 'Save as artwork',
       'artwork_save_success': 'Artwork saved',
@@ -150,13 +151,15 @@ class Languages extends Translations {
       'gallery_saved_count': 'Saved artworks:',
       'gallery_empty_title': 'No artworks yet',
       'gallery_empty_desc': 'Drawings you save will appear here.',
-      'gallery_overlimit_warning': 'You have many artworks. Consider deleting old ones.',
+      'gallery_overlimit_warning':
+          'You have many artworks. Consider deleting old ones.',
       'gallery_selected_suffix': ' selected',
       'gallery_select_mode': 'Select items',
       'gallery_exit_select_mode': 'Done',
       'gallery_delete_selected': 'Delete',
       'gallery_share_selected': 'Share',
-      'gallery_delete_selected_confirm': ' artworks will be permanently deleted.',
+      'gallery_delete_selected_confirm':
+          ' artworks will be permanently deleted.',
       'delete': 'Delete',
     },
     'ko': {
@@ -280,7 +283,7 @@ class Languages extends Translations {
       'save_failed': '저장에 실패했어요. 잠시 후 다시 시도해 주세요.',
       'save_permission_denied': '갤러리 권한이 필요해요',
       'shake_to_clear_title': '흔들어 지우기',
-      'shake_to_clear_desc': '기기를 흔들면 캔버스를 지워요. 항상 확인을 거쳐요.',
+      'shake_to_clear_desc': '기기를 흔들면 캔버스를 지워요.\n지우기 전\u2060에 다시 확인해요.',
       'artwork_title': '작품',
       'artwork_save_action': '작품으로 저장',
       'artwork_save_success': '작품을 저장했어요',
@@ -563,7 +566,8 @@ class Languages extends Translations {
       'save_failed': 'Speichern fehlgeschlagen. Bitte später erneut versuchen.',
       'save_permission_denied': 'Galeriezugriff erforderlich',
       'shake_to_clear_title': 'Schütteln zum Löschen',
-      'shake_to_clear_desc': 'Gerät schütteln, um die Leinwand zu löschen (fragt immer nach).',
+      'shake_to_clear_desc':
+          'Gerät schütteln, um die Leinwand zu löschen (fragt immer nach).',
       'artwork_title': 'Werk',
       'artwork_save_action': 'Als Werk speichern',
       'artwork_save_success': 'Werk gespeichert',
@@ -574,7 +578,8 @@ class Languages extends Translations {
       'gallery_saved_count': 'Gespeicherte Werke:',
       'gallery_empty_title': 'Noch keine Werke',
       'gallery_empty_desc': 'Gespeicherte Zeichnungen erscheinen hier.',
-      'gallery_overlimit_warning': 'Sie haben viele Werke. Löschen Sie alte Werke.',
+      'gallery_overlimit_warning':
+          'Sie haben viele Werke. Löschen Sie alte Werke.',
       'gallery_selected_suffix': ' ausgewählt',
       'gallery_select_mode': 'Auswählen',
       'gallery_exit_select_mode': 'Fertig',
@@ -704,7 +709,8 @@ class Languages extends Translations {
       'save_failed': 'Не удалось сохранить. Повторите позже.',
       'save_permission_denied': 'Требуется доступ к галерее',
       'shake_to_clear_title': 'Встряхнуть, чтобы очистить',
-      'shake_to_clear_desc': 'Встряхните устройство, чтобы очистить холст (всегда запрашивает).',
+      'shake_to_clear_desc':
+          'Встряхните устройство, чтобы очистить холст (всегда запрашивает).',
       'artwork_title': 'Работа',
       'artwork_save_action': 'Сохранить как работу',
       'artwork_save_success': 'Работа сохранена',
@@ -847,7 +853,8 @@ class Languages extends Translations {
       'save_failed': "Échec de l'enregistrement. Réessayez plus tard.",
       'save_permission_denied': 'Autorisation de la galerie requise',
       'shake_to_clear_title': 'Secouer pour effacer',
-      'shake_to_clear_desc': 'Secouez l\'appareil pour effacer la toile (demande toujours confirmation).',
+      'shake_to_clear_desc':
+          'Secouez l\'appareil pour effacer la toile (demande toujours confirmation).',
       'artwork_title': 'Œuvre',
       'artwork_save_action': 'Enregistrer comme œuvre',
       'artwork_save_success': 'Œuvre enregistrée',
@@ -858,13 +865,15 @@ class Languages extends Translations {
       'gallery_saved_count': 'Œuvres enregistrées :',
       'gallery_empty_title': 'Aucune œuvre',
       'gallery_empty_desc': 'Les dessins enregistrés apparaîtront ici.',
-      'gallery_overlimit_warning': 'Vous avez beaucoup d\'œuvres. Supprimez les anciennes.',
+      'gallery_overlimit_warning':
+          'Vous avez beaucoup d\'œuvres. Supprimez les anciennes.',
       'gallery_selected_suffix': ' sélectionné(s)',
       'gallery_select_mode': 'Sélectionner',
       'gallery_exit_select_mode': 'Terminé',
       'gallery_delete_selected': 'Supprimer',
       'gallery_share_selected': 'Partager',
-      'gallery_delete_selected_confirm': ' œuvres seront définitivement supprimées.',
+      'gallery_delete_selected_confirm':
+          ' œuvres seront définitivement supprimées.',
       'delete': 'Supprimer',
     },
     'es': {
@@ -988,7 +997,8 @@ class Languages extends Translations {
       'save_failed': 'No se pudo guardar. Inténtalo más tarde.',
       'save_permission_denied': 'Se requiere permiso de la galería',
       'shake_to_clear_title': 'Agitar para borrar',
-      'shake_to_clear_desc': 'Agita el dispositivo para borrar el lienzo (siempre pide confirmación).',
+      'shake_to_clear_desc':
+          'Agita el dispositivo para borrar el lienzo (siempre pide confirmación).',
       'artwork_title': 'Obra',
       'artwork_save_action': 'Guardar como obra',
       'artwork_save_success': 'Obra guardada',
@@ -1005,7 +1015,8 @@ class Languages extends Translations {
       'gallery_exit_select_mode': 'Listo',
       'gallery_delete_selected': 'Eliminar',
       'gallery_share_selected': 'Compartir',
-      'gallery_delete_selected_confirm': ' obras se eliminarán permanentemente.',
+      'gallery_delete_selected_confirm':
+          ' obras se eliminarán permanentemente.',
       'delete': 'Eliminar',
     },
     'pt': {
@@ -1129,7 +1140,8 @@ class Languages extends Translations {
       'save_failed': 'Falha ao salvar. Tente novamente mais tarde.',
       'save_permission_denied': 'Permissão da galeria necessária',
       'shake_to_clear_title': 'Agitar para limpar',
-      'shake_to_clear_desc': 'Agite o dispositivo para limpar a tela (sempre pede confirmação).',
+      'shake_to_clear_desc':
+          'Agite o dispositivo para limpar a tela (sempre pede confirmação).',
       'artwork_title': 'Obra',
       'artwork_save_action': 'Salvar como obra',
       'artwork_save_success': 'Obra salva',
@@ -1146,7 +1158,8 @@ class Languages extends Translations {
       'gallery_exit_select_mode': 'Concluído',
       'gallery_delete_selected': 'Excluir',
       'gallery_share_selected': 'Compartilhar',
-      'gallery_delete_selected_confirm': ' obras serão excluídas permanentemente.',
+      'gallery_delete_selected_confirm':
+          ' obras serão excluídas permanentemente.',
       'delete': 'Excluir',
     },
     'id': {
@@ -1270,7 +1283,8 @@ class Languages extends Translations {
       'save_failed': 'Gagal menyimpan. Coba lagi nanti.',
       'save_permission_denied': 'Izin galeri diperlukan',
       'shake_to_clear_title': 'Goyangkan untuk menghapus',
-      'shake_to_clear_desc': 'Goyangkan perangkat untuk menghapus kanvas (selalu meminta konfirmasi).',
+      'shake_to_clear_desc':
+          'Goyangkan perangkat untuk menghapus kanvas (selalu meminta konfirmasi).',
       'artwork_title': 'Karya',
       'artwork_save_action': 'Simpan sebagai karya',
       'artwork_save_success': 'Karya tersimpan',

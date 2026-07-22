@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -75,6 +76,149 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'brushes and colors expose 44dp targets and selection semantics',
+    (tester) async {
+      final semanticsHandle = tester.ensureSemantics();
+      tester.view.physicalSize = const Size(320, 640);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(const _AppShell(home: DrawPage()));
+      await tester.pumpAndSettle();
+
+      final penFinder = find.byKey(const ValueKey('draw-brush-pen'));
+      final blackFinder = find.byKey(const ValueKey('draw-color-000000'));
+
+      expect(tester.getSize(penFinder).height, greaterThanOrEqualTo(44));
+      expect(tester.getSize(penFinder).width, greaterThanOrEqualTo(44));
+      expect(tester.getSize(blackFinder).height, greaterThanOrEqualTo(44));
+      expect(tester.getSize(blackFinder).width, greaterThanOrEqualTo(44));
+
+      final penSemantics = tester.widget<Semantics>(penFinder).properties;
+      final blackSemantics = tester.widget<Semantics>(blackFinder).properties;
+      expect(penSemantics.button, isTrue);
+      expect(penSemantics.selected, isTrue);
+      expect(penSemantics.label, 'Pen');
+      expect(penSemantics.onTap, isNotNull);
+      expect(blackSemantics.button, isTrue);
+      expect(blackSemantics.selected, isTrue);
+      expect(blackSemantics.label, 'Pick a Color #000000');
+      expect(blackSemantics.onTap, isNotNull);
+      expect(
+        tester
+            .getSemantics(penFinder)
+            .getSemanticsData()
+            .hasAction(SemanticsAction.tap),
+        isTrue,
+      );
+      expect(
+        tester
+            .getSemantics(blackFinder)
+            .getSemanticsData()
+            .hasAction(SemanticsAction.tap),
+        isTrue,
+      );
+
+      final watercolorSemantics = tester
+          .widget<Semantics>(
+            find.byKey(const ValueKey('draw-brush-watercolor')),
+          )
+          .properties;
+      expect(watercolorSemantics.hint, 'Watch an ad to unlock this brush.');
+      expect(watercolorSemantics.onTap, isNotNull);
+      semanticsHandle.dispose();
+    },
+  );
+
+  testWidgets('canvas colors expose selection and VoiceOver tap actions', (
+    tester,
+  ) async {
+    final semanticsHandle = tester.ensureSemantics();
+    await tester.pumpWidget(const _AppShell(home: DrawPage()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Canvas Color'));
+    await tester.pumpAndSettle();
+
+    final whiteFinder = find.byKey(const ValueKey('canvas-color-FFFFFF'));
+    final customFinder = find.byKey(const ValueKey('canvas-custom-color'));
+    final whiteSemantics = tester.widget<Semantics>(whiteFinder).properties;
+    final customSemantics = tester.widget<Semantics>(customFinder).properties;
+
+    expect(tester.getSize(whiteFinder).height, greaterThanOrEqualTo(44));
+    expect(tester.getSize(whiteFinder).width, greaterThanOrEqualTo(44));
+    expect(whiteSemantics.button, isTrue);
+    expect(whiteSemantics.selected, isTrue);
+    expect(whiteSemantics.label, 'Canvas Color #FFFFFF');
+    expect(whiteSemantics.onTap, isNotNull);
+    expect(customSemantics.button, isTrue);
+    expect(customSemantics.selected, isFalse);
+    expect(customSemantics.label, 'Pick a Color');
+    expect(customSemantics.onTap, isNotNull);
+    expect(
+      tester
+          .getSemantics(whiteFinder)
+          .getSemanticsData()
+          .hasAction(SemanticsAction.tap),
+      isTrue,
+    );
+    expect(
+      tester
+          .getSemantics(customFinder)
+          .getSemanticsData()
+          .hasAction(SemanticsAction.tap),
+      isTrue,
+    );
+    semanticsHandle.dispose();
+  });
+
+  testWidgets('draw toolbar entrances resolve immediately for reduced motion', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const _AppShell(home: DrawPage(), disableAnimations: true),
+    );
+    await tester.pump();
+
+    for (final key in const [
+      ValueKey('draw-top-toolbar-entrance'),
+      ValueKey('draw-bottom-toolbar-entrance'),
+    ]) {
+      final animation = tester.widget<TweenAnimationBuilder<double>>(
+        find.byKey(key),
+      );
+      expect(animation.duration, Duration.zero);
+    }
+  });
+
+  testWidgets('all locales fit a compact screen at 130% text scale', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1.0;
+    tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+    addTearDown(tester.view.reset);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    for (final locale in Languages.supportedLocales) {
+      await tester.pumpWidget(
+        _AppShell(
+          key: ValueKey(locale.languageCode),
+          locale: locale,
+          home: const DrawPage(),
+        ),
+      );
+      await tester.pump();
+
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${locale.languageCode} overflowed',
+      );
+    }
   });
 
   testWidgets('clear and share actions are disabled on an empty canvas', (
@@ -157,27 +301,25 @@ void main() {
     expect(viewer.maxScale, 5.0);
   });
 
-  testWidgets('single-finger drag still records a stroke under InteractiveViewer', (
-    tester,
-  ) async {
-    tester.view.physicalSize = const Size(390, 844);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.reset);
+  testWidgets(
+    'single-finger drag still records a stroke under InteractiveViewer',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
 
-    await tester.pumpWidget(const _AppShell(home: DrawPage()));
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(const _AppShell(home: DrawPage()));
+      await tester.pumpAndSettle();
 
-    expect(DoodleController.to.strokes, isEmpty);
+      expect(DoodleController.to.strokes, isEmpty);
 
-    // 캔버스 중앙에서 한 손가락 드래그 — 회귀 가드.
-    await tester.drag(
-      find.byType(InteractiveViewer),
-      const Offset(60, 60),
-    );
-    await tester.pumpAndSettle();
+      // 캔버스 중앙에서 한 손가락 드래그 — 회귀 가드.
+      await tester.drag(find.byType(InteractiveViewer), const Offset(60, 60));
+      await tester.pumpAndSettle();
 
-    expect(DoodleController.to.strokes, isNotEmpty);
-  });
+      expect(DoodleController.to.strokes, isNotEmpty);
+    },
+  );
 
   testWidgets('back button asks before discarding an active drawing', (
     tester,
@@ -206,21 +348,34 @@ void main() {
 }
 
 class _AppShell extends StatelessWidget {
-  const _AppShell({required this.home});
+  const _AppShell({
+    super.key,
+    required this.home,
+    this.locale = const Locale('en'),
+    this.disableAnimations = false,
+  });
 
   final Widget home;
+  final Locale locale;
+  final bool disableAnimations;
 
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: const Size(390, 844),
+      designSize: const Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
         return GetMaterialApp(
           translations: Languages(),
-          locale: const Locale('en'),
+          locale: locale,
           fallbackLocale: const Locale('en'),
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(disableAnimations: disableAnimations),
+            child: child!,
+          ),
           home: home,
         );
       },

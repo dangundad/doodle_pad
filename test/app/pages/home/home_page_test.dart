@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:hive_ce/hive.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:doodle_pad/app/admob/ads_banner.dart';
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
@@ -30,7 +31,9 @@ void main() {
   setUp(() async {
     Get.testMode = true;
 
-    tempDir = await Directory.systemTemp.createTemp('doodle_pad_home_page_test_');
+    tempDir = await Directory.systemTemp.createTemp(
+      'doodle_pad_home_page_test_',
+    );
     Hive.init(tempDir.path);
     if (!Hive.isAdapterRegistered(2)) {
       Hive.registerAdapter(DrawingAdapter());
@@ -56,10 +59,7 @@ void main() {
 
     Get.put<HiveService>(HiveService(), permanent: true);
     Get.put<DoodleController>(DoodleController(), permanent: true);
-    Get.put<SettingController>(
-      _FakeSettingController(),
-      permanent: true,
-    );
+    Get.put<SettingController>(_FakeSettingController(), permanent: true);
   });
 
   tearDown(() async {
@@ -95,10 +95,7 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
-    Get.put<PurchaseService>(
-      FakePurchaseService(),
-      permanent: true,
-    );
+    Get.put<PurchaseService>(FakePurchaseService(), permanent: true);
 
     await tester.pumpWidget(_buildApp(initialRoute: Routes.HOME));
     await tester.pump();
@@ -236,22 +233,150 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 250));
   });
+
+  testWidgets('all locales fit a compact screen at 130% text scale', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1.0;
+    tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+    addTearDown(tester.view.reset);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    Get.put<PurchaseService>(
+      FakePurchaseService()..isPremium.value = true,
+      permanent: true,
+    );
+
+    for (final locale in Languages.supportedLocales) {
+      await tester.pumpWidget(
+        _buildApp(
+          initialRoute: Routes.HOME,
+          locale: locale,
+          appKey: ValueKey(locale.languageCode),
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 950));
+
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${locale.languageCode} overflowed',
+      );
+    }
+  });
+
+  testWidgets('reduced motion resolves entrance effects without CTA pulsing', (
+    tester,
+  ) async {
+    Get.put<PurchaseService>(
+      FakePurchaseService()..isPremium.value = true,
+      permanent: true,
+    );
+
+    await tester.pumpWidget(
+      _buildApp(initialRoute: Routes.HOME, disableAnimations: true),
+    );
+    await tester.pump();
+
+    final entranceEffects = tester.widgetList<TweenAnimationBuilder<double>>(
+      find.byType(TweenAnimationBuilder<double>),
+    );
+
+    expect(entranceEffects, isNotEmpty);
+    expect(
+      entranceEffects.every((effect) => effect.duration == Duration.zero),
+      isTrue,
+    );
+    final ctaElement = tester.element(
+      find.byKey(const ValueKey('home-start-cta')),
+    );
+    Widget? directParent;
+    ctaElement.visitAncestorElements((ancestor) {
+      directParent = ancestor.widget;
+      return false;
+    });
+    expect(directParent, isNot(isA<Transform>()));
+  });
+
+  testWidgets('artwork navigation chevron follows RTL direction', (
+    tester,
+  ) async {
+    Get.put<PurchaseService>(
+      FakePurchaseService()..isPremium.value = true,
+      permanent: true,
+    );
+
+    await tester.pumpWidget(
+      _buildApp(initialRoute: Routes.HOME, locale: const Locale('ar')),
+    );
+    await tester.pump(const Duration(milliseconds: 950));
+
+    expect(find.byIcon(LucideIcons.chevronLeft), findsOneWidget);
+    expect(find.byIcon(LucideIcons.chevronRight), findsNothing);
+  });
+
+  testWidgets(
+    'Arabic title keeps clear vertical space from hero and subtitle',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      Get.put<PurchaseService>(
+        FakePurchaseService()..isPremium.value = true,
+        permanent: true,
+      );
+
+      await tester.pumpWidget(
+        _buildApp(initialRoute: Routes.HOME, locale: const Locale('ar')),
+      );
+      await tester.pump(const Duration(milliseconds: 950));
+
+      final hero = tester.getRect(
+        find.byKey(const ValueKey('home-hero-artwork')),
+      );
+      final title = tester.getRect(find.byKey(const ValueKey('home-title')));
+      final subtitle = tester.getRect(
+        find.byKey(const ValueKey('home-subtitle')),
+      );
+
+      expect(title.top - hero.bottom, greaterThanOrEqualTo(30));
+      expect(subtitle.top - title.bottom, greaterThanOrEqualTo(8));
+      expect(tester.takeException(), isNull);
+    },
+  );
 }
 
-Widget _buildApp({required String initialRoute}) {
+Widget _buildApp({
+  required String initialRoute,
+  Locale locale = const Locale('en'),
+  Key? appKey,
+  bool disableAnimations = false,
+}) {
   return ScreenUtilInit(
-    designSize: const Size(390, 844),
+    designSize: const Size(375, 812),
     minTextAdapt: true,
     splitScreenMode: true,
     builder: (context, child) {
       return GetMaterialApp(
+        key: appKey,
         translations: Languages(),
-        locale: const Locale('en'),
+        locale: locale,
         fallbackLocale: const Locale('en'),
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(disableAnimations: disableAnimations),
+          child: child!,
+        ),
         initialRoute: initialRoute,
         getPages: [
           GetPage(name: Routes.HOME, page: () => const HomePage()),
-          GetPage(name: Routes.SETTINGS, page: () => const _StubPage('settings')),
+          GetPage(
+            name: Routes.SETTINGS,
+            page: () => const _StubPage('settings'),
+          ),
           GetPage(name: Routes.PREMIUM, page: () => const _StubPage('premium')),
           GetPage(name: Routes.DRAW, page: () => const _StubPage('draw')),
         ],

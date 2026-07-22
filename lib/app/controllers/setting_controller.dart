@@ -10,6 +10,7 @@ import 'package:doodle_pad/app/services/app_rating_service.dart';
 import 'package:doodle_pad/app/translate/translate.dart';
 import 'package:doodle_pad/app/utils/app_constants.dart';
 import 'package:doodle_pad/app/utils/app_toast.dart';
+import 'package:doodle_pad/app/utils/device_qa_config.dart';
 
 typedef CanLaunchUrlFn = Future<bool> Function(Uri uri);
 typedef LaunchUrlFn = Future<bool> Function(Uri uri, LaunchMode mode);
@@ -114,7 +115,10 @@ class SettingController extends GetxController {
     hapticEnabled.value = _readBool(box, _kHapticKey, true);
     showBrushGuide.value = _readBool(box, _kShowBrushGuideKey, true);
     askBeforeClear.value = _readBool(box, _kAskBeforeClearKey, true);
-    language.value = _readString(box, _kLanguageKey, 'en');
+    final storedLanguage = _readString(box, _kLanguageKey, 'en');
+    language.value = _supportedLanguageCodes.contains(DeviceQaConfig.localeCode)
+        ? DeviceQaConfig.localeCode
+        : storedLanguage;
     lastExportResolution.value = _readExportResolution(box);
     lastExportFormat.value = _readExportFormat(box);
     shakeToClearEnabled.value = _readBool(box, _kShakeToClearEnabledKey, false);

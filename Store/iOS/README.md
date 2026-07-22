@@ -36,6 +36,25 @@
 - [ ] EU DSA trader 상태와 공개 연락처
 - [ ] 광고 단위, 인앱 구매 상품, 세금·은행 계약
 
+## iPhone 릴리즈 실기기 확인
+
+릴리즈 빌드는 AdMob 콘솔에서 발급한 iOS 앱 ID가 반드시 필요합니다. 값이 비어 있으면 Google Mobile Ads가 Dart 코드 진입 전에 앱을 종료하므로, Xcode 빌드 단계에서 누락을 오류로 차단합니다.
+
+```bash
+IOS_ADMOB_APP_ID=ca-app-pub-0000000000000000~0000000000 \
+  flutter run --release -d <device-id>
+```
+
+위 예시는 형식만 보여 줍니다. App Store 제출과 실제 광고 검증에는 반드시 이 앱의 AdMob iOS 앱 ID를 사용하고, Google 샘플 ID나 Android 앱 ID를 제출 빌드에 사용하지 않습니다.
+
+화면·번역 실기기 QA에서는 저장 데이터나 기기 언어를 바꾸지 않고 아래 빌드 정의로 시작 화면과 언어를 고정할 수 있습니다. 정의를 생략한 일반 빌드의 동작에는 영향이 없습니다.
+
+```bash
+IOS_ADMOB_APP_ID=<ios-app-id> flutter run --release -d <device-id> \
+  --dart-define=DOODLE_PAD_QA_ROUTE=/settings \
+  --dart-define=DOODLE_PAD_QA_LOCALE=ko
+```
+
 ## 2026 공통 게이트
 
 - 2026-04-28 이후 제출 빌드는 **iOS 26 SDK 이상**으로 빌드해야 합니다.

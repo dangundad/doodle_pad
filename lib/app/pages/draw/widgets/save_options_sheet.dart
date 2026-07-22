@@ -86,12 +86,12 @@ class _SaveOptionsSheetState extends State<SaveOptionsSheet> {
           SizedBox(height: 4.h),
           Text(
             'save_to_gallery_desc'.tr,
-            style: TextStyle(fontSize: 12.sp, color: cs.onSurfaceVariant),
+            style: TextStyle(fontSize: 14.sp, color: cs.onSurfaceVariant),
           ),
           SizedBox(height: 16.h),
           Text(
             'save_resolution_label'.tr,
-            style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
           ),
           SizedBox(height: 8.h),
           _ResolutionPicker(
@@ -101,7 +101,7 @@ class _SaveOptionsSheetState extends State<SaveOptionsSheet> {
           SizedBox(height: 16.h),
           Text(
             'save_format_label'.tr,
-            style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
           ),
           SizedBox(height: 8.h),
           _FormatPicker(

@@ -12,12 +12,13 @@ import 'package:doodle_pad/app/pages/gallery/gallery_page.dart';
 import 'package:doodle_pad/app/services/artwork_repository.dart';
 import 'package:doodle_pad/app/translate/translate.dart';
 
-Widget _shell(Widget home) {
+Widget _shell(Widget home, {Locale locale = const Locale('en'), Key? key}) {
   return ScreenUtilInit(
-    designSize: const Size(390, 844),
+    designSize: const Size(375, 812),
     builder: (_, _) => GetMaterialApp(
+      key: key,
       translations: Languages(),
-      locale: const Locale('en'),
+      locale: locale,
       fallbackLocale: const Locale('en'),
       home: home,
     ),
@@ -63,10 +64,7 @@ void main() {
       Hive.registerAdapter(SerializableStrokeAdapter());
     }
     box = await Hive.openBox<Drawing>('drawings_test');
-    repo = ArtworkRepository(
-      box: box,
-      supportDirProvider: () async => tempDir,
-    );
+    repo = ArtworkRepository(box: box, supportDirProvider: () async => tempDir);
   });
 
   tearDown(() async {
@@ -106,5 +104,35 @@ void main() {
     expect(find.byType(GridView), findsOneWidget);
     // 빈 상태 위젯은 없어야 함
     expect(find.text('No artworks yet'), findsNothing);
+  });
+
+  testWidgets('all locales fit a compact empty gallery at 130% text scale', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1.0;
+    tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+    addTearDown(tester.view.reset);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    Get.put<GalleryController>(GalleryController(repository: repo));
+
+    for (final locale in Languages.supportedLocales) {
+      await tester.pumpWidget(
+        _shell(
+          const GalleryPage(),
+          locale: locale,
+          key: ValueKey(locale.languageCode),
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${locale.languageCode} overflowed',
+      );
+    }
   });
 }

@@ -84,7 +84,7 @@ class ExitBottomSheet extends StatelessWidget {
                           Text(
                             'exit_app_message'.tr,
                             style: TextStyle(
-                              fontSize: 13.sp,
+                              fontSize: 14.sp,
                               height: 1.35,
                               color: cs.onSurfaceVariant,
                             ),
@@ -117,7 +117,7 @@ class ExitBottomSheet extends StatelessWidget {
                           child: Text(
                             'premium_subtitle'.tr,
                             style: TextStyle(
-                              fontSize: 12.sp,
+                              fontSize: 14.sp,
                               color: cs.onSurfaceVariant,
                             ),
                             maxLines: 2,

@@ -136,11 +136,7 @@ class GalleryPage extends GetView<GalleryController> {
       final proceed = await Get.dialog<bool>(
         AlertDialog(
           title: Text('continue_or_new_title'.tr),
-          content: Text(
-            'continue_or_new_desc'.tr,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-          ),
+          content: Text('continue_or_new_desc'.tr),
           actions: [
             TextButton(
               onPressed: () => Get.back(result: false),
@@ -209,17 +205,12 @@ class GalleryPage extends GetView<GalleryController> {
     try {
       await SharePlus.instance.share(
         ShareParams(
-          files: [
-            for (final path in paths) XFile(path, mimeType: 'image/png'),
-          ],
+          files: [for (final path in paths) XFile(path, mimeType: 'image/png')],
         ),
       );
     } catch (_) {
       AppToast.show(
-        AppToastMessage.error(
-          title: 'error'.tr,
-          description: 'share_error'.tr,
-        ),
+        AppToastMessage.error(title: 'error'.tr, description: 'share_error'.tr),
       );
     }
   }
@@ -272,8 +263,6 @@ class GalleryPage extends GetView<GalleryController> {
                       color: cs.onSurfaceVariant,
                     ),
                     textAlign: TextAlign.center,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -335,10 +324,8 @@ class _GalleryEmpty extends StatelessWidget {
             SizedBox(height: 8.h),
             Text(
               'gallery_empty_desc'.tr,
-              style: TextStyle(fontSize: 13.sp, color: cs.onSurfaceVariant),
+              style: TextStyle(fontSize: 14.sp, color: cs.onSurfaceVariant),
               textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
             SizedBox(height: 20.h),
             FilledButton.icon(
@@ -379,12 +366,10 @@ class _OverLimitBanner extends StatelessWidget {
             child: Text(
               '${'gallery_overlimit_warning'.tr} ($count)',
               style: TextStyle(
-                fontSize: 12.sp,
+                fontSize: 14.sp,
                 color: cs.onErrorContainer,
                 fontWeight: FontWeight.w600,
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -488,7 +473,7 @@ class _ArtworkCard extends StatelessWidget {
                   child: Text(
                     dateText,
                     style: TextStyle(
-                      fontSize: 11.sp,
+                      fontSize: 14.sp,
                       color: cs.onSurfaceVariant,
                       fontWeight: FontWeight.w500,
                     ),

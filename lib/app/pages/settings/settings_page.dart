@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/routes/app_pages.dart';
@@ -35,6 +36,12 @@ class SettingsPage extends GetView<SettingController> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final cardShape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16.r),
+      side: BorderSide(color: cs.outline.withValues(alpha: 0.25)),
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -50,16 +57,22 @@ class SettingsPage extends GetView<SettingController> {
             children: [
               Card(
                 key: const ValueKey('release_settings_intro'),
+                elevation: 0,
+                color: cs.surfaceContainerLowest,
+                shape: cardShape,
                 child: ListTile(
-                  leading: const Icon(Icons.tune_rounded),
+                  leading: const Icon(LucideIcons.slidersHorizontal),
                   title: Text('settings'.tr),
                   subtitle: Text('app_name'.tr),
                 ),
               ),
               SizedBox(height: 12.h),
               Card(
+                elevation: 0,
+                color: cs.surfaceContainerLowest,
+                shape: cardShape,
                 child: _ListItem(
-                  icon: Icons.auto_awesome,
+                  icon: LucideIcons.sparkles,
                   title: _loc('premium_title', 'Premium'),
                   subtitle: _loc('premium_subtitle', 'Unlock premium features'),
                   onTap: () => Get.toNamed(Routes.PREMIUM),
@@ -68,7 +81,7 @@ class SettingsPage extends GetView<SettingController> {
               SizedBox(height: 14.h),
               _SettingsSection(
                 title: _loc('drawing_settings', 'Drawing settings'),
-                icon: Icons.draw,
+                icon: LucideIcons.paintbrush,
                 children: [
                   _BuildSwitchTile(
                     value: controller.hapticEnabled.value,
@@ -77,7 +90,7 @@ class SettingsPage extends GetView<SettingController> {
                       'haptic_feedback_desc',
                       'Vibrate when interacting with tools',
                     ),
-                    icon: Icons.vibration,
+                    icon: LucideIcons.vibrate,
                     onChanged: controller.setHapticEnabled,
                   ),
                   _BuildSwitchTile(
@@ -87,7 +100,7 @@ class SettingsPage extends GetView<SettingController> {
                       'show_brush_guide_desc',
                       'Show the brush hint below the drawing toolbar',
                     ),
-                    icon: Icons.tips_and_updates,
+                    icon: LucideIcons.lightbulb,
                     onChanged: controller.setShowBrushGuide,
                   ),
                   _BuildSwitchTile(
@@ -97,7 +110,7 @@ class SettingsPage extends GetView<SettingController> {
                       'ask_before_clear_desc',
                       'Confirm before deleting all strokes',
                     ),
-                    icon: Icons.clear,
+                    icon: LucideIcons.eraser,
                     onChanged: controller.setAskBeforeClear,
                   ),
                   // Plan FR-05: Shake to clear 토글. 기본 OFF.
@@ -109,7 +122,7 @@ class SettingsPage extends GetView<SettingController> {
                       'shake_to_clear_desc',
                       'Shake the device to clear the canvas (always asks).',
                     ),
-                    icon: Icons.vibration,
+                    icon: LucideIcons.vibrate,
                     onChanged: controller.setShakeToClearEnabled,
                   ),
                   _BuildLanguageTile(
@@ -126,16 +139,16 @@ class SettingsPage extends GetView<SettingController> {
               SizedBox(height: 14.h),
               _SettingsSection(
                 title: _loc('data_and_support', 'Data and support'),
-                icon: Icons.cleaning_services,
+                icon: LucideIcons.database,
                 children: [
                   _ListItem(
-                    icon: Icons.delete_outline,
+                    icon: LucideIcons.trash2,
                     title: _loc('clear_data', 'Clear local data'),
                     subtitle: _loc('clear_data_desc', 'Reset app preferences'),
                     onTap: () => _confirmAndClear(),
                   ),
                   _ListItem(
-                    icon: Icons.feedback,
+                    icon: LucideIcons.messageSquare,
                     key: const ValueKey('settings-send-feedback-tile'),
                     title: _loc('feedback', 'Send feedback'),
                     subtitle: _loc(
@@ -145,7 +158,7 @@ class SettingsPage extends GetView<SettingController> {
                     onTap: controller.sendFeedback,
                   ),
                   _ListItem(
-                    icon: Icons.star_rate_rounded,
+                    icon: LucideIcons.star,
                     key: const ValueKey('settings-rate-app-tile'),
                     title: _loc('rate_app', 'Rate app'),
                     subtitle: _loc(
@@ -155,7 +168,7 @@ class SettingsPage extends GetView<SettingController> {
                     onTap: controller.rateApp,
                   ),
                   _ListItem(
-                    icon: Icons.apps_rounded,
+                    icon: LucideIcons.layoutGrid,
                     key: const ValueKey('settings-more-apps-tile'),
                     title: _loc('more_apps', 'More apps'),
                     subtitle: _loc(
@@ -165,7 +178,7 @@ class SettingsPage extends GetView<SettingController> {
                     onTap: controller.openMoreApps,
                   ),
                   _ListItem(
-                    icon: Icons.privacy_tip_outlined,
+                    icon: LucideIcons.shield,
                     key: const ValueKey('settings-privacy-policy-tile'),
                     title: _loc('privacy_policy', 'Privacy policy'),
                     subtitle: _loc(
@@ -192,8 +205,6 @@ class SettingsPage extends GetView<SettingController> {
             'clear_data_confirm',
             'This will reset local preferences. Continue?',
           ),
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
         ),
         actions: [
           TextButton(
@@ -241,35 +252,47 @@ class _BuildLanguageTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
 
-    return ListTile(
-      leading: Icon(Icons.language, color: cs.primary),
-      title: Text(
-        _loc('language', 'Language'),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      subtitle: Padding(
-        padding: EdgeInsets.only(top: 8.h),
-        child: Wrap(
-          spacing: 8.w,
-          children: options.entries
-              .map(
-                (entry) => ChoiceChip(
-                  label: Text(
-                    entry.value,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  selected: value == entry.key,
-                  onSelected: (selected) {
-                    if (selected) {
-                      onChanged(entry.key);
-                    }
-                  },
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16.w, 14.h, 16.w, 16.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(LucideIcons.languages, color: cs.primary),
+              SizedBox(width: 16.w),
+              Expanded(
+                child: Text(
+                  _loc('language', 'Language'),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              )
-              .toList(),
-        ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10.h),
+          Wrap(
+            spacing: 8.w,
+            runSpacing: 6.h,
+            children: options.entries
+                .map(
+                  (entry) => ChoiceChip(
+                    label: Text(
+                      entry.value,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    selected: value == entry.key,
+                    onSelected: (selected) {
+                      if (selected) {
+                        onChanged(entry.key);
+                      }
+                    },
+                  ),
+                )
+                .toList(),
+          ),
+        ],
       ),
     );
   }
@@ -298,8 +321,8 @@ class _BuildSwitchTile extends StatelessWidget {
       value: value,
       onChanged: onChanged,
       secondary: Icon(icon, color: cs.primary),
-      title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
-      subtitle: Text(subtitle, maxLines: 2, overflow: TextOverflow.ellipsis),
+      title: Text(title),
+      subtitle: Text(subtitle),
     );
   }
 }
@@ -334,14 +357,16 @@ class _SettingsSection extends StatelessWidget {
               children: [
                 Icon(icon, size: 18.r, color: cs.primary),
                 SizedBox(width: 8.w),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15.sp,
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15.sp,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -374,9 +399,13 @@ class _ListItem extends StatelessWidget {
 
     return ListTile(
       leading: Icon(icon, color: cs.primary),
-      title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
-      subtitle: Text(subtitle, maxLines: 2, overflow: TextOverflow.ellipsis),
-      trailing: const Icon(Icons.chevron_right),
+      title: Text(title),
+      subtitle: Text(subtitle),
+      trailing: Icon(
+        Directionality.of(context) == TextDirection.rtl
+            ? LucideIcons.chevronLeft
+            : LucideIcons.chevronRight,
+      ),
       onTap: onTap,
     );
   }

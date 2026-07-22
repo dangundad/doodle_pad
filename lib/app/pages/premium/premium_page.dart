@@ -6,6 +6,12 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:doodle_pad/app/controllers/premium_controller.dart';
 import 'package:doodle_pad/app/services/purchase_service.dart';
 
+const _supportIcons = <IconData>[
+  LucideIcons.coffee,
+  LucideIcons.sandwich,
+  LucideIcons.utensils,
+];
+
 class PremiumPage extends GetView<PremiumController> {
   const PremiumPage({super.key});
 
@@ -86,6 +92,7 @@ class _UpgradeContent extends StatelessWidget {
                 child: _SupportOptionTile(
                   key: ValueKey('premium_option_$index'),
                   plan: plan,
+                  icon: _supportIcons[index],
                   price: controller.planPrice(index),
                   selected: isSelected,
                   enabled: !service.isLoading.value,
@@ -101,7 +108,7 @@ class _UpgradeContent extends StatelessWidget {
           'premium_purchase_note'.tr,
           style: TextStyle(
             color: cs.onSurfaceVariant,
-            fontSize: 11.sp,
+            fontSize: 14.sp,
             height: 1.35,
           ),
         ),
@@ -153,19 +160,15 @@ class _HeroPanel extends StatelessWidget {
                     fontWeight: FontWeight.w900,
                     color: cs.onPrimaryContainer,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 6.h),
                 Text(
                   'premium_subtitle'.tr,
                   style: TextStyle(
-                    fontSize: 13.sp,
+                    fontSize: 14.sp,
                     height: 1.35,
                     color: cs.onSurfaceVariant,
                   ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -189,42 +192,40 @@ class _BenefitRow extends StatelessWidget {
       (LucideIcons.heart, 'premium_benefit_one_time_support'.tr),
     ];
 
-    return Row(
-      children: [
-        for (var i = 0; i < items.length; i++) ...[
-          if (i > 0) SizedBox(width: 8.w),
-          Expanded(
-            child: Container(
-              height: 82.h,
-              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-              decoration: BoxDecoration(
-                color: cs.surfaceContainerLow,
-                borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(color: cs.outline.withValues(alpha: 0.28)),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+    return Container(
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.28)),
+      ),
+      child: Column(
+        children: [
+          for (var i = 0; i < items.length; i++) ...[
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+              child: Row(
                 children: [
-                  Icon(items[i].$1, color: cs.primary, size: 19.r),
-                  SizedBox(height: 7.h),
-                  Text(
-                    items[i].$2,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 11.sp,
-                      height: 1.2,
-                      fontWeight: FontWeight.w700,
-                      color: cs.onSurface,
+                  Icon(items[i].$1, color: cs.primary, size: 20.r),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Text(
+                      items[i].$2,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        height: 1.3,
+                        fontWeight: FontWeight.w700,
+                        color: cs.onSurface,
+                      ),
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
-          ),
+            if (i < items.length - 1)
+              Divider(height: 1, color: cs.outlineVariant),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
@@ -233,6 +234,7 @@ class _SupportOptionTile extends StatelessWidget {
   const _SupportOptionTile({
     super.key,
     required this.plan,
+    required this.icon,
     required this.price,
     required this.selected,
     required this.enabled,
@@ -241,6 +243,7 @@ class _SupportOptionTile extends StatelessWidget {
   });
 
   final PremiumPlan plan;
+  final IconData icon;
   final String price;
   final bool selected;
   final bool enabled;
@@ -280,7 +283,7 @@ class _SupportOptionTile extends StatelessWidget {
                       : cs.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(14.r),
                 ),
-                child: Text(plan.emoji, style: TextStyle(fontSize: 24.sp)),
+                child: Icon(icon, size: 23.r, color: cs.primary),
               ),
               SizedBox(width: 12.w),
               Expanded(
@@ -289,7 +292,7 @@ class _SupportOptionTile extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Flexible(
+                        Expanded(
                           child: Text(
                             plan.title,
                             style: TextStyle(
@@ -301,65 +304,58 @@ class _SupportOptionTile extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        if (badge != null) ...[
-                          SizedBox(width: 8.w),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 8.w,
-                              vertical: 3.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: cs.primary,
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            child: Text(
-                              badge,
-                              style: TextStyle(
-                                color: cs.onPrimary,
-                                fontSize: 10.sp,
-                                fontWeight: FontWeight.w800,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                        SizedBox(width: 10.w),
+                        Text(
+                          price,
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            color: cs.primary,
+                            fontWeight: FontWeight.w900,
                           ),
-                        ],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ],
                     ),
+                    if (badge != null) ...[
+                      SizedBox(height: 5.h),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.w,
+                          vertical: 3.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: cs.primary,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          badge,
+                          style: TextStyle(
+                            color: cs.onPrimary,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w800,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                     SizedBox(height: 4.h),
                     Text(
                       plan.description,
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 14.sp,
                         color: cs.onSurfaceVariant,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
               SizedBox(width: 10.w),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    price,
-                    style: TextStyle(
-                      fontSize: 15.sp,
-                      color: cs.primary,
-                      fontWeight: FontWeight.w900,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 6.h),
-                  Icon(
-                    selected ? LucideIcons.check : LucideIcons.circle,
-                    color: selected ? cs.primary : cs.outline,
-                    size: 19.r,
-                  ),
-                ],
+              Icon(
+                selected ? LucideIcons.check : LucideIcons.circle,
+                color: selected ? cs.primary : cs.outline,
+                size: 19.r,
               ),
             ],
           ),
@@ -407,27 +403,18 @@ class _PurchaseBar extends StatelessWidget {
                 controller.selectedPlanIndex.value,
               );
 
-              return Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      '${plan.title} · $price',
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w800,
-                        color: cs.onSurface,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+              return Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: Text(
+                  '${plan.title} · $price',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w800,
+                    color: cs.onSurface,
                   ),
-                  TextButton(
-                    onPressed: service.isLoading.value
-                        ? null
-                        : controller.restore,
-                    child: Text('premium_restore'.tr),
-                  ),
-                ],
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               );
             }),
             SizedBox(

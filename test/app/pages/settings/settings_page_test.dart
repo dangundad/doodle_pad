@@ -118,10 +118,69 @@ void main() {
       await tester.pumpAndSettle();
     },
   );
+
+  testWidgets('all locales fit a compact screen at 130% text scale', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1.0;
+    tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+    addTearDown(tester.view.reset);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    for (final locale in Languages.supportedLocales) {
+      Get.reset();
+      Get.testMode = true;
+      Get.put<SettingController>(_FakeSettingController());
+
+      await tester.pumpWidget(
+        _AppShell(
+          key: ValueKey(locale.languageCode),
+          locale: locale,
+          home: const SettingsPage(),
+        ),
+      );
+      await tester.pump();
+
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${locale.languageCode} overflowed above the fold',
+      );
+
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -1800));
+      await tester.pump();
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${locale.languageCode} overflowed below the fold',
+      );
+    }
+  });
+
+  testWidgets('Korean shake guidance preserves the complete message', (
+    tester,
+  ) async {
+    Get.put<SettingController>(_FakeSettingController());
+
+    await tester.pumpWidget(
+      const _AppShell(locale: Locale('ko'), home: SettingsPage()),
+    );
+    await tester.pumpAndSettle();
+
+    const guidance = '기기를 흔들면 캔버스를 지워요.\n지우기 전\u2060에 다시 확인해요.';
+    final guidanceFinder = find.text(guidance);
+    expect(guidanceFinder, findsOneWidget);
+
+    final guidanceText = tester.widget<Text>(guidanceFinder);
+    expect(guidanceText.maxLines, isNull);
+    expect(guidanceText.overflow, isNull);
+  });
 }
 
 class _AppShell extends StatelessWidget {
   const _AppShell({
+    super.key,
     required this.home,
     required this.locale,
     this.includeTranslations = true,
@@ -134,7 +193,7 @@ class _AppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: const Size(390, 844),
+      designSize: const Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {

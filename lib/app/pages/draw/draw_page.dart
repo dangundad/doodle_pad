@@ -60,9 +60,7 @@ class DrawPage extends GetView<DoodleController> {
                       fontSize: 18.sp,
                       fontWeight: FontWeight.w700,
                     ),
-                    maxLines: 2,
                     textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 8.h),
                   Text(
@@ -72,8 +70,6 @@ class DrawPage extends GetView<DoodleController> {
                       color: cs.onSurfaceVariant,
                     ),
                     textAlign: TextAlign.center,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -119,6 +115,7 @@ class DrawPage extends GetView<DoodleController> {
   Widget build(BuildContext context) {
     final settingCtrl = SettingController.to;
     final cs = Get.theme.colorScheme;
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
 
     return PopScope(
       canPop: false,
@@ -203,8 +200,7 @@ class DrawPage extends GetView<DoodleController> {
                       controller.resetCanvasTransform();
                     },
                     child: Obx(() {
-                      final referencePath =
-                          controller.referenceImagePath.value;
+                      final referencePath = controller.referenceImagePath.value;
                       return Stack(
                         fit: StackFit.expand,
                         children: [
@@ -223,14 +219,14 @@ class DrawPage extends GetView<DoodleController> {
                                   // 캐시 정리/권한 변경 등으로 파일이 사라지면
                                   // 화면에서도 사라지지만 hasDrawableContent는 true로 남아
                                   // 빈 캔버스가 공유될 수 있다. 상태를 즉시 정리한다.
-                                  WidgetsBinding.instance.addPostFrameCallback(
-                                    (_) {
-                                      if (controller.referenceImagePath.value ==
-                                          referencePath) {
-                                        controller.clearReferenceDrawing();
-                                      }
-                                    },
-                                  );
+                                  WidgetsBinding.instance.addPostFrameCallback((
+                                    _,
+                                  ) {
+                                    if (controller.referenceImagePath.value ==
+                                        referencePath) {
+                                      controller.clearReferenceDrawing();
+                                    }
+                                  });
                                   return const SizedBox.shrink();
                                 },
                               ),
@@ -256,8 +252,11 @@ class DrawPage extends GetView<DoodleController> {
               left: 0,
               right: 0,
               child: TweenAnimationBuilder<double>(
+                key: const ValueKey('draw-top-toolbar-entrance'),
                 tween: Tween(begin: 0.0, end: 1.0),
-                duration: const Duration(milliseconds: 400),
+                duration: reduceMotion
+                    ? Duration.zero
+                    : const Duration(milliseconds: 400),
                 curve: Curves.easeOutCubic,
                 builder: (ctx, v, child) {
                   return Transform.translate(
@@ -275,8 +274,11 @@ class DrawPage extends GetView<DoodleController> {
               left: 0,
               right: 0,
               child: TweenAnimationBuilder<double>(
+                key: const ValueKey('draw-bottom-toolbar-entrance'),
                 tween: Tween(begin: 0.0, end: 1.0),
-                duration: const Duration(milliseconds: 400),
+                duration: reduceMotion
+                    ? Duration.zero
+                    : const Duration(milliseconds: 400),
                 curve: Curves.easeOutCubic,
                 builder: (ctx, v, child) {
                   return Transform.translate(
@@ -541,9 +543,7 @@ class _TopToolbar extends StatelessWidget {
             SizedBox(height: 4.h),
             Text(
               'canvas_color_desc'.tr,
-              style: TextStyle(fontSize: 12.sp, color: cs.onSurfaceVariant),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 14.sp, color: cs.onSurfaceVariant),
             ),
             SizedBox(height: 16.h),
             Obx(() {
@@ -568,17 +568,11 @@ class _TopToolbar extends StatelessWidget {
                   cs: cs,
                   customColor: isPresetSelected ? null : current,
                   selected: !isPresetSelected,
-                  onTap: () => _openCanvasCustomColorPicker(
-                    context,
-                    settingCtrl,
-                  ),
+                  onTap: () =>
+                      _openCanvasCustomColorPicker(context, settingCtrl),
                 ),
               ];
-              return Wrap(
-                spacing: 12.w,
-                runSpacing: 12.h,
-                children: swatches,
-              );
+              return Wrap(spacing: 12.w, runSpacing: 12.h, children: swatches);
             }),
           ],
         ),
@@ -596,23 +590,38 @@ class _TopToolbar extends StatelessWidget {
     final color = Color(colorValue);
     final luminance = color.computeLuminance();
     final checkColor = luminance > 0.6 ? Colors.black : Colors.white;
-    return GestureDetector(
+    final hex = colorValue
+        .toUnsigned(32)
+        .toRadixString(16)
+        .padLeft(8, '0')
+        .substring(2)
+        .toUpperCase();
+    return Semantics(
+      key: ValueKey('canvas-color-$hex'),
+      button: true,
+      selected: selected,
+      label: '${'canvas_color'.tr} #$hex',
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        width: 56.r,
-        height: 56.r,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: selected ? cs.primary : cs.outlineVariant,
-            width: selected ? 3 : 1,
+      excludeSemantics: true,
+      child: GestureDetector(
+        excludeFromSemantics: true,
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          width: 56.r,
+          height: 56.r,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: selected ? cs.primary : cs.outlineVariant,
+              width: selected ? 3 : 1,
+            ),
           ),
+          child: selected
+              ? Icon(LucideIcons.check, size: 22.r, color: checkColor)
+              : null,
         ),
-        child: selected
-            ? Icon(LucideIcons.check, size: 22.r, color: checkColor)
-            : null,
       ),
     );
   }
@@ -629,24 +638,33 @@ class _TopToolbar extends StatelessWidget {
     final color = hasCustom ? Color(customColor) : cs.surfaceContainerHigh;
     final luminance = color.computeLuminance();
     final fgColor = luminance > 0.6 ? Colors.black : Colors.white;
-    return GestureDetector(
+    return Semantics(
+      key: const ValueKey('canvas-custom-color'),
+      button: true,
+      selected: selected,
+      label: 'pick_color'.tr,
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        width: 56.r,
-        height: 56.r,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: selected ? cs.primary : cs.outline,
-            width: selected ? 3 : 1.5,
+      excludeSemantics: true,
+      child: GestureDetector(
+        excludeFromSemantics: true,
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          width: 56.r,
+          height: 56.r,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: selected ? cs.primary : cs.outline,
+              width: selected ? 3 : 1.5,
+            ),
           ),
-        ),
-        child: Icon(
-          selected ? LucideIcons.check : LucideIcons.plus,
-          size: 22.r,
-          color: hasCustom ? fgColor : cs.onSurfaceVariant,
+          child: Icon(
+            selected ? LucideIcons.check : LucideIcons.plus,
+            size: 22.r,
+            color: hasCustom ? fgColor : cs.onSurfaceVariant,
+          ),
         ),
       ),
     );
@@ -762,8 +780,6 @@ class _TopToolbar extends StatelessWidget {
                       fontSize: 18.sp,
                       fontWeight: FontWeight.w700,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 8.h),
                   Text(
@@ -773,8 +789,6 @@ class _TopToolbar extends StatelessWidget {
                       color: cs.onSurfaceVariant,
                     ),
                     textAlign: TextAlign.center,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -852,12 +866,10 @@ class _BottomToolbar extends StatelessWidget {
                 ? Text(
                     'brush_guide_desc'.tr,
                     style: TextStyle(
-                      fontSize: 11.sp,
+                      fontSize: 14.sp,
                       color: cs.onSurfaceVariant,
                     ),
                     textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   )
                 : const SizedBox.shrink(),
           ),
@@ -904,41 +916,61 @@ class _BrushTypeSelector extends StatelessWidget {
               iconColor = cs.onSurfaceVariant;
             }
 
-            return GestureDetector(
-              onTap: () {
-                if (settingCtrl.hapticEnabled.value) {
-                  ctrl.hapticSelection();
-                }
-                if (isLocked) {
-                  ctrl.unlockBrush(type);
-                } else {
-                  ctrl.brushType.value = type;
-                }
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                margin: EdgeInsets.only(right: 6.w),
-                width: 44.r,
-                height: 44.r,
-                decoration: BoxDecoration(
-                  color: bgColor,
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Icon(icon, size: 20.r, color: iconColor),
-                    if (isLocked)
-                      Positioned(
-                        right: 4.r,
-                        bottom: 4.r,
-                        child: Icon(
-                          LucideIcons.lock,
-                          size: 10.r,
-                          color: cs.tertiary,
-                        ),
+            final label = isEraser ? 'feature_eraser'.tr : preset!.labelKey.tr;
+            void handleTap() {
+              if (settingCtrl.hapticEnabled.value) {
+                ctrl.hapticSelection();
+              }
+              if (isLocked) {
+                ctrl.unlockBrush(type);
+              } else {
+                ctrl.brushType.value = type;
+              }
+            }
+
+            return Semantics(
+              key: ValueKey('draw-brush-${type.name}'),
+              button: true,
+              selected: selected,
+              label: label,
+              hint: isLocked ? 'brush_unlock_message'.tr : null,
+              onTap: handleTap,
+              excludeSemantics: true,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                excludeFromSemantics: true,
+                onTap: handleTap,
+                child: SizedBox(
+                  width: 50,
+                  height: 44,
+                  child: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: bgColor,
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
-                  ],
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Icon(icon, size: 20.r, color: iconColor),
+                          if (isLocked)
+                            PositionedDirectional(
+                              end: 4.r,
+                              bottom: 4.r,
+                              child: Icon(
+                                LucideIcons.lock,
+                                size: 10.r,
+                                color: cs.tertiary,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
             );
@@ -1023,11 +1055,11 @@ class _ColorPalette extends StatelessWidget {
 
       if (isEraser) {
         return SizedBox(
-          height: 40.r,
+          height: 44,
           child: Center(
             child: Text(
               'eraser_mode'.tr,
-              style: TextStyle(fontSize: 12.sp, color: cs.onSurfaceVariant),
+              style: TextStyle(fontSize: 14.sp, color: cs.onSurfaceVariant),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -1041,7 +1073,7 @@ class _ColorPalette extends StatelessWidget {
       final itemCount = paletteLength + 1;
 
       return SizedBox(
-        height: 40.r,
+        height: 44,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: itemCount,
@@ -1088,48 +1120,70 @@ class _ColorSwatch extends StatelessWidget {
     // 흰색 등 밝은 색상에서도 체크 표시가 보이도록 휘도 기반 대비 색상 선택.
     final luminance = color.computeLuminance();
     final checkColor = luminance > 0.6 ? Colors.black : Colors.white;
+    final hex = colorValue
+        .toUnsigned(32)
+        .toRadixString(16)
+        .padLeft(8, '0')
+        .substring(2)
+        .toUpperCase();
 
-    return GestureDetector(
+    return Semantics(
+      key: ValueKey('draw-color-$hex'),
+      button: true,
+      selected: selected,
+      label: '${'pick_color'.tr} #$hex',
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        width: selected ? 40.r : 32.r,
-        height: selected ? 40.r : 32.r,
-        margin: EdgeInsets.symmetric(
-          horizontal: 4.w,
-          vertical: selected ? 0 : 4.r,
-        ),
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          // 선택 시 흰 링(inner) + primary 외곽선 + glow 그림자로 명확히 강조.
-          border: Border.all(
-            color: selected ? cs.primary : cs.outlineVariant,
-            width: selected ? 4 : 1,
-          ),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: cs.primary.withValues(alpha: 0.45),
-                    blurRadius: 10,
-                    spreadRadius: 1,
-                  ),
-                ]
-              : null,
-        ),
-        child: selected
-            ? Container(
-                margin: EdgeInsets.all(2.r),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: checkColor.withValues(alpha: 0.9),
-                    width: 1.5,
-                  ),
+      excludeSemantics: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        excludeFromSemantics: true,
+        onTap: onTap,
+        child: SizedBox(
+          width: 48,
+          height: 44,
+          child: Center(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              width: selected ? 40 : 32,
+              height: selected ? 40 : 32,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                // 선택 시 흰 링(inner) + primary 외곽선 + glow 그림자로 명확히 강조.
+                border: Border.all(
+                  color: selected ? cs.primary : cs.outlineVariant,
+                  width: selected ? 4 : 1,
                 ),
-                child: Icon(LucideIcons.check, size: 18.r, color: checkColor),
-              )
-            : null,
+                boxShadow: selected
+                    ? [
+                        BoxShadow(
+                          color: cs.primary.withValues(alpha: 0.45),
+                          blurRadius: 10,
+                          spreadRadius: 1,
+                        ),
+                      ]
+                    : null,
+              ),
+              child: selected
+                  ? Container(
+                      margin: EdgeInsets.all(2.r),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: checkColor.withValues(alpha: 0.9),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Icon(
+                        LucideIcons.check,
+                        size: 18.r,
+                        color: checkColor,
+                      ),
+                    )
+                  : null,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -1152,38 +1206,53 @@ class _CustomColorSlot extends StatelessWidget {
     final color = hasCustom ? Color(custom) : cs.surfaceContainerHigh;
     final luminance = color.computeLuminance();
     final fgColor = luminance > 0.6 ? Colors.black : Colors.white;
+    void handleTap() {
+      _openPicker(context);
+    }
 
-    return GestureDetector(
-      onTap: () => _openPicker(context),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        width: selected ? 40.r : 32.r,
-        height: selected ? 40.r : 32.r,
-        margin: EdgeInsets.symmetric(
-          horizontal: 4.w,
-          vertical: selected ? 0 : 4.r,
-        ),
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: selected ? cs.primary : cs.outline,
-            width: selected ? 4 : 1.5,
+    return Semantics(
+      key: const ValueKey('draw-custom-color'),
+      button: true,
+      selected: selected,
+      label: 'pick_color'.tr,
+      onTap: handleTap,
+      excludeSemantics: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        excludeFromSemantics: true,
+        onTap: handleTap,
+        child: SizedBox(
+          width: 48,
+          height: 44,
+          child: Center(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              width: selected ? 40 : 32,
+              height: selected ? 40 : 32,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: selected ? cs.primary : cs.outline,
+                  width: selected ? 4 : 1.5,
+                ),
+                boxShadow: selected
+                    ? [
+                        BoxShadow(
+                          color: cs.primary.withValues(alpha: 0.45),
+                          blurRadius: 10,
+                          spreadRadius: 1,
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Icon(
+                selected ? LucideIcons.check : LucideIcons.plus,
+                size: 18.r,
+                color: hasCustom ? fgColor : cs.onSurfaceVariant,
+              ),
+            ),
           ),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: cs.primary.withValues(alpha: 0.45),
-                    blurRadius: 10,
-                    spreadRadius: 1,
-                  ),
-                ]
-              : null,
-        ),
-        child: Icon(
-          selected ? LucideIcons.check : LucideIcons.plus,
-          size: 18.r,
-          color: hasCustom ? fgColor : cs.onSurfaceVariant,
         ),
       ),
     );

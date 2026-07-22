@@ -6,7 +6,6 @@ import 'package:doodle_pad/app/utils/app_constants.dart';
 class PremiumPlan {
   const PremiumPlan({
     required this.productId,
-    required this.emoji,
     required this.titleKey,
     required this.descKey,
     required this.fallbackPrice,
@@ -14,7 +13,6 @@ class PremiumPlan {
   });
 
   final String productId;
-  final String emoji;
   final String titleKey;
   final String descKey;
   final String fallbackPrice;
@@ -33,14 +31,12 @@ class PremiumController extends GetxController {
   final List<PremiumPlan> plans = const [
     PremiumPlan(
       productId: PurchaseConstants.PREMIUM_SMALL_ANDROID,
-      emoji: '☕',
       titleKey: 'premium_support_small_title',
       descKey: 'premium_support_small_desc',
       fallbackPrice: '￦2,900',
     ),
     PremiumPlan(
       productId: PurchaseConstants.PREMIUM_MEDIUM_ANDROID,
-      emoji: '🍔',
       titleKey: 'premium_support_medium_title',
       descKey: 'premium_support_medium_desc',
       fallbackPrice: '￦5,900',
@@ -48,7 +44,6 @@ class PremiumController extends GetxController {
     ),
     PremiumPlan(
       productId: PurchaseConstants.PREMIUM_LARGE_ANDROID,
-      emoji: '🍽️',
       titleKey: 'premium_support_large_title',
       descKey: 'premium_support_large_desc',
       fallbackPrice: '￦9,900',
