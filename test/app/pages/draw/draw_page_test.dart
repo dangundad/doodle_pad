@@ -127,7 +127,7 @@ void main() {
             find.byKey(const ValueKey('draw-brush-watercolor')),
           )
           .properties;
-      expect(watercolorSemantics.hint, 'Watch an ad to unlock this brush.');
+      expect(watercolorSemantics.hint, 'Watch an ad to unlock.');
       expect(watercolorSemantics.onTap, isNotNull);
       semanticsHandle.dispose();
     },

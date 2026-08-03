@@ -168,7 +168,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    const guidance = '기기를 흔들면 캔버스를 지워요.\n지우기 전\u2060에 다시 확인해요.';
+    // 한 줄로 짧게 다듬은 안내 문구 (줄바꿈/word-joiner 하드코딩 제거).
+    // 잘림 없이 전체가 렌더링되는지 계속 고정한다.
+    const guidance = '흔들면 확인 후 지워요';
     final guidanceFinder = find.text(guidance);
     expect(guidanceFinder, findsOneWidget);
 
