@@ -122,16 +122,155 @@ void main() {
         isTrue,
       );
 
+      // 퀵 행은 최근 사용 브러시만 노출한다. 잠금 브러시(watercolor)는
+      // "+" 슬롯이 여는 전체 시트에서만 보이므로 열어서 확인한다.
+      expect(find.byKey(const ValueKey('draw-brush-watercolor')), findsNothing);
+
+      await tester.tap(find.byKey(const ValueKey('draw-brush-more')));
+      await tester.pumpAndSettle();
+
+      final watercolorFinder = find.byKey(
+        const ValueKey('draw-sheet-brush-watercolor'),
+      );
       final watercolorSemantics = tester
-          .widget<Semantics>(
-            find.byKey(const ValueKey('draw-brush-watercolor')),
-          )
+          .widget<Semantics>(watercolorFinder)
           .properties;
       expect(watercolorSemantics.hint, 'Watch an ad to unlock.');
       expect(watercolorSemantics.onTap, isNotNull);
       semanticsHandle.dispose();
     },
   );
+
+  testWidgets('brush quick row surfaces recent brushes without scrolling', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const _AppShell(home: DrawPage()));
+    await tester.pumpAndSettle();
+
+    // 기본 최근 브러시 4종 + 고정 지우개 + 더보기 = 6칸이 모두 보인다.
+    for (final name in const [
+      'pen',
+      'pencil',
+      'marker',
+      'brush',
+      'eraser',
+    ]) {
+      expect(
+        find.byKey(ValueKey('draw-brush-$name')),
+        findsOneWidget,
+        reason: '$name 슬롯이 퀵 행에 없다',
+      );
+    }
+    expect(find.byKey(const ValueKey('draw-brush-more')), findsOneWidget);
+
+    // 최근 색상 5종 + 더보기 슬롯.
+    expect(find.byKey(const ValueKey('draw-color-more')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('draw-color-000000')),
+      findsOneWidget,
+      reason: '기본 최근 색상(검정)이 퀵 행에 없다',
+    );
+
+    // 툴바 어디에도 가로 스크롤 뷰가 남아 있으면 안 된다 (잘림 회귀 가드).
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('draw-bottom-toolbar-entrance')),
+        matching: find.byType(SingleChildScrollView),
+      ),
+      findsNothing,
+    );
+  });
+
+  // 최근 목록 승격/영속화 로직 자체는 doodle_controller_test 가 검증한다.
+  // (위젯 테스트에서 선택을 실행하면 Hive 쓰기가 FakeAsync 에 묶여 종료되지 않는다.)
+  // 여기서는 "시트가 전체 목록을 보여주는가"와 "최근 목록이 퀵 행에 반영되는가"만 본다.
+
+  testWidgets('brush sheet lists every brush including locked ones', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const _AppShell(home: DrawPage()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('draw-brush-more')));
+    await tester.pumpAndSettle();
+
+    for (final type in BrushType.values) {
+      expect(
+        find.byKey(ValueKey('draw-sheet-brush-${type.name}')),
+        findsOneWidget,
+        reason: '전체 시트에 ${type.name} 이(가) 없다',
+      );
+    }
+  });
+
+  testWidgets('color sheet lists the full palette and the custom picker', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const _AppShell(home: DrawPage()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('draw-color-more')));
+    await tester.pumpAndSettle();
+
+    // 퀵 행에 없던 색(teal)도 전체 시트에는 있어야 한다.
+    expect(find.byKey(const ValueKey('draw-color-009688')), findsNothing);
+    expect(
+      find.byKey(const ValueKey('draw-sheet-color-009688')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('draw-sheet-custom-color')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('quick rows follow the recent lists', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const _AppShell(home: DrawPage()));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('draw-brush-highlighter')), findsNothing);
+    expect(find.byKey(const ValueKey('draw-color-009688')), findsNothing);
+
+    DoodleController.to.recentBrushes.assignAll(const [
+      BrushType.highlighter,
+      BrushType.pen,
+      BrushType.pencil,
+      BrushType.marker,
+    ]);
+    DoodleController.to.recentColors.assignAll(const [
+      0xFF009688,
+      0xFF000000,
+      0xFFF44336,
+      0xFF2196F3,
+      0xFF4CAF50,
+    ]);
+    await tester.pump();
+
+    expect(
+      find.byKey(const ValueKey('draw-brush-highlighter')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('draw-color-009688')), findsOneWidget);
+    // 승격된 브러시가 들어와도 칸 수(최근 4 + 지우개 + 더보기)는 그대로다.
+    expect(find.byKey(const ValueKey('draw-brush-eraser')), findsOneWidget);
+    expect(find.byKey(const ValueKey('draw-brush-more')), findsOneWidget);
+  });
 
   testWidgets('canvas colors expose selection and VoiceOver tap actions', (
     tester,

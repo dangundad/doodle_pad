@@ -831,6 +831,11 @@ class _TopToolbar extends StatelessWidget {
 }
 
 // Bottom Toolbar
+//
+// 3단 구성: [브러시 퀵] · [굵기] · [색상 퀵].
+// 예전에는 브러시 셀렉터와 굵기 슬라이더가 한 행을 나눠 써서 브러시가 가로
+// 스크롤로 잘렸다. 지금은 각 행이 Expanded 슬롯을 균등 분배해 어떤 폭에서도
+// 스크롤 없이 전부 보이고, 전체 목록은 "+" 슬롯이 여는 바텀시트에서 고른다.
 
 class _BottomToolbar extends StatelessWidget {
   final DoodleController ctrl;
@@ -842,34 +847,39 @@ class _BottomToolbar extends StatelessWidget {
     final cs = Get.theme.colorScheme;
     return Container(
       margin: EdgeInsets.fromLTRB(12.w, 0, 12.w, 8.h),
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+      padding: EdgeInsets.fromLTRB(10.w, 6.h, 10.w, 8.h),
       decoration: BoxDecoration(
         color: cs.surface,
-        borderRadius: BorderRadius.circular(20.r),
+        borderRadius: BorderRadius.circular(22.r),
         border: Border.all(color: cs.outlineVariant),
+        boxShadow: [
+          BoxShadow(
+            color: cs.shadow.withValues(alpha: 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, -2),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Expanded(child: _BrushTypeSelector(ctrl: ctrl)),
-              _BrushSizeSlider(ctrl: ctrl),
-            ],
-          ),
-          SizedBox(height: 10.h),
-          _ColorPalette(ctrl: ctrl),
-          SizedBox(height: 4.h),
-          // 설정 변경 시 즉시 반영되도록 Obx로 감싼다.
+          _BrushQuickRow(ctrl: ctrl),
+          _BrushSizeRow(ctrl: ctrl),
+          _ColorQuickRow(ctrl: ctrl),
           Obx(
             () => settingCtrl.showBrushGuide.value
-                ? Text(
-                    'brush_guide_desc'.tr,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: cs.onSurfaceVariant,
+                ? Padding(
+                    padding: EdgeInsets.only(top: 4.h),
+                    child: Text(
+                      'brush_guide_desc'.tr,
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: cs.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    textAlign: TextAlign.center,
                   )
                 : const SizedBox.shrink(),
           ),
@@ -879,120 +889,186 @@ class _BottomToolbar extends StatelessWidget {
   }
 }
 
-// Brush Type Selector
-
-class _BrushTypeSelector extends StatelessWidget {
+/// 1행 — 최근 사용 브러시 + 항상 고정되는 지우개 + 전체 목록 열기.
+class _BrushQuickRow extends StatelessWidget {
   final DoodleController ctrl;
-  const _BrushTypeSelector({required this.ctrl});
+  const _BrushQuickRow({required this.ctrl});
 
   @override
   Widget build(BuildContext context) {
     final settingCtrl = SettingController.to;
-    final cs = Get.theme.colorScheme;
     return Obx(() {
-      return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: BrushType.values.map((type) {
-            final selected = ctrl.brushType.value == type;
-            final isEraser = type == BrushType.eraser;
-            final preset = isEraser ? null : BrushPresets.of(type);
-            final isLocked = !isEraser && !ctrl.isBrushUnlocked(type);
-
-            final IconData icon = isEraser ? LucideIcons.eraser : preset!.icon;
-
-            // 선택된 도구는 primary 배경 + onPrimary 아이콘으로 충분한 대비 확보.
-            final Color bgColor;
-            final Color iconColor;
-            if (selected) {
-              bgColor = cs.primary;
-              iconColor = cs.onPrimary;
-            } else if (isLocked) {
-              bgColor = cs.surfaceContainerLow;
-              iconColor = cs.onSurface.withValues(alpha: 0.35);
-            } else {
-              bgColor = cs.surfaceContainerHigh;
-              iconColor = cs.onSurfaceVariant;
-            }
-
-            final label = isEraser ? 'feature_eraser'.tr : preset!.labelKey.tr;
-            void handleTap() {
-              if (settingCtrl.hapticEnabled.value) {
-                ctrl.hapticSelection();
-              }
-              if (isLocked) {
-                ctrl.unlockBrush(type);
-              } else {
-                ctrl.brushType.value = type;
-              }
-            }
-
-            return Semantics(
-              key: ValueKey('draw-brush-${type.name}'),
-              button: true,
-              selected: selected,
-              label: label,
-              hint: isLocked ? 'brush_unlock_message'.tr : null,
-              onTap: handleTap,
-              excludeSemantics: true,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                excludeFromSemantics: true,
-                onTap: handleTap,
-                child: SizedBox(
-                  width: 50,
-                  height: 44,
-                  child: Align(
-                    alignment: AlignmentDirectional.centerStart,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: bgColor,
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Icon(icon, size: 20.r, color: iconColor),
-                          if (isLocked)
-                            PositionedDirectional(
-                              end: 4.r,
-                              bottom: 4.r,
-                              child: Icon(
-                                LucideIcons.lock,
-                                size: 10.r,
-                                color: cs.tertiary,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+      final selected = ctrl.brushType.value;
+      return Row(
+        children: [
+          for (final type in ctrl.recentBrushes)
+            Expanded(
+              child: _BrushSlot(
+                ctrl: ctrl,
+                settingCtrl: settingCtrl,
+                type: type,
+                selected: selected == type,
               ),
-            );
-          }).toList(),
-        ),
+            ),
+          // 지우개는 사용 빈도가 높아 최근 목록과 무관하게 자리를 고정한다.
+          Expanded(
+            child: _BrushSlot(
+              ctrl: ctrl,
+              settingCtrl: settingCtrl,
+              type: BrushType.eraser,
+              selected: selected == BrushType.eraser,
+            ),
+          ),
+          Expanded(
+            child: _MoreSlot(
+              slotKey: const ValueKey('draw-brush-more'),
+              label: 'brush_all_title'.tr,
+              onTap: () {
+                if (settingCtrl.hapticEnabled.value) ctrl.hapticSelection();
+                BrushSheet.show(ctrl, settingCtrl);
+              },
+            ),
+          ),
+        ],
       );
     });
   }
 }
 
-// Brush Size Slider
+class _BrushSlot extends StatelessWidget {
+  const _BrushSlot({
+    required this.ctrl,
+    required this.settingCtrl,
+    required this.type,
+    required this.selected,
+  });
 
-class _BrushSizeSlider extends StatelessWidget {
   final DoodleController ctrl;
-  const _BrushSizeSlider({required this.ctrl});
+  final SettingController settingCtrl;
+  final BrushType type;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Get.theme.colorScheme;
+    final isEraser = type == BrushType.eraser;
+    final preset = isEraser ? null : BrushPresets.of(type);
+    final locked = !isEraser && !ctrl.isBrushUnlocked(type);
+    final label = isEraser ? 'feature_eraser'.tr : preset!.labelKey.tr;
+
+    void handleTap() {
+      if (settingCtrl.hapticEnabled.value) ctrl.hapticSelection();
+      if (locked) {
+        ctrl.unlockBrush(type);
+      } else {
+        ctrl.useBrush(type);
+      }
+    }
+
+    return Semantics(
+      key: ValueKey('draw-brush-${type.name}'),
+      button: true,
+      selected: selected,
+      label: label,
+      hint: locked ? 'brush_unlock_message'.tr : null,
+      onTap: handleTap,
+      excludeSemantics: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        excludeFromSemantics: true,
+        onTap: handleTap,
+        child: SizedBox(
+          height: 44,
+          child: Center(
+            child: _BrushGlyph(
+              icon: isEraser ? LucideIcons.eraser : preset!.icon,
+              selected: selected,
+              locked: locked,
+              size: 38,
+              cs: cs,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 브러시 아이콘 타일. 퀵 행과 전체 시트가 같은 모양을 공유한다.
+class _BrushGlyph extends StatelessWidget {
+  const _BrushGlyph({
+    required this.icon,
+    required this.selected,
+    required this.locked,
+    required this.size,
+    required this.cs,
+  });
+
+  final IconData icon;
+  final bool selected;
+  final bool locked;
+  final double size;
+  final ColorScheme cs;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color bg;
+    final Color fg;
+    if (selected) {
+      bg = cs.primary;
+      fg = cs.onPrimary;
+    } else if (locked) {
+      bg = cs.surfaceContainerLow;
+      fg = cs.onSurface.withValues(alpha: 0.35);
+    } else {
+      bg = cs.surfaceContainerHigh;
+      fg = cs.onSurfaceVariant;
+    }
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOut,
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: selected
+            ? [
+                BoxShadow(
+                  color: cs.primary.withValues(alpha: 0.38),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                ),
+              ]
+            : null,
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Icon(icon, size: size * 0.47, color: fg),
+          if (locked)
+            PositionedDirectional(
+              end: 3,
+              bottom: 3,
+              child: Icon(LucideIcons.lock, size: 9.r, color: cs.tertiary),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 2행 — 굵기. 슬라이더가 행 전체를 쓰므로 예전보다 조작 폭이 3배 넓다.
+class _BrushSizeRow extends StatelessWidget {
+  final DoodleController ctrl;
+  const _BrushSizeRow({required this.ctrl});
 
   @override
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
     return Obx(() {
-      final brushT = ctrl.brushType.value;
-      final isEraser = brushT == BrushType.eraser;
+      final isEraser = ctrl.brushType.value == BrushType.eraser;
       final minSize = isEraser ? 10.0 : 2.0;
       final maxSize = isEraser ? 60.0 : 30.0;
       final size = ctrl.brushSize.value.clamp(minSize, maxSize);
@@ -1002,35 +1078,104 @@ class _BrushSizeSlider extends StatelessWidget {
           ctrl.brushSize.value = size;
         });
       }
-      final dotSize = (size * 0.6).clamp(4.0, 24.0);
+      final dotSize = (size * 0.55).clamp(5.0, 22.0);
 
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Live preview dot — 현재 선택된 색상을 시각적으로 보여준다.
-          SizedBox(
-            width: 32.r,
-            height: 32.r,
-            child: Center(
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                width: dotSize.r,
-                height: dotSize.r,
-                decoration: BoxDecoration(
-                  color: isEraser ? cs.outline : Color(ctrl.brushColor.value),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: cs.outlineVariant, width: 1),
+      return SizedBox(
+        height: 34,
+        child: Row(
+          children: [
+            SizedBox(
+              width: 26.r,
+              child: Center(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  width: dotSize.r,
+                  height: dotSize.r,
+                  decoration: BoxDecoration(
+                    color: isEraser ? cs.outline : Color(ctrl.brushColor.value),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: cs.outlineVariant),
+                  ),
                 ),
               ),
             ),
+            Expanded(
+              child: SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  trackHeight: 3,
+                  thumbShape: const RoundSliderThumbShape(
+                    enabledThumbRadius: 8,
+                  ),
+                  overlayShape: const RoundSliderOverlayShape(
+                    overlayRadius: 16,
+                  ),
+                ),
+                child: Semantics(
+                  label: 'brush_size'.tr,
+                  child: Slider(
+                    value: size,
+                    min: minSize,
+                    max: maxSize,
+                    onChanged: (v) => ctrl.brushSize.value = v,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+}
+
+/// 3행 — 최근 사용 색상 + 전체 팔레트 열기.
+class _ColorQuickRow extends StatelessWidget {
+  final DoodleController ctrl;
+  const _ColorQuickRow({required this.ctrl});
+
+  @override
+  Widget build(BuildContext context) {
+    final settingCtrl = SettingController.to;
+    final cs = Get.theme.colorScheme;
+    return Obx(() {
+      // 지우개는 색상 개념이 없으므로 같은 높이의 안내로 대체해 레이아웃 점프를 막는다.
+      if (ctrl.brushType.value == BrushType.eraser) {
+        return SizedBox(
+          height: 44,
+          child: Center(
+            child: Text(
+              'eraser_mode'.tr,
+              style: TextStyle(fontSize: 12.sp, color: cs.onSurfaceVariant),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-          SizedBox(
-            width: 100.w,
-            child: Slider(
-              value: size,
-              min: minSize,
-              max: maxSize,
-              onChanged: (v) => ctrl.brushSize.value = v,
+        );
+      }
+
+      final current = ctrl.brushColor.value;
+      return Row(
+        children: [
+          for (final color in ctrl.recentColors)
+            Expanded(
+              child: _ColorSlot(
+                colorValue: color,
+                selected: current == color,
+                onTap: () {
+                  if (settingCtrl.hapticEnabled.value) ctrl.hapticSelection();
+                  ctrl.useColor(color);
+                },
+              ),
+            ),
+          Expanded(
+            child: _MoreSlot(
+              slotKey: const ValueKey('draw-color-more'),
+              label: 'pick_color'.tr,
+              circular: true,
+              onTap: () {
+                if (settingCtrl.hapticEnabled.value) ctrl.hapticSelection();
+                ColorSheet.show(ctrl, settingCtrl);
+              },
             ),
           ),
         ],
@@ -1039,94 +1184,21 @@ class _BrushSizeSlider extends StatelessWidget {
   }
 }
 
-// Color Palette
-
-class _ColorPalette extends StatelessWidget {
-  final DoodleController ctrl;
-  const _ColorPalette({required this.ctrl});
-
-  @override
-  Widget build(BuildContext context) {
-    final settingCtrl = SettingController.to;
-    final cs = Get.theme.colorScheme;
-    return Obx(() {
-      final brushT = ctrl.brushType.value;
-      final isEraser = brushT == BrushType.eraser;
-
-      if (isEraser) {
-        return SizedBox(
-          height: 44,
-          child: Center(
-            child: Text(
-              'eraser_mode'.tr,
-              style: TextStyle(fontSize: 14.sp, color: cs.onSurfaceVariant),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        );
-      }
-
-      // 팔레트 + 마지막 슬롯(커스텀 컬러 피커).
-      final paletteLength = DoodleController.colorPalette.length;
-      // +1 = 커스텀 슬롯
-      final itemCount = paletteLength + 1;
-
-      return SizedBox(
-        height: 44,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: itemCount,
-          itemBuilder: (ctx, i) {
-            // 마지막 슬롯: 커스텀 컬러 피커
-            if (i == paletteLength) {
-              return _CustomColorSlot(ctrl: ctrl, settingCtrl: settingCtrl);
-            }
-
-            final c = DoodleController.colorPalette[i];
-            final selected = ctrl.brushColor.value == c;
-            return _ColorSwatch(
-              colorValue: c,
-              selected: selected,
-              onTap: () {
-                if (settingCtrl.hapticEnabled.value) {
-                  ctrl.hapticSelection();
-                }
-                ctrl.brushColor.value = c;
-              },
-            );
-          },
-        ),
-      );
-    });
-  }
-}
-
-class _ColorSwatch extends StatelessWidget {
-  final int colorValue;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _ColorSwatch({
+class _ColorSlot extends StatelessWidget {
+  const _ColorSlot({
     required this.colorValue,
     required this.selected,
     required this.onTap,
   });
 
+  final int colorValue;
+  final bool selected;
+  final VoidCallback onTap;
+
   @override
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
-    final color = Color(colorValue);
-    // 흰색 등 밝은 색상에서도 체크 표시가 보이도록 휘도 기반 대비 색상 선택.
-    final luminance = color.computeLuminance();
-    final checkColor = luminance > 0.6 ? Colors.black : Colors.white;
-    final hex = colorValue
-        .toUnsigned(32)
-        .toRadixString(16)
-        .padLeft(8, '0')
-        .substring(2)
-        .toUpperCase();
-
+    final hex = _hexOf(colorValue);
     return Semantics(
       key: ValueKey('draw-color-$hex'),
       button: true,
@@ -1139,48 +1211,12 @@ class _ColorSwatch extends StatelessWidget {
         excludeFromSemantics: true,
         onTap: onTap,
         child: SizedBox(
-          width: 48,
           height: 44,
           child: Center(
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              width: selected ? 40 : 32,
-              height: selected ? 40 : 32,
-              decoration: BoxDecoration(
-                color: color,
-                shape: BoxShape.circle,
-                // 선택 시 흰 링(inner) + primary 외곽선 + glow 그림자로 명확히 강조.
-                border: Border.all(
-                  color: selected ? cs.primary : cs.outlineVariant,
-                  width: selected ? 4 : 1,
-                ),
-                boxShadow: selected
-                    ? [
-                        BoxShadow(
-                          color: cs.primary.withValues(alpha: 0.45),
-                          blurRadius: 10,
-                          spreadRadius: 1,
-                        ),
-                      ]
-                    : null,
-              ),
-              child: selected
-                  ? Container(
-                      margin: EdgeInsets.all(2.r),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: checkColor.withValues(alpha: 0.9),
-                          width: 1.5,
-                        ),
-                      ),
-                      child: Icon(
-                        LucideIcons.check,
-                        size: 18.r,
-                        color: checkColor,
-                      ),
-                    )
-                  : null,
+            child: _ColorDot(
+              colorValue: colorValue,
+              selected: selected,
+              cs: cs,
             ),
           ),
         ),
@@ -1189,67 +1225,98 @@ class _ColorSwatch extends StatelessWidget {
   }
 }
 
-class _CustomColorSlot extends StatelessWidget {
-  final DoodleController ctrl;
-  final SettingController settingCtrl;
+/// 색상 원. 선택 시 확대 + 링 + 글로우로 상태를 크게 벌린다.
+class _ColorDot extends StatelessWidget {
+  const _ColorDot({
+    required this.colorValue,
+    required this.selected,
+    required this.cs,
+    this.baseSize = 28,
+  });
 
-  const _CustomColorSlot({required this.ctrl, required this.settingCtrl});
+  final int colorValue;
+  final bool selected;
+  final ColorScheme cs;
+  final double baseSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Color(colorValue);
+    // 흰색 등 밝은 색상에서도 체크 표시가 보이도록 휘도 기반 대비 색상 선택.
+    final checkColor = color.computeLuminance() > 0.6
+        ? Colors.black
+        : Colors.white;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 150),
+      width: selected ? baseSize + 8 : baseSize,
+      height: selected ? baseSize + 8 : baseSize,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: selected ? cs.primary : cs.outlineVariant,
+          width: selected ? 3 : 1,
+        ),
+        boxShadow: selected
+            ? [
+                BoxShadow(
+                  color: cs.primary.withValues(alpha: 0.42),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                ),
+              ]
+            : null,
+      ),
+      child: selected
+          ? Icon(LucideIcons.check, size: 16.r, color: checkColor)
+          : null,
+    );
+  }
+}
+
+/// 전체 목록을 여는 "+" 슬롯.
+class _MoreSlot extends StatelessWidget {
+  const _MoreSlot({
+    required this.slotKey,
+    required this.label,
+    required this.onTap,
+    this.circular = false,
+  });
+
+  final Key slotKey;
+  final String label;
+  final VoidCallback onTap;
+  final bool circular;
 
   @override
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
-    final custom = ctrl.customColor.value;
-    final hasCustom = custom != null;
-    // 커스텀 색상이 설정되어 있고 현재 선택과 같으면 "선택됨" 표시.
-    final selected = hasCustom && ctrl.brushColor.value == custom;
-
-    final color = hasCustom ? Color(custom) : cs.surfaceContainerHigh;
-    final luminance = color.computeLuminance();
-    final fgColor = luminance > 0.6 ? Colors.black : Colors.white;
-    void handleTap() {
-      _openPicker(context);
-    }
-
     return Semantics(
-      key: const ValueKey('draw-custom-color'),
+      key: slotKey,
       button: true,
-      selected: selected,
-      label: 'pick_color'.tr,
-      onTap: handleTap,
+      label: label,
+      onTap: onTap,
       excludeSemantics: true,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         excludeFromSemantics: true,
-        onTap: handleTap,
+        onTap: onTap,
         child: SizedBox(
-          width: 48,
           height: 44,
           child: Center(
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              width: selected ? 40 : 32,
-              height: selected ? 40 : 32,
+            child: Container(
+              width: circular ? 28 : 38,
+              height: circular ? 28 : 38,
               decoration: BoxDecoration(
-                color: color,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: selected ? cs.primary : cs.outline,
-                  width: selected ? 4 : 1.5,
-                ),
-                boxShadow: selected
-                    ? [
-                        BoxShadow(
-                          color: cs.primary.withValues(alpha: 0.45),
-                          blurRadius: 10,
-                          spreadRadius: 1,
-                        ),
-                      ]
-                    : null,
+                color: cs.primaryContainer.withValues(alpha: 0.5),
+                shape: circular ? BoxShape.circle : BoxShape.rectangle,
+                borderRadius: circular ? null : BorderRadius.circular(12.r),
+                border: Border.all(color: cs.primary.withValues(alpha: 0.45)),
               ),
               child: Icon(
-                selected ? LucideIcons.check : LucideIcons.plus,
-                size: 18.r,
-                color: hasCustom ? fgColor : cs.onSurfaceVariant,
+                LucideIcons.plus,
+                size: circular ? 15.r : 18.r,
+                color: cs.primary,
               ),
             ),
           ),
@@ -1257,60 +1324,136 @@ class _CustomColorSlot extends StatelessWidget {
       ),
     );
   }
+}
 
-  Future<void> _openPicker(BuildContext context) async {
-    if (settingCtrl.hapticEnabled.value) {
-      ctrl.hapticSelection();
-    }
+String _hexOf(int colorValue) => colorValue
+    .toUnsigned(32)
+    .toRadixString(16)
+    .padLeft(8, '0')
+    .substring(2)
+    .toUpperCase();
+
+// Sheets — 퀵 행에 없는 항목은 여기서 고른다.
+
+/// 전체 브러시 시트.
+class BrushSheet {
+  const BrushSheet._();
+
+  static Future<void> show(
+    DoodleController ctrl,
+    SettingController settingCtrl,
+  ) {
     final cs = Get.theme.colorScheme;
-    Color picked = Color(ctrl.customColor.value ?? ctrl.brushColor.value);
-
-    await Get.dialog(
-      Dialog(
-        backgroundColor: cs.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.r),
+    // 시트는 항목을 고르는 즉시 닫히므로 반응형(Obx)일 필요가 없다.
+    // 오히려 pop 중인 라우트 안에서 Rx 알림을 받으면 리빌드가 꼬이므로,
+    // 열리는 시점의 선택 상태를 캡처해 정적으로 그린다.
+    final selected = ctrl.brushType.value;
+    return Get.bottomSheet<void>(
+      _SheetShell(
+        icon: LucideIcons.paintbrush,
+        title: 'brush_all_title'.tr,
+        child: Builder(
+          builder: (context) {
+            final tiles = <Widget>[
+              for (final preset in BrushPresets.values)
+                _SheetBrushTile(
+                  ctrl: ctrl,
+                  settingCtrl: settingCtrl,
+                  type: preset.type,
+                  icon: preset.icon,
+                  label: preset.labelKey.tr,
+                  selected: selected == preset.type,
+                  cs: cs,
+                ),
+              _SheetBrushTile(
+                ctrl: ctrl,
+                settingCtrl: settingCtrl,
+                type: BrushType.eraser,
+                icon: LucideIcons.eraser,
+                label: 'feature_eraser'.tr,
+                selected: selected == BrushType.eraser,
+                cs: cs,
+              ),
+            ];
+            return Wrap(spacing: 8.w, runSpacing: 12.h, children: tiles);
+          },
         ),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 12.h),
+      ),
+      isScrollControlled: true,
+    );
+  }
+}
+
+class _SheetBrushTile extends StatelessWidget {
+  const _SheetBrushTile({
+    required this.ctrl,
+    required this.settingCtrl,
+    required this.type,
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.cs,
+  });
+
+  final DoodleController ctrl;
+  final SettingController settingCtrl;
+  final BrushType type;
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final ColorScheme cs;
+
+  @override
+  Widget build(BuildContext context) {
+    final locked = type != BrushType.eraser && !ctrl.isBrushUnlocked(type);
+
+    void handleTap() {
+      if (settingCtrl.hapticEnabled.value) ctrl.hapticSelection();
+      // 잠금 해제 다이얼로그가 시트 위에 겹치지 않도록 먼저 시트를 닫는다.
+      Get.back<void>();
+      if (locked) {
+        ctrl.unlockBrush(type);
+      } else {
+        ctrl.useBrush(type);
+      }
+    }
+
+    return Semantics(
+      key: ValueKey('draw-sheet-brush-${type.name}'),
+      button: true,
+      selected: selected,
+      label: label,
+      hint: locked ? 'brush_unlock_message'.tr : null,
+      onTap: handleTap,
+      excludeSemantics: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        excludeFromSemantics: true,
+        onTap: handleTap,
+        child: SizedBox(
+          width: 60.w,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              _BrushGlyph(
+                icon: icon,
+                selected: selected,
+                locked: locked,
+                size: 44,
+                cs: cs,
+              ),
+              SizedBox(height: 6.h),
               Text(
-                'pick_color'.tr,
-                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
-              ),
-              SizedBox(height: 12.h),
-              ColorPicker(
-                pickerColor: picked,
-                onColorChanged: (c) => picked = c,
-                enableAlpha: false,
-                labelTypes: const [],
-                pickerAreaHeightPercent: 0.6,
-                displayThumbColor: true,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: Get.back,
-                      child: Text('cancel'.tr),
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: () {
-                        // 알파 채널은 항상 0xFF 로 강제.
-                        // ignore: deprecated_member_use
-                        final argb = picked.value | 0xFF000000;
-                        ctrl.setCustomColor(argb);
-                        Get.back();
-                      },
-                      child: Text('confirm'.tr),
-                    ),
-                  ),
-                ],
+                label,
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  height: 1.15,
+                  color: selected ? cs.primary : cs.onSurfaceVariant,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -1318,4 +1461,255 @@ class _CustomColorSlot extends StatelessWidget {
       ),
     );
   }
+}
+
+/// 전체 색상 시트 — 16색 팔레트 + 커스텀 피커.
+class ColorSheet {
+  const ColorSheet._();
+
+  static Future<void> show(
+    DoodleController ctrl,
+    SettingController settingCtrl,
+  ) {
+    final cs = Get.theme.colorScheme;
+    // BrushSheet과 같은 이유로 정적 렌더 (선택 즉시 닫힘).
+    final current = ctrl.brushColor.value;
+    final custom = ctrl.customColor.value;
+    return Get.bottomSheet<void>(
+      _SheetShell(
+        icon: LucideIcons.palette,
+        title: 'pick_color'.tr,
+        child: Builder(
+          builder: (context) {
+            return Wrap(
+              spacing: 6.w,
+              runSpacing: 6.h,
+              children: [
+                for (final color in DoodleController.colorPalette)
+                  _SheetColorTile(
+                    colorValue: color,
+                    selected: current == color,
+                    cs: cs,
+                    onTap: () {
+                      if (settingCtrl.hapticEnabled.value) {
+                        ctrl.hapticSelection();
+                      }
+                      ctrl.useColor(color);
+                      Get.back<void>();
+                    },
+                  ),
+                // 커스텀 슬롯: 저장된 커스텀 색이 있으면 그 색을, 없으면 "+"를 보여준다.
+                Semantics(
+                  key: const ValueKey('draw-sheet-custom-color'),
+                  button: true,
+                  selected: custom != null && current == custom,
+                  label: 'pick_color'.tr,
+                  onTap: () => _openBrushColorPicker(ctrl, settingCtrl),
+                  excludeSemantics: true,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    excludeFromSemantics: true,
+                    onTap: () => _openBrushColorPicker(ctrl, settingCtrl),
+                    child: SizedBox(
+                      width: 44,
+                      height: 44,
+                      child: Center(
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: custom != null
+                                ? Color(custom)
+                                : cs.primaryContainer.withValues(alpha: 0.5),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: cs.primary.withValues(alpha: 0.45),
+                            ),
+                          ),
+                          child: Icon(
+                            LucideIcons.pipette,
+                            size: 15.r,
+                            color: custom != null
+                                ? (Color(custom).computeLuminance() > 0.6
+                                      ? Colors.black
+                                      : Colors.white)
+                                : cs.primary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+}
+
+class _SheetColorTile extends StatelessWidget {
+  const _SheetColorTile({
+    required this.colorValue,
+    required this.selected,
+    required this.cs,
+    required this.onTap,
+  });
+
+  final int colorValue;
+  final bool selected;
+  final ColorScheme cs;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final hex = _hexOf(colorValue);
+    return Semantics(
+      key: ValueKey('draw-sheet-color-$hex'),
+      button: true,
+      selected: selected,
+      label: '${'pick_color'.tr} #$hex',
+      onTap: onTap,
+      excludeSemantics: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        excludeFromSemantics: true,
+        onTap: onTap,
+        child: SizedBox(
+          width: 44,
+          height: 44,
+          child: Center(
+            child: _ColorDot(
+              colorValue: colorValue,
+              selected: selected,
+              cs: cs,
+              baseSize: 32,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 시트 공통 껍데기 — 둥근 상단 + 제목 + 내용.
+class _SheetShell extends StatelessWidget {
+  const _SheetShell({
+    required this.icon,
+    required this.title,
+    required this.child,
+  });
+
+  final IconData icon;
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Get.theme.colorScheme;
+    return Container(
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22.r)),
+      ),
+      padding: EdgeInsets.fromLTRB(18.w, 14.h, 18.w, 20.h),
+      child: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(icon, size: 18.r, color: cs.primary),
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 14.h),
+              child,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 브러시 색상용 커스텀 컬러 피커. 확정 시 색상 시트도 함께 닫는다.
+Future<void> _openBrushColorPicker(
+  DoodleController ctrl,
+  SettingController settingCtrl,
+) async {
+  if (settingCtrl.hapticEnabled.value) {
+    ctrl.hapticSelection();
+  }
+  final cs = Get.theme.colorScheme;
+  Color picked = Color(ctrl.customColor.value ?? ctrl.brushColor.value);
+
+  await Get.dialog<void>(
+    Dialog(
+      backgroundColor: cs.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 12.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'pick_color'.tr,
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
+            ),
+            SizedBox(height: 12.h),
+            ColorPicker(
+              pickerColor: picked,
+              onColorChanged: (c) => picked = c,
+              enableAlpha: false,
+              labelTypes: const [],
+              pickerAreaHeightPercent: 0.6,
+              displayThumbColor: true,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: Get.back,
+                    child: Text('cancel'.tr),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: () {
+                      // 알파 채널은 항상 0xFF 로 강제.
+                      // ignore: deprecated_member_use
+                      final argb = picked.value | 0xFF000000;
+                      ctrl.setCustomColor(argb);
+                      // 다이얼로그 → 색상 시트 순으로 닫는다.
+                      Get.back<void>();
+                      if (Get.isBottomSheetOpen ?? false) Get.back<void>();
+                    },
+                    child: Text('confirm'.tr),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }

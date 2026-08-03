@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:typed_data';
@@ -127,8 +128,77 @@ class DoodleController extends GetxController
   /// 컬러 피커에서 색상이 선택되면 호출.
   Future<void> setCustomColor(int colorValue) async {
     customColor.value = colorValue;
-    brushColor.value = colorValue;
     await HiveService.to.setSetting(_customColorKey, colorValue);
+    await useColor(colorValue);
+  }
+
+  // ---- 최근 사용 브러시 / 색상 ----
+  // 하단 툴바는 전체 목록 대신 최근 사용 항목만 노출하고, 나머지는 "더보기"
+  // 시트에서 고른다. 가로 스크롤로 항목이 잘리던 문제를 없애기 위한 구조.
+
+  /// 한 행에 6칸(최근 N + 고정/더보기)을 넘기지 않도록 잡은 상한.
+  /// 320dp 폭에서도 각 칸이 44dp 터치 타깃을 유지하는 최대치다.
+  static const int maxRecentBrushes = 4;
+  static const int maxRecentColors = 5;
+
+  static const String recentBrushesKey = 'recent_brushes';
+  static const String recentColorsKey = 'recent_colors';
+
+  /// 첫 실행 기본값. 저장된 최근 항목이 모자라면 뒤를 이 값으로 채운다.
+  static const List<BrushType> defaultRecentBrushes = [
+    BrushType.pen,
+    BrushType.pencil,
+    BrushType.marker,
+    BrushType.brush,
+  ];
+  static const List<int> defaultRecentColors = [
+    0xFF000000, // black
+    0xFFF44336, // red
+    0xFF2196F3, // blue
+    0xFF4CAF50, // green
+    0xFFFFEB3B, // yellow
+  ];
+
+  final recentBrushes = <BrushType>[].obs;
+  final recentColors = <int>[].obs;
+
+  /// 브러시 선택 단일 진입점. 최근 목록 맨 앞으로 당기고 영속화한다.
+  /// eraser는 툴바에 항상 고정 노출되므로 최근 목록에 넣지 않는다.
+  Future<void> useBrush(BrushType type) async {
+    brushType.value = type;
+    if (type == BrushType.eraser) return;
+    _promote(recentBrushes, type, maxRecentBrushes);
+    await HiveService.to.setSetting(
+      recentBrushesKey,
+      recentBrushes.map((b) => b.stableId).toList(),
+    );
+  }
+
+  /// 색상 선택 단일 진입점(팔레트·커스텀 피커 공통).
+  Future<void> useColor(int colorValue) async {
+    brushColor.value = colorValue;
+    _promote(recentColors, colorValue, maxRecentColors);
+    await HiveService.to.setSetting(recentColorsKey, recentColors.toList());
+  }
+
+  static void _promote<T>(RxList<T> list, T value, int max) {
+    final next = list.toList()
+      ..remove(value)
+      ..insert(0, value);
+    if (next.length > max) next.removeRange(max, next.length);
+    list.assignAll(next);
+  }
+
+  /// 저장된 최근 목록을 기본값 위에 얹어 항상 정확히 [max]개를 만든다.
+  /// 칸 수가 들쭉날쭉해 툴바 레이아웃이 흔들리는 것을 막는다.
+  static List<T> _mergeRecents<T>(List<T> saved, List<T> defaults, int max) {
+    final merged = defaults.toList();
+    for (final item in saved.reversed) {
+      merged
+        ..remove(item)
+        ..insert(0, item);
+    }
+    return merged.take(max).toList();
   }
 
   /// 캔버스 배경 색상 (기본: 흰색). 공유 시에도 이 색이 그대로 캡처된다.
@@ -154,9 +224,13 @@ class DoodleController extends GetxController
   Future<void> resetDrawingPreferences() async {
     canvasColor.value = defaultCanvasColor;
     customColor.value = null;
+    recentBrushes.assignAll(defaultRecentBrushes);
+    recentColors.assignAll(defaultRecentColors);
     final box = HiveService.to.settingsBox;
     await box.delete(_canvasColorKey);
     await box.delete(_customColorKey);
+    await box.delete(recentBrushesKey);
+    await box.delete(recentColorsKey);
   }
 
   // Reference image (used by share preview overlay only).
@@ -434,6 +508,32 @@ class DoodleController extends GetxController
     if (savedCanvas != null) canvasColor.value = savedCanvas;
     final savedCustom = hive.getSetting<int>(_customColorKey);
     if (savedCustom != null) customColor.value = savedCustom;
+
+    final savedBrushes = hive.getSetting<List<dynamic>>(recentBrushesKey);
+    recentBrushes.assignAll(
+      _mergeRecents(
+        savedBrushes == null
+            ? const <BrushType>[]
+            : savedBrushes
+                  .whereType<int>()
+                  .map(BrushTypePersistence.fromStableId)
+                  .where((b) => b != BrushType.eraser)
+                  .toList(),
+        defaultRecentBrushes,
+        maxRecentBrushes,
+      ),
+    );
+
+    final savedColors = hive.getSetting<List<dynamic>>(recentColorsKey);
+    recentColors.assignAll(
+      _mergeRecents(
+        savedColors == null
+            ? const <int>[]
+            : savedColors.whereType<int>().toList(),
+        defaultRecentColors,
+        maxRecentColors,
+      ),
+    );
   }
 
   void startStroke(Offset point) {
@@ -500,19 +600,19 @@ class DoodleController extends GetxController
 
     // eraser나 등록되지 않은 brush는 잠금 개념 자체가 없다.
     if (preset == null || preset.lock == BrushLock.none) {
-      brushType.value = type;
+      unawaited(useBrush(type));
       return;
     }
 
     if (hasPremiumBrushAccess) {
-      brushType.value = type;
+      unawaited(useBrush(type));
       return;
     }
 
     if (!Get.isRegistered<RewardedAdManager>()) return;
 
     if (_isLockUnlocked(preset.lock)) {
-      brushType.value = type;
+      unawaited(useBrush(type));
       return;
     }
 
@@ -565,7 +665,7 @@ class DoodleController extends GetxController
     adManager.showAdIfAvailable(
       onUserEarnedReward: (RewardItem reward) async {
         await _persistUnlock(preset.lock);
-        brushType.value = type;
+        await useBrush(type);
         AppToast.show(
           AppToastMessage.success(
             title: 'brush_unlocked'.tr,

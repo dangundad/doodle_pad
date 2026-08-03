@@ -190,4 +190,99 @@ void main() {
     expect(result, isNull);
     expect(controller.isSavingArtwork.value, isTrue);
   });
+
+  test('useBrush: 최근 목록 맨 앞으로 당기고 상한을 지킨다', () async {
+    final controller = DoodleController();
+    Get.put<DoodleController>(controller);
+    controller.recentBrushes.assignAll(DoodleController.defaultRecentBrushes);
+
+    await controller.useBrush(BrushType.highlighter);
+
+    expect(controller.brushType.value, BrushType.highlighter);
+    expect(controller.recentBrushes.first, BrushType.highlighter);
+    expect(
+      controller.recentBrushes.length,
+      DoodleController.maxRecentBrushes,
+      reason: '툴바 칸 수가 흔들리지 않도록 상한을 유지해야 한다',
+    );
+
+    // 이미 목록에 있는 브러시는 중복 없이 앞으로만 이동한다.
+    await controller.useBrush(BrushType.pen);
+    expect(controller.recentBrushes.first, BrushType.pen);
+    expect(controller.recentBrushes.where((b) => b == BrushType.pen).length, 1);
+  });
+
+  test('useBrush: eraser는 최근 목록을 오염시키지 않는다', () async {
+    final controller = DoodleController();
+    Get.put<DoodleController>(controller);
+    controller.recentBrushes.assignAll(DoodleController.defaultRecentBrushes);
+
+    await controller.useBrush(BrushType.eraser);
+
+    // 지우개는 툴바에 항상 고정 노출되므로 최근 목록에서는 제외한다.
+    expect(controller.brushType.value, BrushType.eraser);
+    expect(controller.recentBrushes.contains(BrushType.eraser), isFalse);
+    expect(controller.recentBrushes, DoodleController.defaultRecentBrushes);
+  });
+
+  test('useColor: 최근 색상을 앞으로 당기고 Hive에 영속화한다', () async {
+    final controller = DoodleController();
+    Get.put<DoodleController>(controller);
+    controller.recentColors.assignAll(DoodleController.defaultRecentColors);
+
+    const teal = 0xFF009688;
+    await controller.useColor(teal);
+
+    expect(controller.brushColor.value, teal);
+    expect(controller.recentColors.first, teal);
+    expect(controller.recentColors.length, DoodleController.maxRecentColors);
+
+    final stored = HiveService.to.getSetting<List<dynamic>>(
+      DoodleController.recentColorsKey,
+    );
+    expect(stored?.first, teal, reason: '재실행 시 복원되도록 저장되어야 한다');
+  });
+
+  test('setCustomColor: 커스텀 색상도 최근 목록에 합류한다', () async {
+    final controller = DoodleController();
+    Get.put<DoodleController>(controller);
+    controller.recentColors.assignAll(DoodleController.defaultRecentColors);
+
+    const custom = 0xFF123456;
+    await controller.setCustomColor(custom);
+
+    expect(controller.customColor.value, custom);
+    expect(controller.brushColor.value, custom);
+    expect(controller.recentColors.first, custom);
+  });
+
+  test('저장된 최근 목록이 모자라면 기본값으로 칸을 채운다', () async {
+    // 색상 1개만 저장된 상태 — 툴바는 여전히 정확히 maxRecentColors 칸이어야 한다.
+    const saved = 0xFF9C27B0;
+    await HiveService.to.setSetting(DoodleController.recentColorsKey, [saved]);
+    await HiveService.to.setSetting(DoodleController.recentBrushesKey, [
+      BrushType.crayon.stableId,
+    ]);
+
+    final controller = DoodleController();
+    Get.put<DoodleController>(controller);
+    controller.onInit();
+
+    expect(controller.recentColors.first, saved);
+    expect(controller.recentColors.length, DoodleController.maxRecentColors);
+    expect(controller.recentBrushes.first, BrushType.crayon);
+    expect(controller.recentBrushes.length, DoodleController.maxRecentBrushes);
+  });
+
+  test('resetDrawingPreferences: 최근 목록도 기본값으로 되돌린다', () async {
+    final controller = DoodleController();
+    Get.put<DoodleController>(controller);
+    await controller.useColor(0xFF009688);
+    await controller.useBrush(BrushType.crayon);
+
+    await controller.resetDrawingPreferences();
+
+    expect(controller.recentColors, DoodleController.defaultRecentColors);
+    expect(controller.recentBrushes, DoodleController.defaultRecentBrushes);
+  });
 }
