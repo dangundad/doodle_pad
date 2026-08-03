@@ -1,0 +1,4 @@
+"CFBundleDisplayName" = "かんたんお絵かき";
+"NSPhotoLibraryAddUsageDescription" = "完成した絵を写真ライブラリに保存するにはアクセスが必要です。";
+"NSPhotoLibraryUsageDescription" = "写真を読み込んで絵に使うには写真ライブラリへのアクセスが必要です。";
+"NSUserTrackingUsageDescription" = "この識別子はパーソナライズ広告の配信に使用されます。アプリを無料で提供し続けるためのものです。";

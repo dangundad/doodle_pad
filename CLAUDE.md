@@ -76,6 +76,8 @@ flutter run
 ## 최근 감사 이력
 - 2026-05-08 핵심 로직 + UI gradient 1차 감사 통과
 - 2026-05-16~17 Wave 3 2차 감사 (설정/광고/strings/Haptic) + release_settings_intro Card 정리
+- 2026-08-03 시작 흐름 단순화: 첫 실행 온보딩(HomePage) 분기를 제거하고 앱 시작 시 항상 DrawPage로 직진입 (`main.dart` initialRoute). HomePage는 DrawPage 상단 홈 버튼으로 접근하는 허브(설정/갤러리/프리미엄/배너) 역할 유지. `AppBinding.isOnboardingSeen`은 라우팅에서 더 이상 사용되지 않음.
+- 2026-08-03 iOS 배포 준비(siren `IOS_DEPLOYMENT_GUIDE.md` 기준 적용, 결과는 루트 `IOS_DEPLOYMENT_GUIDE.md`). (1) `ios/Runner/PrivacyInfo.xcprivacy` 생성(UserDefaults CA92.1 + DeviceID 추적 + 추적 도메인) 및 pbxproj 등록, (2) `ios/Runner/<lang>.lproj/InfoPlist.strings` 11개 언어(앱 이름=translate `app_name`, 사진/추적 권한 문구) 생성 + `knownRegions`/`PBXVariantGroup` 등록, `Info.plist` 기본 문구는 영어 폴백으로 전환, (3) ATT 사전 설명 다이얼로그(`att_*` 3키 × 11언어, CupertinoAlertDialog) 추가, (4) `ExitBottomSheet` 종료 버튼 iOS 분기(시트만 닫음). 남은 스토어 측 작업: App Store Connect 앱 레코드/IAP 상품 3종 등록, DSA 거래자 정보, Nutrition Label.
 - 2026-08-03 iOS 최종 로직 감사. (1) iOS 광고 단위 ID를 릴리스 테스트 ID 하드코딩에서 Android와 동일한 `--dart-define=DOODLE_PAD_ADMOB_{BANNER,INTERSTITIAL,REWARDED}_IOS` 주입 방식으로 전환(미주입 시 광고 스킵 + 경고 로그), (2) `Info.plist`에 SKAdNetworkItems 40종 추가, (3) App Store ID를 `--dart-define=DOODLE_PAD_APP_STORE_ID` 주입으로 전환(미주입 시 인앱 리뷰 폴백), (4) 갤러리 작품 열기 다이얼로그를 공통 스타일 + 전용 문구(`artwork_open_overwrite_*`, 11개 언어)로 교체. `flutter analyze` / `flutter test` 117개 통과, iPhone 12 Pro Max 실기기 실행 검증.
 - 2026-05-27 Phase 1~4 Wave 3B 사전배포 감사 통과. 실제 경로는 `C:\Github_WorkSpace\doodle_pad`이며 Firebase Core/Crashlytics와 `google-services.json`은 유지하고 미사용 Firebase Analytics/기기정보 직접 의존성은 제거했습니다. `flutter pub outdated --no-transitive` 기준 `image`는 최신 resolvable `4.8.0`으로 유지했고, `flutter analyze`, `flutter test` 101개, Android `processDebugResources`/`assembleDebug`를 통과했습니다.
 

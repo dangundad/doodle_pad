@@ -1,0 +1,4 @@
+"CFBundleDisplayName" = "Zeichenblock";
+"NSPhotoLibraryAddUsageDescription" = "Zugriff wird benötigt, um fertige Zeichnungen in deiner Fotomediathek zu speichern.";
+"NSPhotoLibraryUsageDescription" = "Zugriff auf deine Fotomediathek wird benötigt, um Fotos in deine Zeichnungen zu importieren.";
+"NSUserTrackingUsageDescription" = "Diese Kennung wird verwendet, um dir personalisierte Werbung anzuzeigen. Das hilft, die App kostenlos zu halten.";

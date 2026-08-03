@@ -1,0 +1,4 @@
+"CFBundleDisplayName" = "Bloc dessin";
+"NSPhotoLibraryAddUsageDescription" = "L'accès est nécessaire pour enregistrer vos dessins terminés dans votre photothèque.";
+"NSPhotoLibraryUsageDescription" = "L'accès à votre photothèque est nécessaire pour importer des photos dans vos dessins.";
+"NSUserTrackingUsageDescription" = "Cet identifiant sera utilisé pour vous proposer des publicités personnalisées. Cela aide à garder l'app gratuite.";

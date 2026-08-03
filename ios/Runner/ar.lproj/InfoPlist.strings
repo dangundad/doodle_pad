@@ -1,0 +1,4 @@
+"CFBundleDisplayName" = "الرسم السهل";
+"NSPhotoLibraryAddUsageDescription" = "الوصول مطلوب لحفظ رسوماتك المكتملة في مكتبة الصور.";
+"NSPhotoLibraryUsageDescription" = "الوصول إلى مكتبة الصور مطلوب لاستيراد الصور إلى رسوماتك.";
+"NSUserTrackingUsageDescription" = "سيُستخدم هذا المعرّف لعرض إعلانات مخصصة لك، مما يساعد على إبقاء التطبيق مجانيًا.";

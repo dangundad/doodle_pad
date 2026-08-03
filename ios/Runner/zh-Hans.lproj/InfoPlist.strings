@@ -1,0 +1,4 @@
+"CFBundleDisplayName" = "简易画板";
+"NSPhotoLibraryAddUsageDescription" = "需要访问权限才能将完成的画作保存到您的照片图库。";
+"NSPhotoLibraryUsageDescription" = "需要访问您的照片图库才能导入照片用于绘画。";
+"NSUserTrackingUsageDescription" = "此标识符将用于向您投放个性化广告，帮助应用保持免费。";

@@ -1,0 +1,4 @@
+"CFBundleDisplayName" = "Dibujo Fácil";
+"NSPhotoLibraryAddUsageDescription" = "Se necesita acceso para guardar tus dibujos terminados en tu fototeca.";
+"NSPhotoLibraryUsageDescription" = "Se necesita acceso a tu fototeca para importar fotos a tus dibujos.";
+"NSUserTrackingUsageDescription" = "Este identificador se usará para mostrarte anuncios personalizados. Esto ayuda a mantener la app gratuita.";

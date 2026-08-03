@@ -1,0 +1,4 @@
+"CFBundleDisplayName" = "Tela Fácil";
+"NSPhotoLibraryAddUsageDescription" = "O acesso é necessário para salvar seus desenhos concluídos na sua fototeca.";
+"NSPhotoLibraryUsageDescription" = "O acesso à sua fototeca é necessário para importar fotos para seus desenhos.";
+"NSUserTrackingUsageDescription" = "Este identificador será usado para exibir anúncios personalizados. Isso ajuda a manter o app gratuito.";

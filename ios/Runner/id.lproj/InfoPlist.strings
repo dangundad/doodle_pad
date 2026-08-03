@@ -1,0 +1,4 @@
+"CFBundleDisplayName" = "Gambar Mudah";
+"NSPhotoLibraryAddUsageDescription" = "Akses diperlukan untuk menyimpan gambar yang selesai ke galeri foto Anda.";
+"NSPhotoLibraryUsageDescription" = "Akses ke galeri foto diperlukan untuk mengimpor foto ke gambar Anda.";
+"NSUserTrackingUsageDescription" = "Pengenal ini akan digunakan untuk menayangkan iklan yang dipersonalisasi. Ini membantu aplikasi tetap gratis.";

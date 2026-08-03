@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -141,7 +142,16 @@ class ExitBottomSheet extends StatelessWidget {
                     SizedBox(width: 10.w),
                     Expanded(
                       child: FilledButton.icon(
-                        onPressed: SystemNavigator.pop,
+                        // iOS는 HIG상 앱이 스스로 종료하면 안 되며
+                        // SystemNavigator.pop도 iOS에서는 무시된다(죽은 버튼 방지).
+                        // iOS에서는 시트만 닫고, Android에서만 실제 종료한다.
+                        onPressed: () {
+                          if (defaultTargetPlatform == TargetPlatform.iOS) {
+                            Get.back();
+                            return;
+                          }
+                          SystemNavigator.pop();
+                        },
                         icon: Icon(LucideIcons.logOut, size: 18.r),
                         label: Text('exit'.tr),
                       ),

@@ -13,7 +13,6 @@ import 'package:toastification/toastification.dart';
 import 'package:doodle_pad/app/admob/ads_helper.dart';
 import 'package:doodle_pad/app/bindings/app_binding.dart';
 import 'package:doodle_pad/app/routes/app_pages.dart';
-// Routes 상수 사용 (HOME / DRAW 분기).
 import 'package:doodle_pad/app/services/hive_service.dart';
 import 'package:doodle_pad/app/theme/app_theme.dart';
 import 'package:doodle_pad/app/translate/translate.dart';
@@ -190,13 +189,11 @@ class _DoodlePadAppState extends State<DoodlePadApp> {
             scrollBehavior: ScrollBehavior().copyWith(overscroll: false),
             navigatorKey: Get.key,
             getPages: AppPages.routes,
-            // Item 3: 온보딩(HomePage)은 첫 실행에서만 노출.
-            // 이후 실행은 DrawPage로 직진입.
+            // 앱 시작 시 항상 DrawPage로 직진입한다.
+            // HomePage(설정/갤러리/프리미엄 허브)는 DrawPage 상단 홈 버튼으로 접근.
             initialRoute: DeviceQaConfig.route.isNotEmpty
                 ? DeviceQaConfig.route
-                : AppBinding.isOnboardingSeen()
-                ? Routes.DRAW
-                : AppPages.INITIAL,
+                : Routes.DRAW,
           ),
         );
       },

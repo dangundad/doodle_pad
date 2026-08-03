@@ -1,0 +1,4 @@
+"CFBundleDisplayName" = "Doodle Pad";
+"NSPhotoLibraryAddUsageDescription" = "Access is needed to save your finished drawings to your photo library.";
+"NSPhotoLibraryUsageDescription" = "Access to your photo library is needed to import photos into your drawings.";
+"NSUserTrackingUsageDescription" = "This identifier will be used to deliver personalized ads to you. This helps support the app and keep it free.";

@@ -31,11 +31,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>완성한 그림을 사진 보관함에 저장하려면 접근이 필요합니다.</string>
+	<string>Access is needed to save your finished drawings to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>사진을 불러와 그림에 사용하려면 사진 보관함 접근이 필요합니다.</string>
+	<string>Access to your photo library is needed to import photos into your drawings.</string>
 	<key>NSUserTrackingUsageDescription</key>
-	<string>맞춤형 광고를 제공하고 앱을 무료로 유지하기 위해 추적 권한을 사용합니다.</string>
+	<string>This identifier will be used to deliver personalized ads to you. This helps support the app and keep it free.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>

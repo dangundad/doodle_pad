@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:gma_mediation_applovin/gma_mediation_applovin.dart';
@@ -121,11 +122,38 @@ class AdHelper {
     try {
       final status = await AppTrackingTransparency.trackingAuthorizationStatus;
       if (status == TrackingStatus.notDetermined) {
+        // Guideline 5.1.1 — 시스템 팝업 전에 추적이 왜 필요한지 먼저 설명한다.
+        await _showAttExplainerDialog();
         await Future<void>.delayed(const Duration(milliseconds: 250));
         await AppTrackingTransparency.requestTrackingAuthorization();
       }
     } catch (e) {
       debugPrint('ATT authorization request skipped: $e');
+    }
+  }
+
+  /// ATT 사전 설명(Pre-ATT Explainer) 다이얼로그.
+  /// 첫 프레임 이후에 호출되므로 Get.context(Navigator 포함)를 사용할 수 있다.
+  /// Navigator가 아직 없으면 설명 없이 시스템 팝업으로 진행한다(요청 자체는 보장).
+  static Future<void> _showAttExplainerDialog() async {
+    if (Get.context == null) return;
+    try {
+      await Get.dialog<void>(
+        CupertinoAlertDialog(
+          title: Text('att_title'.tr),
+          content: Text('att_content'.tr),
+          actions: [
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              onPressed: () => Get.back<void>(),
+              child: Text('att_action'.tr),
+            ),
+          ],
+        ),
+        barrierDismissible: false,
+      );
+    } catch (e) {
+      debugPrint('ATT explainer dialog skipped: $e');
     }
   }
 
