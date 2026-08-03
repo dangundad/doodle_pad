@@ -218,7 +218,14 @@ class GalleryPage extends GetView<GalleryController> {
     // DrawPage 캔버스는 Positioned.fill이므로 화면 크기를 근사값으로 사용.
     final viewport = MediaQuery.sizeOf(context);
     ctrl.loadArtwork(artwork, viewport: viewport);
-    await Get.toNamed(Routes.DRAW);
+
+    // 그리기 화면에서 넘어온 경우(툴바의 "내 작품")에는 뒤로 돌아가면 된다.
+    // Get.toNamed 로 새 DrawPage 를 쌓으면 스택에 그리기 화면이 중복된다.
+    if (Get.previousRoute == Routes.DRAW) {
+      Get.back<void>();
+      return;
+    }
+    await Get.offNamed(Routes.DRAW);
   }
 
   /// 단건 길게누름 삭제 (일반 모드).

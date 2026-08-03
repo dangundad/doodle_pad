@@ -12,6 +12,8 @@ import 'package:doodle_pad/app/controllers/doodle_controller.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/data/models/drawing.dart';
 import 'package:doodle_pad/app/pages/draw/draw_page.dart';
+import 'package:doodle_pad/app/pages/gallery/gallery_page.dart';
+import 'package:doodle_pad/app/routes/app_pages.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
 import 'package:doodle_pad/app/translate/translate.dart';
 
@@ -152,13 +154,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // 기본 최근 브러시 4종 + 고정 지우개 + 더보기 = 6칸이 모두 보인다.
-    for (final name in const [
-      'pen',
-      'pencil',
-      'marker',
-      'brush',
-      'eraser',
-    ]) {
+    for (final name in const ['pen', 'pencil', 'marker', 'brush', 'eraser']) {
       expect(
         find.byKey(ValueKey('draw-brush-$name')),
         findsOneWidget,
@@ -279,7 +275,10 @@ void main() {
     await tester.pumpWidget(const _AppShell(home: DrawPage()));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('Canvas Color'));
+    // 캔버스 색상은 상단 툴바의 "더보기" 시트로 이동했다.
+    await tester.tap(find.byTooltip('More'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('draw-more-canvas-color')));
     await tester.pumpAndSettle();
 
     final whiteFinder = find.byKey(const ValueKey('canvas-color-FFFFFF'));
@@ -484,6 +483,83 @@ void main() {
 
     expect(find.text('Discard drawing?'), findsOneWidget);
   });
+
+  testWidgets('my artworks button opens the gallery and keeps the drawing', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    DoodleController.to.strokes.add(
+      DrawingStroke(
+        points: const [Offset(10, 10), Offset(30, 30)],
+        color: Colors.black,
+        width: 4,
+      ),
+    );
+
+    await tester.pumpWidget(
+      const _AppShell(home: DrawPage(), withRoutes: true),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('My Artworks'));
+    await tester.pumpAndSettle();
+
+    // 홈 버튼과 달리 작업 중인 그림을 버리라고 묻지 않고 그대로 보관함으로 간다.
+    expect(find.text('Discard drawing?'), findsNothing);
+    expect(find.byType(GalleryPage), findsOneWidget);
+    expect(DoodleController.to.strokes, isNotEmpty);
+  });
+
+  testWidgets('more sheet hosts canvas color and reference image actions', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const _AppShell(home: DrawPage()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('More'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('draw-more-canvas-color')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('draw-more-reference-image')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('custom color slot opens the rich picker with every palette', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const _AppShell(home: DrawPage()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('draw-color-more')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('draw-sheet-custom-color')));
+    await tester.pumpAndSettle();
+
+    // Material 기본/강조 팔레트 + 흑백 + 자유 색상 휠 4종이 모두 제공된다.
+    for (final label in const ['Primary', 'Accent', 'B&W', 'Custom']) {
+      expect(find.text(label), findsOneWidget, reason: '리치 피커에 $label 팔레트가 없다');
+    }
+    // 최근 사용 색상이 피커 안에서도 이어진다.
+    expect(find.text('Recent'), findsOneWidget);
+    // HEX 코드 입력/복사 필드.
+    expect(find.byType(TextField), findsOneWidget);
+  });
 }
 
 class _AppShell extends StatelessWidget {
@@ -492,11 +568,13 @@ class _AppShell extends StatelessWidget {
     required this.home,
     this.locale = const Locale('en'),
     this.disableAnimations = false,
+    this.withRoutes = false,
   });
 
   final Widget home;
   final Locale locale;
   final bool disableAnimations;
+  final bool withRoutes;
 
   @override
   Widget build(BuildContext context) {
@@ -515,6 +593,7 @@ class _AppShell extends StatelessWidget {
             ).copyWith(disableAnimations: disableAnimations),
             child: child!,
           ),
+          getPages: withRoutes ? AppPages.routes : null,
           home: home,
         );
       },

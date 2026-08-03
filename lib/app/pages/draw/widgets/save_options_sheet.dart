@@ -137,7 +137,9 @@ class _SaveOptionsSheetState extends State<SaveOptionsSheet> {
 }
 
 /// 해상도 선택: 1x / 2x / 3x 가로 균등 분할.
-/// 라벨 키는 `save_resolution_{1,2,3}x` 로 11개 언어 모두 번역 키가 준비되어 있다.
+/// 배수(1x/2x/3x)는 언어 공통이라 코드에서 그리고, 번역 키
+/// `save_resolution_{1,2,3}x` 에는 화질 이름만 담는다. 한 줄에 배수+이름을
+/// 몰아넣던 예전 방식은 좁은 화면/큰 글자에서 "3x Ultr…" 처럼 잘렸다.
 class _ResolutionPicker extends StatelessWidget {
   const _ResolutionPicker({required this.current, required this.onChanged});
 
@@ -148,32 +150,17 @@ class _ResolutionPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(
-          child: _ResolutionOption(
-            label: 'save_resolution_1x'.tr,
-            value: 1,
-            selected: current == 1,
-            onTap: () => onChanged(1),
+        for (final value in const [1, 2, 3]) ...[
+          if (value != 1) SizedBox(width: 8.w),
+          Expanded(
+            child: _ResolutionOption(
+              label: 'save_resolution_${value}x'.tr,
+              value: value,
+              selected: current == value,
+              onTap: () => onChanged(value),
+            ),
           ),
-        ),
-        SizedBox(width: 8.w),
-        Expanded(
-          child: _ResolutionOption(
-            label: 'save_resolution_2x'.tr,
-            value: 2,
-            selected: current == 2,
-            onTap: () => onChanged(2),
-          ),
-        ),
-        SizedBox(width: 8.w),
-        Expanded(
-          child: _ResolutionOption(
-            label: 'save_resolution_3x'.tr,
-            value: 3,
-            selected: current == 3,
-            onTap: () => onChanged(3),
-          ),
-        ),
+        ],
       ],
     );
   }
@@ -195,6 +182,9 @@ class _ResolutionOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
+    // 선택 시 primaryContainer 위에 얹히므로 전경은 반드시 onPrimaryContainer.
+    // (예전에는 아이콘/텍스트에 primary 를 써서 주황 배경에 주황 전경이 겹쳤다.)
+    final fg = selected ? cs.onPrimaryContainer : cs.onSurface;
     return Material(
       color: selected ? cs.primaryContainer : cs.surfaceContainerLow,
       borderRadius: BorderRadius.circular(12.r),
@@ -202,7 +192,7 @@ class _ResolutionOption extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
         onTap: onTap,
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
+          padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 10.h),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12.r),
             border: Border.all(
@@ -210,17 +200,32 @@ class _ResolutionOption extends StatelessWidget {
               width: selected ? 2 : 1,
             ),
           ),
-          child: Center(
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w700,
-                color: selected ? cs.onPrimaryContainer : cs.onSurface,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '${value}x',
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w800,
+                  height: 1.1,
+                  color: fg,
+                ),
               ),
-            ),
+              SizedBox(height: 2.h),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  height: 1.1,
+                  color: selected ? fg : cs.onSurfaceVariant,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -278,6 +283,9 @@ class _FormatOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
+    // 선택 시 아이콘·라벨 모두 onPrimaryContainer(이 테마에서 흰색)로 통일한다.
+    // 예전에는 아이콘만 primary 라 주황 배경 위 주황 아이콘이 되어 사라져 보였다.
+    final fg = selected ? cs.onPrimaryContainer : cs.onSurfaceVariant;
     return Material(
       color: selected ? cs.primaryContainer : cs.surfaceContainerLow,
       borderRadius: BorderRadius.circular(14.r),
@@ -285,7 +293,7 @@ class _FormatOption extends StatelessWidget {
         borderRadius: BorderRadius.circular(14.r),
         onTap: onTap,
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 14.h),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14.r),
             border: Border.all(
@@ -296,11 +304,7 @@ class _FormatOption extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                icon,
-                size: 18.r,
-                color: selected ? cs.primary : cs.onSurfaceVariant,
-              ),
+              Icon(icon, size: 18.r, color: fg),
               SizedBox(width: 8.w),
               Flexible(
                 child: Text(

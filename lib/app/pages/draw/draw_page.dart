@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -315,167 +315,183 @@ class _TopToolbar extends StatelessWidget {
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: cs.outlineVariant),
       ),
-      child: Obx(() {
-        return Row(
-          children: [
-            IconButton(
-              // Item 3: DRAW가 루트가 되었으므로 leading은 홈 진입점.
-              // 설정/갤러리/프리미엄은 HomePage를 거쳐 이동한다.
-              icon: const Icon(LucideIcons.house),
-              onPressed: () async {
-                _maybeHaptic(settingCtrl);
-                final shouldPop = await DrawPage._confirmDiscardIfNeeded(
-                  ctrl,
-                  settingCtrl,
-                );
-                if (!shouldPop) return;
-                ctrl.clearCanvas();
-                if (Get.previousRoute.isEmpty) {
-                  // 스택 교체 — Home으로 이동해도 다시 Draw로 돌아오게 한다.
-                  await Get.offAllNamed(Routes.HOME);
-                } else {
-                  Get.back();
-                }
-              },
-              tooltip: 'home'.tr,
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        LucideIcons.undo2,
-                        color: ctrl.canUndo
-                            ? cs.onSurface
-                            : cs.onSurface.withValues(alpha: 0.3),
-                      ),
-                      onPressed: ctrl.canUndo
-                          ? () {
-                              if (settingCtrl.hapticEnabled.value) {
-                                ctrl.hapticLight();
+      // 기본 IconButton(48dp)로는 9개 액션이 일반 폰 폭을 넘겨 마지막 버튼이
+      // 잘린 채 가로 스크롤되었다. 밀도를 낮춰 한 화면에 모두 들어오게 하고,
+      // 아주 좁은 기기(320dp)에서는 기존처럼 스크롤로 폴백한다.
+      child: IconButtonTheme(
+        data: IconButtonThemeData(
+          style: IconButton.styleFrom(
+            padding: EdgeInsets.zero,
+            minimumSize: const Size(38, 40),
+            fixedSize: const Size(38, 40),
+            iconSize: 19.r,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ),
+        child: Obx(() {
+          return Row(
+            children: [
+              IconButton(
+                // Item 3: DRAW가 루트가 되었으므로 leading은 홈 진입점.
+                // 설정/갤러리/프리미엄은 HomePage를 거쳐 이동한다.
+                icon: const Icon(LucideIcons.house),
+                onPressed: () async {
+                  _maybeHaptic(settingCtrl);
+                  final shouldPop = await DrawPage._confirmDiscardIfNeeded(
+                    ctrl,
+                    settingCtrl,
+                  );
+                  if (!shouldPop) return;
+                  ctrl.clearCanvas();
+                  if (Get.previousRoute.isEmpty) {
+                    // 스택 교체 — Home으로 이동해도 다시 Draw로 돌아오게 한다.
+                    await Get.offAllNamed(Routes.HOME);
+                  } else {
+                    Get.back();
+                  }
+                },
+                tooltip: 'home'.tr,
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          LucideIcons.undo2,
+                          color: ctrl.canUndo
+                              ? cs.onSurface
+                              : cs.onSurface.withValues(alpha: 0.3),
+                        ),
+                        onPressed: ctrl.canUndo
+                            ? () {
+                                if (settingCtrl.hapticEnabled.value) {
+                                  ctrl.hapticLight();
+                                }
+                                ctrl.undo();
                               }
-                              ctrl.undo();
-                            }
-                          : null,
-                      tooltip: 'undo'.tr,
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        LucideIcons.redo2,
-                        color: ctrl.canRedo
-                            ? cs.onSurface
-                            : cs.onSurface.withValues(alpha: 0.3),
+                            : null,
+                        tooltip: 'undo'.tr,
                       ),
-                      onPressed: ctrl.canRedo
-                          ? () {
-                              _maybeHaptic(settingCtrl);
-                              ctrl.redo();
-                            }
-                          : null,
-                      tooltip: 'redo'.tr,
-                    ),
-                    IconButton(
-                      icon: Icon(LucideIcons.paintBucket, color: cs.onSurface),
-                      onPressed: () =>
-                          _openCanvasColorPicker(context, settingCtrl),
-                      tooltip: 'canvas_color'.tr,
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        ctrl.referenceImagePath.value != null
-                            ? LucideIcons.imageMinus
-                            : LucideIcons.imagePlus,
-                        color: cs.onSurface,
+                      IconButton(
+                        icon: Icon(
+                          LucideIcons.redo2,
+                          color: ctrl.canRedo
+                              ? cs.onSurface
+                              : cs.onSurface.withValues(alpha: 0.3),
+                        ),
+                        onPressed: ctrl.canRedo
+                            ? () {
+                                _maybeHaptic(settingCtrl);
+                                ctrl.redo();
+                              }
+                            : null,
+                        tooltip: 'redo'.tr,
                       ),
-                      onPressed: () async {
-                        _maybeHaptic(settingCtrl);
-                        if (ctrl.referenceImagePath.value != null) {
-                          ctrl.clearReferenceDrawing();
-                        } else {
-                          await ctrl.pickReferenceImage();
-                        }
-                      },
-                      tooltip: ctrl.referenceImagePath.value != null
-                          ? 'remove_image'.tr
-                          : 'import_image'.tr,
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        LucideIcons.trash2,
-                        color: ctrl.hasDrawableContent
-                            ? cs.error
-                            : cs.error.withValues(alpha: 0.3),
+                      // 저장한 작품 보관함으로 바로 이동한다.
+                      // 홈 버튼은 캔버스를 비우고 나가므로, 작업 중인 그림을
+                      // 유지한 채 작품을 열어보려면 이 진입점이 필요하다.
+                      IconButton(
+                        icon: Icon(LucideIcons.images, color: cs.onSurface),
+                        onPressed: () {
+                          _maybeHaptic(settingCtrl);
+                          Get.toNamed(Routes.GALLERY);
+                        },
+                        tooltip: 'gallery_title'.tr,
                       ),
-                      onPressed: ctrl.hasDrawableContent
-                          ? () => _confirmClear(context, cs, settingCtrl)
-                          : null,
-                      tooltip: 'clear_canvas'.tr,
-                    ),
-                    // Design Ref: §5.1 — Save 버튼은 Share 좌측에 배치.
-                    // Plan FR-01/FR-07: Save 시트로 해상도·포맷 선택 후 갤러리 저장.
-                    IconButton(
-                      icon: Icon(
-                        LucideIcons.download,
-                        color: ctrl.hasDrawableContent
-                            ? cs.onSurface
-                            : cs.onSurface.withValues(alpha: 0.3),
+                      IconButton(
+                        icon: Icon(
+                          LucideIcons.trash2,
+                          color: ctrl.hasDrawableContent
+                              ? cs.error
+                              : cs.error.withValues(alpha: 0.3),
+                        ),
+                        onPressed: ctrl.hasDrawableContent
+                            ? () => _confirmClear(context, cs, settingCtrl)
+                            : null,
+                        tooltip: 'clear_canvas'.tr,
                       ),
-                      onPressed: ctrl.hasDrawableContent
-                          ? () => _openSaveSheet(context, settingCtrl)
-                          : null,
-                      tooltip: 'save_to_gallery_title'.tr,
-                    ),
-                    // Plan FR-11: 작품 저장 버튼 — 갤러리 저장과 별개로 in-app 보관.
-                    // 저장 진행 중에는 연타로 인한 중복 저장을 막기 위해 비활성화한다.
-                    // 이 Row는 상위 Obx 안이라 isSavingArtwork 읽기가 반응형으로 추적된다.
-                    IconButton(
-                      icon: Icon(
-                        LucideIcons.bookmarkPlus,
-                        color:
+                      // Design Ref: §5.1 — Save 버튼은 Share 좌측에 배치.
+                      // Plan FR-01/FR-07: Save 시트로 해상도·포맷 선택 후 갤러리 저장.
+                      IconButton(
+                        icon: Icon(
+                          LucideIcons.download,
+                          color: ctrl.hasDrawableContent
+                              ? cs.onSurface
+                              : cs.onSurface.withValues(alpha: 0.3),
+                        ),
+                        onPressed: ctrl.hasDrawableContent
+                            ? () => _openSaveSheet(context, settingCtrl)
+                            : null,
+                        tooltip: 'save_to_gallery_title'.tr,
+                      ),
+                      // Plan FR-11: 작품 저장 버튼 — 갤러리 저장과 별개로 in-app 보관.
+                      // 저장 진행 중에는 연타로 인한 중복 저장을 막기 위해 비활성화한다.
+                      // 이 Row는 상위 Obx 안이라 isSavingArtwork 읽기가 반응형으로 추적된다.
+                      IconButton(
+                        icon: Icon(
+                          LucideIcons.bookmarkPlus,
+                          color:
+                              (ctrl.hasDrawableContent &&
+                                  !ctrl.isSavingArtwork.value)
+                              ? cs.onSurface
+                              : cs.onSurface.withValues(alpha: 0.3),
+                        ),
+                        onPressed:
                             (ctrl.hasDrawableContent &&
                                 !ctrl.isSavingArtwork.value)
-                            ? cs.onSurface
-                            : cs.onSurface.withValues(alpha: 0.3),
-                      ),
-                      onPressed:
-                          (ctrl.hasDrawableContent &&
-                              !ctrl.isSavingArtwork.value)
-                          ? () {
-                              if (settingCtrl.hapticEnabled.value) {
-                                ctrl.hapticMedium();
+                            ? () {
+                                if (settingCtrl.hapticEnabled.value) {
+                                  ctrl.hapticMedium();
+                                }
+                                ctrl.saveAsArtwork();
                               }
-                              ctrl.saveAsArtwork();
-                            }
-                          : null,
-                      tooltip: 'artwork_save_action'.tr,
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        LucideIcons.share2,
-                        color: ctrl.hasDrawableContent
-                            ? cs.onSurface
-                            : cs.onSurface.withValues(alpha: 0.3),
+                            : null,
+                        tooltip: 'artwork_save_action'.tr,
                       ),
-                      onPressed: ctrl.hasDrawableContent
-                          ? () {
-                              if (settingCtrl.hapticEnabled.value) {
-                                ctrl.hapticMedium();
+                      IconButton(
+                        icon: Icon(
+                          LucideIcons.share2,
+                          color: ctrl.hasDrawableContent
+                              ? cs.onSurface
+                              : cs.onSurface.withValues(alpha: 0.3),
+                        ),
+                        onPressed: ctrl.hasDrawableContent
+                            ? () {
+                                if (settingCtrl.hapticEnabled.value) {
+                                  ctrl.hapticMedium();
+                                }
+                                ctrl.shareCanvas();
                               }
-                              ctrl.shareCanvas();
-                            }
-                          : null,
-                      tooltip: 'share'.tr,
-                    ),
-                  ],
+                            : null,
+                        tooltip: 'share'.tr,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
-        );
-      }),
+              // 더보기는 스크롤 영역 밖에 고정한다. 좁은 화면에서 스크롤에 밀려
+              // 사라지면 캔버스 배경색·사진 기능에 아예 닿을 수 없기 때문이다.
+              IconButton(
+                icon: Icon(LucideIcons.ellipsis, color: cs.onSurface),
+                onPressed: () {
+                  _maybeHaptic(settingCtrl);
+                  MoreActionsSheet.show(
+                    ctrl: ctrl,
+                    settingCtrl: settingCtrl,
+                    hasReferenceImage: ctrl.referenceImagePath.value != null,
+                    onCanvasColor: () =>
+                        _openCanvasColorPicker(context, settingCtrl),
+                  );
+                },
+                tooltip: 'more_actions'.tr,
+              ),
+            ],
+          );
+        }),
+      ),
     );
   }
 
@@ -677,63 +693,14 @@ class _TopToolbar extends StatelessWidget {
     if (settingCtrl.hapticEnabled.value) {
       ctrl.hapticSelection();
     }
-    final cs = Get.theme.colorScheme;
-    Color picked = Color(ctrl.canvasColor.value);
-
-    await Get.dialog(
-      Dialog(
-        backgroundColor: cs.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.r),
-        ),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 12.h),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'pick_color'.tr,
-                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
-              ),
-              SizedBox(height: 12.h),
-              ColorPicker(
-                pickerColor: picked,
-                onColorChanged: (c) => picked = c,
-                enableAlpha: false,
-                labelTypes: const [],
-                pickerAreaHeightPercent: 0.6,
-                displayThumbColor: true,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: Get.back,
-                      child: Text('cancel'.tr),
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: () {
-                        // 알파 채널은 항상 0xFF 로 강제.
-                        // ignore: deprecated_member_use
-                        final argb = picked.value | 0xFF000000;
-                        ctrl.setCanvasColor(argb);
-                        // bottomSheet 도 닫는다 (다이얼로그 -> 시트 순).
-                        Get.back();
-                        if (Get.isBottomSheetOpen ?? false) Get.back();
-                      },
-                      child: Text('confirm'.tr),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+    final picked = await pickRichColor(
+      context: context,
+      initial: Color(ctrl.canvasColor.value),
     );
+    if (picked == null) return;
+    await ctrl.setCanvasColor(picked);
+    // 다이얼로그가 닫힌 뒤 배경색 시트도 함께 닫는다.
+    if (Get.isBottomSheetOpen ?? false) Get.back<void>();
   }
 
   void _confirmClear(
@@ -1019,7 +986,8 @@ class _BrushGlyph extends StatelessWidget {
       fg = cs.onPrimary;
     } else if (locked) {
       bg = cs.surfaceContainerLow;
-      fg = cs.onSurface.withValues(alpha: 0.35);
+      // 0.35 는 실기기에서 거의 보이지 않아 잠금인지 빈 칸인지 구분이 어려웠다.
+      fg = cs.onSurface.withValues(alpha: 0.5);
     } else {
       bg = cs.surfaceContainerHigh;
       fg = cs.onSurfaceVariant;
@@ -1307,11 +1275,16 @@ class _MoreSlot extends StatelessWidget {
             child: Container(
               width: circular ? 28 : 38,
               height: circular ? 28 : 38,
+              // 중립 배경 + primary 외곽선/아이콘.
+              // primaryContainer 를 깔면 "선택된 항목"처럼 보여 혼동을 준다.
               decoration: BoxDecoration(
-                color: cs.primaryContainer.withValues(alpha: 0.5),
+                color: cs.surfaceContainerHighest,
                 shape: circular ? BoxShape.circle : BoxShape.rectangle,
                 borderRadius: circular ? null : BorderRadius.circular(12.r),
-                border: Border.all(color: cs.primary.withValues(alpha: 0.45)),
+                border: Border.all(
+                  color: cs.primary.withValues(alpha: 0.55),
+                  width: 1.5,
+                ),
               ),
               child: Icon(
                 LucideIcons.plus,
@@ -1334,6 +1307,130 @@ String _hexOf(int colorValue) => colorValue
     .toUpperCase();
 
 // Sheets — 퀵 행에 없는 항목은 여기서 고른다.
+
+/// 상단 툴바 더보기 시트 — 캔버스 배경색 / 참조 사진.
+/// 시트가 열린 동안 상태가 바뀌지 않는 액션들이라 스냅샷 값으로 정적으로 그린다.
+class MoreActionsSheet {
+  const MoreActionsSheet._();
+
+  static Future<void> show({
+    required DoodleController ctrl,
+    required SettingController settingCtrl,
+    required bool hasReferenceImage,
+    required VoidCallback onCanvasColor,
+  }) {
+    return Get.bottomSheet<void>(
+      _SheetShell(
+        icon: LucideIcons.ellipsis,
+        title: 'more_actions'.tr,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _SheetActionTile(
+              tileKey: const ValueKey('draw-more-canvas-color'),
+              icon: LucideIcons.paintBucket,
+              label: 'canvas_color'.tr,
+              description: 'canvas_color_desc'.tr,
+              onTap: () {
+                Get.back<void>();
+                // 시트가 완전히 닫힌 뒤 다음 시트를 연다.
+                WidgetsBinding.instance.addPostFrameCallback(
+                  (_) => onCanvasColor(),
+                );
+              },
+            ),
+            SizedBox(height: 8.h),
+            _SheetActionTile(
+              tileKey: const ValueKey('draw-more-reference-image'),
+              icon: hasReferenceImage
+                  ? LucideIcons.imageMinus
+                  : LucideIcons.imagePlus,
+              label: hasReferenceImage ? 'remove_image'.tr : 'import_image'.tr,
+              onTap: () {
+                if (settingCtrl.hapticEnabled.value) ctrl.hapticSelection();
+                Get.back<void>();
+                if (hasReferenceImage) {
+                  ctrl.clearReferenceDrawing();
+                } else {
+                  ctrl.pickReferenceImage();
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+}
+
+class _SheetActionTile extends StatelessWidget {
+  const _SheetActionTile({
+    required this.tileKey,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.description,
+  });
+
+  final Key tileKey;
+  final IconData icon;
+  final String label;
+  final String? description;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Get.theme.colorScheme;
+    return Material(
+      key: tileKey,
+      color: cs.surfaceContainerLow,
+      borderRadius: BorderRadius.circular(14.r),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14.r),
+        onTap: onTap,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+          child: Row(
+            children: [
+              Icon(icon, size: 20.r, color: cs.primary),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w700,
+                        color: cs.onSurface,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (description != null) ...[
+                      SizedBox(height: 2.h),
+                      Text(
+                        description!,
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          color: cs.onSurfaceVariant,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 /// 전체 브러시 시트.
 class BrushSheet {
@@ -1504,12 +1601,14 @@ class ColorSheet {
                   button: true,
                   selected: custom != null && current == custom,
                   label: 'pick_color'.tr,
-                  onTap: () => _openBrushColorPicker(ctrl, settingCtrl),
+                  onTap: () =>
+                      _openBrushColorPicker(ctrl, settingCtrl, context),
                   excludeSemantics: true,
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     excludeFromSemantics: true,
-                    onTap: () => _openBrushColorPicker(ctrl, settingCtrl),
+                    onTap: () =>
+                        _openBrushColorPicker(ctrl, settingCtrl, context),
                     child: SizedBox(
                       width: 44,
                       height: 44,
@@ -1650,66 +1749,103 @@ class _SheetShell extends StatelessWidget {
 }
 
 /// 브러시 색상용 커스텀 컬러 피커. 확정 시 색상 시트도 함께 닫는다.
+/// 브러시 색상 선택 — Material 팔레트(색조 포함) · 흑백 · 컬러휠 · HEX 입력을
+/// 한 다이얼로그에서 제공한다. 확정 시 색상 시트도 함께 닫는다.
 Future<void> _openBrushColorPicker(
   DoodleController ctrl,
   SettingController settingCtrl,
+  BuildContext context,
 ) async {
   if (settingCtrl.hapticEnabled.value) {
     ctrl.hapticSelection();
   }
-  final cs = Get.theme.colorScheme;
-  Color picked = Color(ctrl.customColor.value ?? ctrl.brushColor.value);
-
-  await Get.dialog<void>(
-    Dialog(
-      backgroundColor: cs.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 12.h),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'pick_color'.tr,
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
-            ),
-            SizedBox(height: 12.h),
-            ColorPicker(
-              pickerColor: picked,
-              onColorChanged: (c) => picked = c,
-              enableAlpha: false,
-              labelTypes: const [],
-              pickerAreaHeightPercent: 0.6,
-              displayThumbColor: true,
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: TextButton(
-                    onPressed: Get.back,
-                    child: Text('cancel'.tr),
-                  ),
-                ),
-                SizedBox(width: 8.w),
-                Expanded(
-                  child: FilledButton(
-                    onPressed: () {
-                      // 알파 채널은 항상 0xFF 로 강제.
-                      // ignore: deprecated_member_use
-                      final argb = picked.value | 0xFF000000;
-                      ctrl.setCustomColor(argb);
-                      // 다이얼로그 → 색상 시트 순으로 닫는다.
-                      Get.back<void>();
-                      if (Get.isBottomSheetOpen ?? false) Get.back<void>();
-                    },
-                    child: Text('confirm'.tr),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    ),
+  final picked = await pickRichColor(
+    context: context,
+    initial: Color(ctrl.brushColor.value),
+    recentColors: ctrl.recentColors.map(Color.new).toList(),
   );
+  if (picked == null) return;
+  await ctrl.setCustomColor(picked);
+  if (Get.isBottomSheetOpen ?? false) Get.back<void>();
+}
+
+/// 앱 공통 리치 컬러 피커.
+/// 취소하면 null, 확정하면 불투명(alpha 0xFF) 색상을 돌려준다.
+Future<int?> pickRichColor({
+  required BuildContext context,
+  required Color initial,
+  List<Color> recentColors = const <Color>[],
+}) async {
+  final cs = Get.theme.colorScheme;
+  Color picked = initial;
+
+  final confirmed =
+      await ColorPicker(
+        color: initial,
+        onColorChanged: (color) => picked = color,
+        // Material 기본/강조 팔레트 + 흑백 + 자유 색상 휠.
+        pickersEnabled: const <ColorPickerType, bool>{
+          ColorPickerType.primary: true,
+          ColorPickerType.accent: true,
+          ColorPickerType.bw: true,
+          ColorPickerType.wheel: true,
+        },
+        enableShadesSelection: true,
+        // 그리기 색은 항상 불투명하게 다룬다(지우개가 투명도를 담당).
+        enableOpacity: false,
+        showRecentColors: recentColors.isNotEmpty,
+        maxRecentColors: DoodleController.maxRecentColors,
+        recentColors: recentColors,
+        showColorCode: true,
+        colorCodeHasColor: true,
+        copyPasteBehavior: const ColorPickerCopyPasteBehavior(
+          copyButton: true,
+          pasteButton: true,
+          longPressMenu: true,
+        ),
+        heading: Text(
+          'pick_color'.tr,
+          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
+        ),
+        subheading: Text(
+          'color_shades'.tr,
+          style: TextStyle(fontSize: 13.sp, color: cs.onSurfaceVariant),
+        ),
+        wheelSubheading: Text(
+          'color_shades'.tr,
+          style: TextStyle(fontSize: 13.sp, color: cs.onSurfaceVariant),
+        ),
+        recentColorsSubheading: Text(
+          'color_recent'.tr,
+          style: TextStyle(fontSize: 13.sp, color: cs.onSurfaceVariant),
+        ),
+        pickerTypeLabels: <ColorPickerType, String>{
+          ColorPickerType.primary: 'color_type_primary'.tr,
+          ColorPickerType.accent: 'color_type_accent'.tr,
+          ColorPickerType.bw: 'color_type_bw'.tr,
+          ColorPickerType.wheel: 'color_wheel'.tr,
+        },
+        width: 34,
+        height: 34,
+        borderRadius: 17,
+        spacing: 4,
+        runSpacing: 4,
+        wheelDiameter: 190,
+        actionButtons: const ColorPickerActionButtons(
+          dialogActionButtons: true,
+          dialogActionOnlyOkButton: false,
+        ),
+      ).showPickerDialog(
+        context,
+        backgroundColor: cs.surface,
+        constraints: const BoxConstraints(
+          minHeight: 480,
+          minWidth: 300,
+          maxWidth: 340,
+        ),
+      );
+
+  if (!confirmed) return null;
+  // 알파 채널은 항상 0xFF 로 강제.
+  return picked.toARGB32() | 0xFF000000;
 }

@@ -158,7 +158,9 @@ class _HeroPanel extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 22.sp,
                     fontWeight: FontWeight.w900,
-                    color: cs.onPrimaryContainer,
+                    // 패널이 primaryContainer 를 alpha .55 로 깔아 연한 톤이라
+                    // onPrimaryContainer(흰색)를 쓰면 대비가 무너진다.
+                    color: cs.onSurface,
                   ),
                 ),
                 SizedBox(height: 6.h),
@@ -466,7 +468,13 @@ class _OwnedPremiumView extends StatelessWidget {
                 color: cs.primaryContainer,
                 borderRadius: BorderRadius.circular(24.r),
               ),
-              child: Icon(LucideIcons.crown, color: cs.primary, size: 36.r),
+              // primaryContainer 위에는 onPrimaryContainer 를 써야 한다.
+              // primary 를 쓰면 이 테마(shadOrange)에서 주황 위 주황이 되어 사라진다.
+              child: Icon(
+                LucideIcons.crown,
+                color: cs.onPrimaryContainer,
+                size: 36.r,
+              ),
             ),
             SizedBox(height: 18.h),
             Text(

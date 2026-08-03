@@ -9,10 +9,10 @@ dependencies:
   app_tracking_transparency: ^2.0.7
   firebase_core: ^4.12.1
   firebase_crashlytics: ^5.2.6
+  flex_color_picker: ^3.8.0
   flex_color_scheme: ^8.4.0
   flutter:
     sdk: flutter
-  flutter_colorpicker: ^1.1.0
   flutter_localizations:
     sdk: flutter
   flutter_screenutil: ^5.9.3
