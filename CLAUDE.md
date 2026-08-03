@@ -40,9 +40,9 @@ flutter run
 
 ## 현재 의존성 하이라이트
 - 기반: `get` ^4.7.3, `hive_ce` ^2.19.3, `hive_ce_flutter` ^2.3.4, `path_provider` ^2.1.5, `shared_preferences` ^2.5.5
-- 드로잉/이미지: `perfect_freehand` ^2.5.2, `image_picker` ^1.1.2, `flutter_colorpicker` ^1.1.0, `gal` ^2.3.2, `image` ^4.8.0, `sensors_plus` ^7.0.0
-- UI/UX: `flutter_screenutil` ^5.9.3, `flex_color_scheme` ^8.4.0, `google_fonts` ^8.1.0, `lucide_icons_flutter` ^3.1.14+2, `toastification` ^3.2.0
-- 수익화/운영: `google_mobile_ads` ^8.0.0, `gma_mediation_applovin` ^2.6.0, `gma_mediation_pangle` ^3.6.0, `gma_mediation_unity` ^1.7.0, `in_app_purchase` ^3.2.3, `in_app_purchase_android` ^0.4.0+11, `in_app_review` ^2.0.12, `rate_my_app` ^2.4.0, `firebase_core` ^4.9.0, `firebase_crashlytics` ^5.2.2, `share_plus` ^13.1.0, `url_launcher` ^6.3.2, `vibration` ^3.1.8
+- 드로잉/이미지: `perfect_freehand` ^2.5.2+1, `image_picker` ^1.2.3, `flutter_colorpicker` ^1.1.0, `gal` ^2.3.3, `image` ^4.9.1, `sensors_plus` ^7.1.0
+- UI/UX: `flutter_screenutil` ^5.9.3, `flex_color_scheme` ^8.4.0, `google_fonts` ^8.2.1, `lucide_icons_flutter` ^3.1.14+2, `toastification` ^3.2.0
+- 수익화/운영: `google_mobile_ads` ^9.0.0, `gma_mediation_applovin` ^2.6.2, `gma_mediation_pangle` ^4.0.0, `gma_mediation_unity` ^1.9.0, `app_tracking_transparency` ^2.0.7, `in_app_purchase` ^3.3.0, `in_app_purchase_android` ^0.5.2, `in_app_review` ^2.0.12, `rate_my_app` ^2.4.1, `firebase_core` ^4.12.1, `firebase_crashlytics` ^5.2.6, `share_plus` ^13.3.0, `url_launcher` ^6.3.2, `vibration` ^3.2.0
 - 로컬라이제이션: `flutter_localizations` (SDK)
 - 개발 도구: `build_runner` ^2.15.0, `hive_ce_generator` ^1.11.2, `flutter_lints` ^6.0.0, `flutter_launcher_icons` ^0.14.4, `flutter_native_splash` ^2.4.7, `change_app_package_name` ^1.5.0, `in_app_purchase_platform_interface` ^1.4.0, `plugin_platform_interface` ^2.1.8
 
@@ -76,6 +76,7 @@ flutter run
 ## 최근 감사 이력
 - 2026-05-08 핵심 로직 + UI gradient 1차 감사 통과
 - 2026-05-16~17 Wave 3 2차 감사 (설정/광고/strings/Haptic) + release_settings_intro Card 정리
+- 2026-08-03 iOS 최종 로직 감사. (1) iOS 광고 단위 ID를 릴리스 테스트 ID 하드코딩에서 Android와 동일한 `--dart-define=DOODLE_PAD_ADMOB_{BANNER,INTERSTITIAL,REWARDED}_IOS` 주입 방식으로 전환(미주입 시 광고 스킵 + 경고 로그), (2) `Info.plist`에 SKAdNetworkItems 40종 추가, (3) App Store ID를 `--dart-define=DOODLE_PAD_APP_STORE_ID` 주입으로 전환(미주입 시 인앱 리뷰 폴백), (4) 갤러리 작품 열기 다이얼로그를 공통 스타일 + 전용 문구(`artwork_open_overwrite_*`, 11개 언어)로 교체. `flutter analyze` / `flutter test` 117개 통과, iPhone 12 Pro Max 실기기 실행 검증.
 - 2026-05-27 Phase 1~4 Wave 3B 사전배포 감사 통과. 실제 경로는 `C:\Github_WorkSpace\doodle_pad`이며 Firebase Core/Crashlytics와 `google-services.json`은 유지하고 미사용 Firebase Analytics/기기정보 직접 의존성은 제거했습니다. `flutter pub outdated --no-transitive` 기준 `image`는 최신 resolvable `4.8.0`으로 유지했고, `flutter analyze`, `flutter test` 101개, Android `processDebugResources`/`assembleDebug`를 통과했습니다.
 
 ## 문서 유지 규칙

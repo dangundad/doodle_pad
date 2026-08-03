@@ -1,14 +1,14 @@
 PODS:
-  - Ads-Global (7.9.0.8):
-    - Ads-Global/BUAdSDK (= 7.9.0.8)
-  - Ads-Global/BUAdSDK (7.9.0.8):
-    - Ads-Global/PangleSDK
-    - Ads-Global/TikTokBusinessSDK
-  - Ads-Global/PangleSDK (7.9.0.8)
-  - Ads-Global/TikTokBusinessSDK (7.9.0.8)
+  - Ads-Global-Beta (8.2.0.3):
+    - Ads-Global-Beta/BUAdSDK (= 8.2.0.3)
+  - Ads-Global-Beta/BUAdSDK (8.2.0.3):
+    - Ads-Global-Beta/PangleSDK
+    - Ads-Global-Beta/TikTokBusinessSDK
+  - Ads-Global-Beta/PangleSDK (8.2.0.3)
+  - Ads-Global-Beta/TikTokBusinessSDK (8.2.0.3)
   - app_tracking_transparency (0.0.1):
     - Flutter
-  - AppLovinSDK (13.6.2)
+  - AppLovinSDK (13.6.3)
   - device_info_plus (0.0.1):
     - Flutter
   - Firebase/CoreOnly (12.15.0):
@@ -59,33 +59,33 @@ PODS:
   - gal (1.0.0):
     - Flutter
     - FlutterMacOS
-  - gma_mediation_applovin (2.6.1):
+  - gma_mediation_applovin (2.6.2):
     - Flutter
-    - GoogleMobileAdsMediationAppLovin (~> 13.6.2.0)
-  - gma_mediation_pangle (3.6.0):
+    - GoogleMobileAdsMediationAppLovin (~> 13.6.3.0)
+  - gma_mediation_pangle (4.0.0):
     - Flutter
-    - GoogleMobileAdsMediationPangle (~> 7.9.0.8.0)
-  - gma_mediation_unity (1.8.1):
+    - GoogleMobileAdsMediationPangle (~> 8.2.0.3.0)
+  - gma_mediation_unity (1.9.0):
     - Flutter
-    - GoogleMobileAdsMediationUnity (~> 4.18.1.0)
-  - Google-Mobile-Ads-SDK (13.2.0):
+    - GoogleMobileAdsMediationUnity (~> 4.19.0.0)
+  - Google-Mobile-Ads-SDK (13.3.0):
     - GoogleUserMessagingPlatform (>= 1.1)
-  - google_mobile_ads (8.0.0):
+  - google_mobile_ads (9.0.0):
     - Flutter
-    - Google-Mobile-Ads-SDK (~> 13.2.0)
+    - Google-Mobile-Ads-SDK (~> 13.3.0)
     - webview_flutter_wkwebview
-  - GoogleDataTransport (10.1.0):
+  - GoogleDataTransport (10.1.1):
     - nanopb (~> 3.30910.0)
     - PromisesObjC (~> 2.4)
-  - GoogleMobileAdsMediationAppLovin (13.6.2.0):
-    - AppLovinSDK (= 13.6.2)
-    - Google-Mobile-Ads-SDK (~> 13.0)
-  - GoogleMobileAdsMediationPangle (7.9.0.8.0):
-    - Ads-Global (= 7.9.0.8)
-    - Google-Mobile-Ads-SDK (~> 13.0)
-  - GoogleMobileAdsMediationUnity (4.18.1.0):
-    - Google-Mobile-Ads-SDK (~> 13.0)
-    - UnityAds (= 4.18.1)
+  - GoogleMobileAdsMediationAppLovin (13.6.3.0):
+    - AppLovinSDK (= 13.6.3)
+    - Google-Mobile-Ads-SDK (~> 13.3)
+  - GoogleMobileAdsMediationPangle (8.2.0.3.0):
+    - Ads-Global-Beta (= 8.2.0.3)
+    - Google-Mobile-Ads-SDK (~> 13.3)
+  - GoogleMobileAdsMediationUnity (4.19.0.0):
+    - Google-Mobile-Ads-SDK (~> 13.3)
+    - UnityAds (= 4.19.0)
   - GoogleUserMessagingPlatform (3.1.0)
   - GoogleUtilities/Environment (8.1.2):
     - GoogleUtilities/Privacy
@@ -105,7 +105,7 @@ PODS:
     - FlutterMacOS
   - in_app_review (2.0.0):
     - Flutter
-  - IronSourceAdQualitySDK (9.8.0)
+  - IronSourceAdQualitySDK (9.8.1)
   - nanopb (3.30910.0):
     - nanopb/decode (= 3.30910.0)
     - nanopb/encode (= 3.30910.0)
@@ -124,8 +124,10 @@ PODS:
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - UnityAds (4.18.1):
+  - UnityAds (4.19.0):
     - IronSourceAdQualitySDK (< 10.0.0)
+    - UnityCoherenceLib (= 0.1.0)
+  - UnityCoherenceLib (0.1.0)
   - url_launcher_ios (0.0.1):
     - Flutter
   - vibration (3.0.0):
@@ -158,7 +160,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - Ads-Global
+    - Ads-Global-Beta
     - AppLovinSDK
     - Firebase
     - FirebaseCore
@@ -180,6 +182,7 @@ SPEC REPOS:
     - PromisesObjC
     - PromisesSwift
     - UnityAds
+    - UnityCoherenceLib
 
 EXTERNAL SOURCES:
   app_tracking_transparency:
@@ -224,9 +227,9 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter_wkwebview/darwin"
 
 SPEC CHECKSUMS:
-  Ads-Global: b21f686881cc572879a107860aaab40c811e60a0
+  Ads-Global-Beta: fc5c6f72a88d6365373a76ec41c88d164555ce6b
   app_tracking_transparency: 3d84f147f67ca82d3c15355c36b1fa6b66ca7c92
-  AppLovinSDK: 91a47db42b6c0e2b83224006aa46b0b88c62c16f
+  AppLovinSDK: f3da9503e8193d8c4badc1a9965d73a0779812fa
   device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
   Firebase: a8539b633d474fbeb654c7043f9c1649e274045b
   firebase_core: 1c1e250a77e2df9e80bb8bf0875c8b427044a697
@@ -240,21 +243,21 @@ SPEC CHECKSUMS:
   FirebaseSessions: acfe7eadca47cda94ac86592737204581bb1abf6
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   gal: baecd024ebfd13c441269ca7404792a7152fde89
-  gma_mediation_applovin: af95032eed0b379a27dd279cbc3581af3a2bc95e
-  gma_mediation_pangle: 2cbfe519eeb63abacb747942de6550b247138dd7
-  gma_mediation_unity: 1a1fce2877f26f0793ef973d778263958d3a5370
-  Google-Mobile-Ads-SDK: f0365e190d66539c65cea8ded43e2c367abb5477
-  google_mobile_ads: fc71399df4ee37c5637400f351898ee22543f75b
-  GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
-  GoogleMobileAdsMediationAppLovin: b32db78894088699b8261c2050228c603c7236c5
-  GoogleMobileAdsMediationPangle: 8b526049bd6044732c40f3f3989f8daadfd80a32
-  GoogleMobileAdsMediationUnity: 44550b7df109dbb935b80597885adf2e81200144
+  gma_mediation_applovin: a4d0c57b3366234c99add8d9ccc34d8f58b66ee1
+  gma_mediation_pangle: 75d56dedd10ee8034e8026256e476a53a62f303b
+  gma_mediation_unity: fb9b4ecb5e6f75becd959a4ad1cdcc5fa45d4b09
+  Google-Mobile-Ads-SDK: 7692126a35ed859f20635af281c50a2162be8bea
+  google_mobile_ads: bab325fd4e31c9705cab0cb298e4f5a9bdb7370f
+  GoogleDataTransport: a24e58982ab3ba2f64d79613e027fe7f57e88539
+  GoogleMobileAdsMediationAppLovin: 8929ef5280829acc3e1e4c41f9c6cfd3f99ee7cd
+  GoogleMobileAdsMediationPangle: 5b37330b7c11ebcd4605b63c848af8a6da7aa9dc
+  GoogleMobileAdsMediationUnity: 404030848c15aa5b7a2add413275c087d06bdf2b
   GoogleUserMessagingPlatform: befe603da6501006420c206222acd449bba45a9c
   GoogleUtilities: 766ace00c6b10d8148408f329d10c4f051931850
   image_picker_ios: e0ece4aa2a75771a7de3fa735d26d90817041326
   in_app_purchase_storekit: 22cca7d08eebca9babdf4d07d0baccb73325d3c8
   in_app_review: 7dd1ea365263f834b8464673f9df72c80c17c937
-  IronSourceAdQualitySDK: 4a35860414765500aafbddb7635ef50862052acf
+  IronSourceAdQualitySDK: c024e553beebce7801ea3888eb528261a51e4df3
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PromisesObjC: 752c3227f599e3467650e47ea36f433eeb10c273
   PromisesSwift: 217dea0fd5d2ad65222a109c48698add13cc1c5b
@@ -262,7 +265,8 @@ SPEC CHECKSUMS:
   sensors_plus: b70a93b69dafdabd26ce4ac3f4d0529ab9acc4ca
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
-  UnityAds: 07379b63b1044dcad98b3092319166fd6f2cfda4
+  UnityAds: 40804188247edc15e4e173450a749dbb2fbc61c5
+  UnityCoherenceLib: d9be08c5b9c2880cb220c7ecd643f97ebda422b7
   url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b
   vibration: ca8104a8875b9c493e15b21b04e456befd0ff6eb
   webview_flutter_wkwebview: 8ebf4fded22593026f7dbff1fbff31ea98573c8d

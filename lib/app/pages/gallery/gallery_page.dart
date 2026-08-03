@@ -133,20 +133,79 @@ class GalleryPage extends GetView<GalleryController> {
     // 홈 진입의 "이어 그리기 / 새로 시작" 다이얼로그와 같은 손실 방어 원칙.
     final ctrl = DoodleController.to;
     if (ctrl.hasDrawableContent) {
+      // 앱 공통 다이얼로그 스타일(아이콘 원형 배경 + 좌우 버튼) + 정확한 문구:
+      // "이어/새로" 가 아니라 "현재 캔버스가 이 작품으로 교체됨"을 명시한다.
+      final cs = Get.theme.colorScheme;
       final proceed = await Get.dialog<bool>(
-        AlertDialog(
-          title: Text('continue_or_new_title'.tr),
-          content: Text('continue_or_new_desc'.tr),
-          actions: [
-            TextButton(
-              onPressed: () => Get.back(result: false),
-              child: Text('cancel'.tr),
-            ),
-            FilledButton(
-              onPressed: () => Get.back(result: true),
-              child: Text('confirm'.tr),
-            ),
-          ],
+        Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.r),
+          ),
+          clipBehavior: Clip.antiAlias,
+          backgroundColor: cs.surface,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 8.h),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 52.r,
+                      height: 52.r,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: cs.primaryContainer,
+                      ),
+                      child: Icon(
+                        LucideIcons.folderOpen,
+                        size: 26.r,
+                        color: cs.onPrimaryContainer,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    Text(
+                      'artwork_open_overwrite_title'.tr,
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      'artwork_open_overwrite_desc'.tr,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: cs.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Get.back(result: false),
+                        child: Text('cancel'.tr),
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: () => Get.back(result: true),
+                        child: Text('confirm'.tr),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
         barrierDismissible: true,
       );

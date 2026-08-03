@@ -51,6 +51,13 @@ class AppRatingService extends GetxService {
   Future<void> openStoreListing() async {
     try {
       if (Platform.isIOS) {
+        // App Store ID 미주입 빌드에서는 스토어 열기 대신 인앱 리뷰로 폴백.
+        if (RateMyAppConfig.APP_STORE_ID.isEmpty) {
+          if (await _inAppReview.isAvailable()) {
+            await _inAppReview.requestReview();
+          }
+          return;
+        }
         await _inAppReview.openStoreListing(
           appStoreId: RateMyAppConfig.APP_STORE_ID,
         );

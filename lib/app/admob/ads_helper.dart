@@ -17,6 +17,15 @@ class AdHelper {
   static const String _rewardedAdUnitIdAndroidEnv = String.fromEnvironment(
     'DOODLE_PAD_ADMOB_REWARDED_ANDROID',
   );
+  static const String _bannerAdUnitIdIosEnv = String.fromEnvironment(
+    'DOODLE_PAD_ADMOB_BANNER_IOS',
+  );
+  static const String _interstitialAdUnitIdIosEnv = String.fromEnvironment(
+    'DOODLE_PAD_ADMOB_INTERSTITIAL_IOS',
+  );
+  static const String _rewardedAdUnitIdIosEnv = String.fromEnvironment(
+    'DOODLE_PAD_ADMOB_REWARDED_IOS',
+  );
 
   static final GmaMediationApplovin _appLovinMediation = GmaMediationApplovin();
   static final GmaMediationUnity _unityMediation = GmaMediationUnity();
@@ -50,6 +59,12 @@ class AdHelper {
   static String? releaseInterstitialAdUnitIdAndroidOverride;
   @visibleForTesting
   static String? releaseRewardedAdUnitIdAndroidOverride;
+  @visibleForTesting
+  static String? releaseBannerAdUnitIdIosOverride;
+  @visibleForTesting
+  static String? releaseInterstitialAdUnitIdIosOverride;
+  @visibleForTesting
+  static String? releaseRewardedAdUnitIdIosOverride;
 
   static Future<bool> initializeConsentAndAds({
     Future<void> Function()? requestTrackingAuthorizationIfNeeded,
@@ -223,6 +238,9 @@ class AdHelper {
     releaseBannerAdUnitIdAndroidOverride = null;
     releaseInterstitialAdUnitIdAndroidOverride = null;
     releaseRewardedAdUnitIdAndroidOverride = null;
+    releaseBannerAdUnitIdIosOverride = null;
+    releaseInterstitialAdUnitIdIosOverride = null;
+    releaseRewardedAdUnitIdIosOverride = null;
   }
 
   static bool get _isDebugMode => debugModeOverride ?? kDebugMode;
@@ -258,7 +276,15 @@ class AdHelper {
               slot: 'banner-android',
             );
     } else if (_targetPlatform == TargetPlatform.iOS) {
-      return 'ca-app-pub-3940256099942544/2934735716';
+      // Android와 동일하게 릴리스에서는 --dart-define 주입 ID를 사용한다.
+      // 하드코딩 테스트 ID가 릴리스에 남으면 수익 0 + AdMob 정책 위반 소지.
+      return _isDebugMode
+          ? 'ca-app-pub-3940256099942544/2934735716' // 테스트
+          : _configuredReleaseAdUnit(
+              envValue: _bannerAdUnitIdIosEnv,
+              override: releaseBannerAdUnitIdIosOverride,
+              slot: 'banner-ios',
+            );
     }
     return 'ca-app-pub-3940256099942544/6300978111';
   }
@@ -274,7 +300,13 @@ class AdHelper {
               slot: 'interstitial-android',
             );
     } else if (_targetPlatform == TargetPlatform.iOS) {
-      return 'ca-app-pub-3940256099942544/4411468910';
+      return _isDebugMode
+          ? 'ca-app-pub-3940256099942544/4411468910' // 테스트
+          : _configuredReleaseAdUnit(
+              envValue: _interstitialAdUnitIdIosEnv,
+              override: releaseInterstitialAdUnitIdIosOverride,
+              slot: 'interstitial-ios',
+            );
     }
     return 'ca-app-pub-3940256099942544/1033173712';
   }
@@ -290,7 +322,13 @@ class AdHelper {
               slot: 'rewarded-android',
             );
     } else if (_targetPlatform == TargetPlatform.iOS) {
-      return 'ca-app-pub-3940256099942544/1712485313';
+      return _isDebugMode
+          ? 'ca-app-pub-3940256099942544/1712485313' // 테스트
+          : _configuredReleaseAdUnit(
+              envValue: _rewardedAdUnitIdIosEnv,
+              override: releaseRewardedAdUnitIdIosOverride,
+              slot: 'rewarded-ios',
+            );
     }
     return 'ca-app-pub-3940256099942544/5224354917';
   }

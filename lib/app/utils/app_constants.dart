@@ -65,7 +65,10 @@ abstract class RateMyAppConfig {
   static const int MIN_LAUNCHES = 5;
   static const int REMIND_DAYS = 7;
   static const int REMIND_LAUNCHES = 10;
-  // iOS 비대상. Android는 PACKAGE_NAME 기반으로 Play Store를 직접 열기 때문에
-  // 본 값은 사용되지 않는다. 향후 iOS 빌드 시점에 App Store Connect ID로 교체.
-  static const String APP_STORE_ID = '0000000000';
+  // iOS 스토어 열기(openStoreListing)에 사용된다. App Store Connect에서 발급된
+  // 실제 숫자 ID를 빌드 시 --dart-define=DOODLE_PAD_APP_STORE_ID=... 로 주입한다.
+  // 미주입 시 빈 값이며, AppRatingService가 스토어 열기를 건너뛴다.
+  static const String APP_STORE_ID = String.fromEnvironment(
+    'DOODLE_PAD_APP_STORE_ID',
+  );
 }
