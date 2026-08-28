@@ -56,7 +56,7 @@ if [ -z "$AUTO" ]; then
 fi
 
 usage() {
-  echo "사용법: ./store.sh ios <status|from-docs|pull|push> [-Force|-DryRun]"
+  echo "사용법: ./store.sh ios <create|init|from-docs|push|iap|pull|status> [-Force|-DryRun]"
   echo "        ./store.sh <status|from-docs|pull|push>        (Android, PowerShell 필요)"
   echo "  앱    : $APP"
   echo "  경로  : $PLAY_APP_DIR"
@@ -83,6 +83,7 @@ cmd=$1
 shift
 
 case $cmd in
+  create)    lane=create ;;
   status)    lane=status ;;
   from-docs) lane=from_docs ;;
   init|init-docs|init_docs) lane=init_docs ;;
