@@ -21,11 +21,12 @@
 
 | 항목 | 권장 설정값 | 비고 |
 |---|---|---|
+| **첫 출시 버전 (Version)** | `1.0.0` | 세 자리 형식 (`1.0.0`) |
 | **기본 카테고리 (Primary Category)** | `유틸리티 (Utilities)` | 또는 `생산성 (Productivity)` |
 | **보조 카테고리 (Secondary)** | `라이프스타일 (Lifestyle)` | 선택 사항 |
 | **연령 등급 (Age Rating)** | `4+` (만 4세 이상) | 모든 설문에서 **'없음 / 아니요'** 선택 |
 | **EU DSA 거래자 상태 (Trader Status)** | `비거래자 (Non-Trader)` | 개인 개발자 계정 시 선택 (또는 Trader) |
-| **저작권 (Copyright)** | `2026 DangunDad Lab` | `연도 개발자명` 형식 |
+| **저작권 (Copyright)** | `DangunDad Lab` | 개발자/조직명 |
 | **가격 (Price)** | `무료 (₩0)` | 기본값 |
 | **가용 국가/지역 (Availability)** | `175개국 전체 선택` | 기본값 |
 | **지원 URL (Support URL)** | `https://dangundad.blogspot.com/p/support.html` | **필수** |
@@ -56,6 +57,7 @@
 
 | 항목 | 입력값 / 선택값 | 비고 |
 |---|---|---|
+| **버전 번호 (Version)** | `1.0.0` | 세 자리 형식 (`1.0.0`) |
 | **로그인 정보 (Sign-In Required)** | `체크 해제 (로그인 불필요)` | 계정 없이 모든 기능 사용 가능 |
 | **연락처 성 (Last Name)** | `Oh` | 담당자 정보 |
 | **연락처 이름 (First Name)** | `Yongjin` | 담당자 정보 |
