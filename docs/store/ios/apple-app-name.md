@@ -62,8 +62,7 @@
 | **연락처 성 (Last Name)** | `Oh` | 담당자 정보 |
 | **연락처 이름 (First Name)** | `Yongjin` | 담당자 정보 |
 | **전화번호 (Phone Number)** | `+82 1031115058` | 국가번호(+82) 포함 |
-| **이메일 (Email)** | `dangundad@gmail.com` | 담당자 이메일 |
-| **심사 메모 (Review Notes)** | `선택형 자발적 후원 인앱 상품(Coffee/Lunch/Dinner) 3종이 포함되어 있으며 구매 시 광고가 제거됩니다. 모든 기능은 로그인 없이 즉시 사용 가능합니다.` | 심사관 안내 |
+| **심사 메모 (Review Notes)** | `[Guideline 2.1 Compliance] 1. Sign-In: NO (No login/account required, fully functional upon launch). 2. IAPs: 3 optional tip tiers (Coffee/Lunch/Dinner) via StoreKit 2 which remove ads; all core features are 100% free. 3. SDKs: AdMob (standard ads for free users), Firebase Analytics/Crashlytics (anonymous stability only). 4. Tested Devices: iPhone 15 Pro, iPhone 13, iPad Pro (iOS 18/17). 5. Compliance: Consistent worldwide, no regulated industry, all code/assets proprietary by DangunDad Lab.` | 심사관 안내 (Guideline 2.1 표준 답변) |
 | **광고 식별자 (IDFA)** | `예 (Yes)` - 타사 광고 게재 목적 | AdMob SDK 사용 |
 | **수출 규정 준수 (Export Compliance)** | `면제 (Exempt)` | 표준 HTTPS만 사용 (`ITSAppUsesNonExemptEncryption=NO`) |
 | **콘텐츠 권한 (Content Rights)** | `아니요 (No)` | 타사 지적재산권 포함 안 함 (자체 제작) |
