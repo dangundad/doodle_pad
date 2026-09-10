@@ -17,6 +17,7 @@ import 'package:doodle_pad/app/services/hive_service.dart';
 import 'package:doodle_pad/app/theme/app_theme.dart';
 import 'package:doodle_pad/app/translate/translate.dart';
 import 'package:doodle_pad/app/utils/device_qa_config.dart';
+import 'package:doodle_pad/app/utils/store_screenshot_seed.dart';
 import 'package:doodle_pad/firebase_options.dart';
 
 Future<bool> _initFirebaseSafely() async {
@@ -102,6 +103,9 @@ Future<void> main() async {
       stackTrace: coreStackTrace!,
       reason: 'Core service initialization failed',
     );
+  } else {
+    // 스토어 스크린샷용 더미 작품. dart-define 미지정 시 no-op.
+    await StoreScreenshotSeed.runIfEnabled();
   }
 
   await Future.wait([orientationFuture, systemUiFuture]);
