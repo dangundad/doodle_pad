@@ -11,6 +11,7 @@ import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/data/brushes/brush_presets.dart';
 import 'package:doodle_pad/app/pages/draw/widgets/canvas_painter.dart';
 import 'package:doodle_pad/app/pages/draw/widgets/save_options_sheet.dart';
+import 'package:doodle_pad/app/pages/gallery/gallery_page.dart';
 import 'package:doodle_pad/app/routes/app_pages.dart';
 import 'package:doodle_pad/app/services/export_service.dart';
 import 'package:doodle_pad/app/theme/app_theme.dart';
@@ -354,7 +355,13 @@ class _TopToolbar extends StatelessWidget {
                         icon: const Icon(LucideIcons.images),
                         onPressed: () {
                           _maybeHaptic(settingCtrl);
-                          Get.toNamed(Routes.GALLERY);
+                          // 보관함이 "돌아갈 DrawPage가 아래에 있다"를 알 수
+                          // 있게 인자를 넘긴다. Get.previousRoute 는 다이얼로그를
+                          // 한 번 띄우면 오염되므로 판별에 쓰지 않는다.
+                          Get.toNamed(
+                            Routes.GALLERY,
+                            arguments: GalleryPage.fromDrawArguments,
+                          );
                         },
                         tooltip: 'gallery_title'.tr,
                       ),
@@ -1527,6 +1534,9 @@ Future<int?> pickRichColor({
           copyButton: true,
           pasteButton: true,
           longPressMenu: true,
+          // 사용자에게는 "#RRGGBB"만 보여준다. Dart 형식(0xAARRGGBB)은 좁은
+          // 입력칸에서 잘리고 알파 접두어가 혼란을 준다.
+          copyFormat: ColorPickerCopyFormat.numHexRRGGBB,
         ),
         heading: Text(
           'pick_color'.tr,

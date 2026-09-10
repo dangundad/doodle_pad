@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/pages/settings/settings_page.dart';
 import 'package:doodle_pad/app/translate/translate.dart';
+import 'package:doodle_pad/app/widgets/app_ui.dart';
 
 void main() {
   setUp(() {
@@ -107,7 +108,7 @@ void main() {
       await tester.tap(clearTile);
       await tester.pumpAndSettle();
 
-      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(find.byType(AppConfirmDialog), findsOneWidget);
       expect(
         find.text('This will reset local preferences. Continue?'),
         findsOneWidget,

@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import 'package:doodle_pad/app/routes/app_pages.dart';
 import 'package:doodle_pad/app/services/purchase_service.dart';
 import 'package:doodle_pad/app/theme/app_theme.dart';
 import 'package:doodle_pad/app/widgets/app_ui.dart';
@@ -83,37 +84,49 @@ class ExitBottomSheet extends StatelessWidget {
               ),
               if (!PurchaseService.isPremiumActive) ...[
                 SizedBox(height: 14.h),
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12.w,
-                    vertical: 10.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: cs.secondaryContainer,
+                // 안내만 하고 누를 수 없던 배너(실기기 QA). 탭하면 프리미엄으로 간다.
+                Material(
+                  color: cs.secondaryContainer,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm.r),
+                  child: InkWell(
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm.r),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        LucideIcons.crown,
-                        size: 16.r,
-                        color: cs.onSecondaryContainer,
+                    onTap: () {
+                      Get.back();
+                      Get.toNamed(Routes.PREMIUM);
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 10.h,
                       ),
-                      SizedBox(width: 8.w),
-                      Expanded(
-                        child: Text(
-                          'premium_subtitle'.tr,
-                          style: TextStyle(
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w600,
+                      child: Row(
+                        children: [
+                          Icon(
+                            LucideIcons.crown,
+                            size: 16.r,
                             color: cs.onSecondaryContainer,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                          SizedBox(width: 8.w),
+                          Expanded(
+                            child: Text(
+                              'premium_subtitle'.tr,
+                              style: TextStyle(
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w600,
+                                color: cs.onSecondaryContainer,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Icon(
+                            LucideIcons.chevronRight,
+                            size: 16.r,
+                            color: cs.onSecondaryContainer,
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ],

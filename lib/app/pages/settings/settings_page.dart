@@ -232,26 +232,16 @@ class SettingsPage extends GetView<SettingController> {
   }
 
   Future<void> _confirmAndClear() async {
-    final shouldClear = await Get.dialog<bool>(
-      AlertDialog(
-        title: Text(_loc('clear_data', 'Clear local data')),
-        content: Text(
-          _loc(
-            'clear_data_confirm',
-            'This will reset local preferences. Continue?',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(result: false),
-            child: Text(_loc('cancel', 'Cancel')),
-          ),
-          FilledButton(
-            onPressed: () => Get.back(result: true),
-            child: Text(_loc('confirm', 'Confirm')),
-          ),
-        ],
+    final shouldClear = await AppConfirmDialog.show(
+      icon: LucideIcons.rotateCcw,
+      title: _loc('clear_data', 'Clear local data'),
+      message: _loc(
+        'clear_data_confirm',
+        'This will reset local preferences. Continue?',
       ),
+      confirmLabel: _loc('confirm', 'Confirm'),
+      cancelLabel: _loc('cancel', 'Cancel'),
+      destructive: true,
     );
 
     if (shouldClear != true) {

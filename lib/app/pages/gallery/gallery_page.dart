@@ -19,6 +19,17 @@ import 'package:doodle_pad/app/widgets/app_ui.dart';
 class GalleryPage extends GetView<GalleryController> {
   const GalleryPage({super.key});
 
+  /// DrawPage 툴바에서 열렸음을 알리는 라우트 인자.
+  /// 이 경우 "그리기로 돌아가기"는 새 DrawPage 를 올리지 않고 `Get.back()` 한다.
+  /// (DrawPage 가 두 장 겹치면 같은 canvasKey(GlobalKey)가 충돌해 아래 장의
+  /// 캔버스가 빈 화면으로 남는다 — 실기기 QA 에서 확인.)
+  static const Map<String, Object> fromDrawArguments = {'from': 'draw'};
+
+  static bool get _openedFromDraw {
+    final args = Get.arguments;
+    return args is Map && args['from'] == 'draw';
+  }
+
   @override
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
@@ -120,6 +131,11 @@ class GalleryPage extends GetView<GalleryController> {
   }
 
   void _goToDraw() {
+    // 그리기 화면에서 들어온 경우 DrawPage 가 이미 아래에 있으므로 되돌아간다.
+    if (_openedFromDraw) {
+      Get.back<void>();
+      return;
+    }
     Get.offNamed(Routes.DRAW);
   }
 
@@ -148,7 +164,7 @@ class GalleryPage extends GetView<GalleryController> {
     ctrl.loadArtwork(artwork, viewport: viewport);
 
     // 그리기 화면에서 넘어온 경우에는 뒤로 돌아가 스택 중복을 막는다.
-    if (Get.previousRoute == Routes.DRAW) {
+    if (_openedFromDraw) {
       Get.back<void>();
       return;
     }
@@ -432,11 +448,7 @@ class _ArtworkCard extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        LucideIcons.calendar,
-                        size: 12.r,
-                        color: cs.outline,
-                      ),
+                      Icon(LucideIcons.calendar, size: 12.r, color: cs.outline),
                       SizedBox(width: 5.w),
                       Expanded(
                         child: Text(

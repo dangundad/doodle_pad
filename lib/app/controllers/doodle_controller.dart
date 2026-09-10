@@ -24,7 +24,7 @@ import 'package:doodle_pad/app/services/hive_service.dart';
 import 'package:doodle_pad/app/services/purchase_service.dart';
 import 'package:doodle_pad/app/utils/app_toast.dart';
 import 'package:doodle_pad/app/utils/share_file_cleanup.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:doodle_pad/app/widgets/app_ui.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:vibration/vibration.dart';
 
@@ -397,109 +397,25 @@ class DoodleController extends GetxController
     if (Get.isBottomSheetOpen ?? false) return;
     if (!hasDrawableContent) return;
 
-    final cs = Get.theme.colorScheme;
-    final settings = Get.isRegistered<SettingController>()
-        ? SettingController.to
-        : null;
-
-    if (settings != null && !settings.askBeforeClear.value) {
-      // 사용자가 확인 다이얼로그를 끈 상태라도 Shake로 인한 손실은 방지.
-      // 명시적으로 한 번 더 확인을 띄운다.
-    }
-
-    await Get.dialog<void>(
-      Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.r),
-        ),
-        clipBehavior: Clip.antiAlias,
-        backgroundColor: cs.surface,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 8.h),
-              child: Column(
-                children: [
-                  Container(
-                    width: 52.r,
-                    height: 52.r,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: cs.errorContainer,
-                    ),
-                    child: Icon(
-                      LucideIcons.triangleAlert,
-                      size: 26.r,
-                      color: cs.onErrorContainer,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    'shake_to_clear_title'.tr,
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    'clear_canvas_confirm'.tr,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: cs.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: Get.back,
-                      child: Text('cancel'.tr),
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: cs.error,
-                        foregroundColor: cs.onError,
-                      ),
-                      onPressed: () {
-                        clearCanvas();
-                        if (settings?.hapticEnabled.value ?? false) {
-                          hapticHeavy();
-                        }
-                        Get.back();
-                      },
-                      child: Text('clear'.tr),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      barrierDismissible: true,
+    await AppConfirmDialog.show(
+      icon: LucideIcons.smartphone,
+      title: 'shake_to_clear_title'.tr,
+      message: 'clear_canvas_confirm'.tr,
+      confirmLabel: 'clear'.tr,
+      cancelLabel: 'cancel'.tr,
+      destructive: true,
+      onConfirm: () {
+        clearCanvas();
+        if (_hapticOn) hapticHeavy();
+      },
     );
   }
 
   /// Returns true when haptic feedback is enabled in settings.
   /// Defaults to true if SettingController is not registered yet.
-  bool get _hapticOn =>
-      Get.isRegistered<SettingController>()
-          ? SettingController.to.hapticEnabled.value
-          : true;
+  bool get _hapticOn => Get.isRegistered<SettingController>()
+      ? SettingController.to.hapticEnabled.value
+      : true;
 
   void hapticSelection() {
     if (_hasVibrator && _hapticOn) Vibration.vibrate(duration: 30);
@@ -657,86 +573,13 @@ class DoodleController extends GetxController
     // 앱의 다른 모든 다이얼로그(지우기 확인 / 작품 열기 / 작품 삭제)와 같은
     // 모양을 쓴다. 예전에는 여기만 Get.defaultDialog 라 알약 버튼 + 아이콘 없는
     // 전혀 다른 스타일이 튀어나와, 잠금 브러시를 누른 순간 다른 앱처럼 보였다.
-    final cs = Get.theme.colorScheme;
-    Get.dialog<void>(
-      Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.r),
-        ),
-        clipBehavior: Clip.antiAlias,
-        backgroundColor: cs.surface,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 8.h),
-              child: Column(
-                children: [
-                  Container(
-                    width: 52.r,
-                    height: 52.r,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: cs.primaryContainer,
-                    ),
-                    child: Icon(
-                      preset.icon,
-                      size: 26.r,
-                      color: cs.onPrimaryContainer,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    preset.labelKey.tr,
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    'brush_unlock_message'.tr,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: cs.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: Get.back,
-                      child: Text('cancel'.tr),
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: FilledButton.icon(
-                      icon: Icon(LucideIcons.play, size: 16.r),
-                      label: Text(
-                        'watch_ad'.tr,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      onPressed: () {
-                        Get.back();
-                        _watchRewardedAdForBrush(type);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+    AppConfirmDialog.show(
+      icon: preset.icon,
+      title: preset.labelKey.tr,
+      message: 'brush_unlock_message'.tr,
+      confirmLabel: 'watch_ad'.tr,
+      cancelLabel: 'cancel'.tr,
+      onConfirm: () => _watchRewardedAdForBrush(type),
     );
   }
 
@@ -827,7 +670,11 @@ class DoodleController extends GetxController
 
   bool get isPinching => _pinchBaseMatrix != null;
 
-  void beginPinch(Offset focal, {double minScale = 0.5, double maxScale = 5.0}) {
+  void beginPinch(
+    Offset focal, {
+    double minScale = 0.5,
+    double maxScale = 5.0,
+  }) {
     _pinchBaseMatrix = transformController.value.clone();
     _pinchBaseFocal = focal;
     _pinchMinScale = minScale;
@@ -1090,9 +937,9 @@ class DoodleController extends GetxController
 
       final serial = strokes.map(_serializeStroke).toList();
       // timestamp 단독은 빠른 연속 저장 시 ms 단위 충돌 가능 → random suffix로 안전화.
-      final suffix = (math.Random().nextInt(1 << 20))
-          .toRadixString(36)
-          .padLeft(4, '0');
+      final suffix = (math.Random().nextInt(
+        1 << 20,
+      )).toRadixString(36).padLeft(4, '0');
       final id = 'artwork_${DateTime.now().millisecondsSinceEpoch}_$suffix';
       final repo = repository ?? ArtworkRepository.instance;
       try {

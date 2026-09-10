@@ -513,6 +513,47 @@ void main() {
     expect(DoodleController.to.strokes, isNotEmpty);
   });
 
+  testWidgets('empty gallery "Start Drawing" returns to the existing draw page '
+      'instead of stacking a second one (even after a dialog)', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    DoodleController.to.strokes.add(
+      DrawingStroke(
+        points: const [Offset(10, 10), Offset(30, 30)],
+        color: Colors.black,
+        width: 4,
+      ),
+    );
+
+    await tester.pumpWidget(
+      const _AppShell(home: DrawPage(), withRoutes: true),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('My Artworks'));
+    await tester.pumpAndSettle();
+    expect(find.byType(GalleryPage), findsOneWidget);
+
+    // 실기기 재현 조건: 보관함에서 다이얼로그를 한 번 띄우면
+    // Get.previousRoute 가 오염돼 DRAW 판별이 깨졌다.
+    Get.dialog<void>(const AlertDialog(title: Text('probe')));
+    await tester.pumpAndSettle();
+    Get.back<void>();
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Start Drawing'));
+    await tester.pumpAndSettle();
+
+    // DrawPage 가 두 장 겹치면 canvasKey(GlobalKey) 충돌로 아래 장 캔버스가
+    // 빈 화면이 된다. 정확히 한 장만 있어야 한다.
+    expect(find.byType(DrawPage), findsOneWidget);
+    expect(find.byType(GalleryPage), findsNothing);
+    expect(DoodleController.to.strokes, isNotEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('more sheet hosts canvas color and reference image actions', (
     tester,
   ) async {
