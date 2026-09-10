@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -12,6 +13,8 @@ import 'package:doodle_pad/app/pages/draw/widgets/canvas_painter.dart';
 import 'package:doodle_pad/app/pages/draw/widgets/save_options_sheet.dart';
 import 'package:doodle_pad/app/routes/app_pages.dart';
 import 'package:doodle_pad/app/services/export_service.dart';
+import 'package:doodle_pad/app/theme/app_theme.dart';
+import 'package:doodle_pad/app/widgets/app_ui.dart';
 import 'package:doodle_pad/app/widgets/exit_bottom_sheet.dart';
 
 class DrawPage extends GetView<DoodleController> {
@@ -25,90 +28,48 @@ class DrawPage extends GetView<DoodleController> {
   ) async {
     if (!ctrl.hasDrawableContent) return true;
 
-    final cs = Get.theme.colorScheme;
-    final result = await Get.dialog<bool>(
-      Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.r),
-        ),
-        clipBehavior: Clip.antiAlias,
-        backgroundColor: cs.surface,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 8.h),
-              child: Column(
-                children: [
-                  Container(
-                    width: 52.r,
-                    height: 52.r,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: cs.errorContainer,
-                    ),
-                    child: Icon(
-                      LucideIcons.triangleAlert,
-                      size: 26.r,
-                      color: cs.onErrorContainer,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    'discard_drawing_title'.tr,
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    'discard_drawing_desc'.tr,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: cs.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () => Get.back(result: false),
-                      child: Text('keep_drawing'.tr),
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: cs.error,
-                        foregroundColor: cs.onError,
-                      ),
-                      onPressed: () {
-                        if (settingCtrl.hapticEnabled.value) {
-                          ctrl.hapticHeavy();
-                        }
-                        Get.back(result: true);
-                      },
-                      child: Text('discard'.tr),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+    final result = await AppConfirmDialog.show(
+      icon: LucideIcons.triangleAlert,
+      title: 'discard_drawing_title'.tr,
+      message: 'discard_drawing_desc'.tr,
+      confirmLabel: 'discard'.tr,
+      cancelLabel: 'keep_drawing'.tr,
+      destructive: true,
       barrierDismissible: false,
+      onConfirm: () {
+        if (settingCtrl.hapticEnabled.value) ctrl.hapticHeavy();
+      },
     );
     return result ?? false;
+  }
+
+  /// DrawPage 아래로 돌아갈 라우트가 실제로 남아 있는지.
+  ///
+  /// `Get.previousRoute`는 시트/다이얼로그를 한 번 띄우면 다시는 비지 않아
+  /// "DRAW가 루트인가" 판별에 쓸 수 없다. Navigator에 직접 묻는다.
+  static bool _canPopBack(BuildContext context) =>
+      Navigator.of(context).canPop();
+
+  /// 상태바 아이콘 밝기를 "캔버스 색"에 맞춘다.
+  /// DrawPage에는 AppBar가 없어 직전 화면 스타일이 남는 문제를 막고,
+  /// 다크 테마에서도 흰 캔버스 위 시계·배터리가 보이게 한다.
+  static SystemUiOverlayStyle _overlayStyleFor({
+    required int canvasColorValue,
+    required Brightness themeBrightness,
+  }) {
+    final canvasIsLight = Color(canvasColorValue).computeLuminance() > 0.5;
+    final themeIsLight = themeBrightness == Brightness.light;
+    return SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: canvasIsLight
+          ? Brightness.dark
+          : Brightness.light,
+      statusBarBrightness: canvasIsLight ? Brightness.light : Brightness.dark,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarIconBrightness: themeIsLight
+          ? Brightness.dark
+          : Brightness.light,
+    );
   }
 
   @override
@@ -116,40 +77,54 @@ class DrawPage extends GetView<DoodleController> {
     final settingCtrl = SettingController.to;
     final cs = Get.theme.colorScheme;
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
+    final themeBrightness = Theme.of(context).brightness;
 
+    return Obx(
+      () => AnnotatedRegion<SystemUiOverlayStyle>(
+        value: _overlayStyleFor(
+          canvasColorValue: controller.canvasColor.value,
+          themeBrightness: themeBrightness,
+        ),
+        child: _buildScaffold(context, settingCtrl, cs, reduceMotion),
+      ),
+    );
+  }
+
+  Widget _buildScaffold(
+    BuildContext context,
+    SettingController settingCtrl,
+    ColorScheme cs,
+    bool reduceMotion,
+  ) {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) async {
         if (didPop) return;
+        final canPopBack = _canPopBack(context);
         final shouldPop = await _confirmDiscardIfNeeded(
           controller,
           settingCtrl,
         );
         if (!shouldPop) return;
         controller.clearCanvas();
-        // Item 3: DRAW가 루트인 경우(=온보딩 이후) 시스템 백은 ExitBottomSheet.
-        // 그 외는 일반 Get.back() — 호환을 위해 분기.
-        if (Get.previousRoute.isEmpty) {
-          ExitBottomSheet.show();
-        } else {
+        if (canPopBack) {
           Get.back();
+        } else {
+          ExitBottomSheet.show();
         }
       },
       child: Scaffold(
-        backgroundColor: cs.surfaceContainerHighest,
+        // 캔버스 바깥(줌아웃 시 보이는 영역)은 종이보다 한 단계 어두운 책상색.
+        backgroundColor: cs.surfaceContainerHigh,
         body: Stack(
           children: [
-            // Full-screen drawing canvas
-            // Design Ref: §2.2 — InteractiveViewer가 outer, RepaintBoundary가 inner.
-            // 캡처는 logical 캔버스(transform 미적용) 기준으로 일관됨.
-            // 한 손가락 = GestureDetector 그리기, 두 손가락 = InteractiveViewer 핀치 줌.
+            // Full-screen drawing canvas.
+            // InteractiveViewer가 outer, RepaintBoundary가 inner라 캡처는
+            // logical 캔버스 기준으로 일관된다.
+            // 한 손가락 = 그리기, 두 손가락 = 핀치 줌.
             Positioned.fill(
               child: InteractiveViewer(
                 transformationController: controller.transformController,
-                // 자식 GestureDetector가 onScale*로 그리기/핀치를 모두 처리한다.
-                // Flutter 제스처 아레나에서 자식 ScaleGestureRecognizer가
-                // 부모 InteractiveViewer의 그것을 이기기 때문에 부모는
-                // transformController의 적용만 담당하고 자체 제스처는 모두 끈다.
                 panEnabled: false,
                 scaleEnabled: false,
                 minScale: 0.5,
@@ -160,7 +135,6 @@ class DrawPage extends GetView<DoodleController> {
                     behavior: HitTestBehavior.opaque,
                     onScaleStart: (d) {
                       if (d.pointerCount >= 2) {
-                        // 두 손가락: 핀치 시작. 진행 중 스트로크는 취소.
                         controller.cancelCurrentStroke();
                         controller.beginPinch(d.localFocalPoint);
                       } else {
@@ -172,15 +146,12 @@ class DrawPage extends GetView<DoodleController> {
                     },
                     onScaleUpdate: (d) {
                       if (d.pointerCount >= 2) {
-                        // 단일 → 멀티 전환: 그리던 선을 지우고 핀치 모드로.
                         if (!controller.isPinching) {
                           controller.cancelCurrentStroke();
                           controller.beginPinch(d.localFocalPoint);
                         }
                         controller.updatePinch(d.scale, d.localFocalPoint);
                       } else {
-                        // 멀티 → 단일 전환 중에는 그리기를 재개하지 않는다
-                        // (사용자가 핀치를 끝내며 한 손가락이 먼저 떨어진 직후).
                         if (controller.isPinching) return;
                         controller.continueStroke(d.localFocalPoint);
                       }
@@ -192,7 +163,6 @@ class DrawPage extends GetView<DoodleController> {
                         controller.endStroke();
                       }
                     },
-                    // Plan FR-04: 더블탭 시 Fit-to-screen으로 복귀.
                     onDoubleTap: () {
                       if (settingCtrl.hapticEnabled.value) {
                         controller.hapticSelection();
@@ -216,9 +186,6 @@ class DrawPage extends GetView<DoodleController> {
                                 ),
                                 fit: BoxFit.contain,
                                 errorBuilder: (context, error, stackTrace) {
-                                  // 캐시 정리/권한 변경 등으로 파일이 사라지면
-                                  // 화면에서도 사라지지만 hasDrawableContent는 true로 남아
-                                  // 빈 캔버스가 공유될 수 있다. 상태를 즉시 정리한다.
                                   WidgetsBinding.instance.addPostFrameCallback((
                                     _,
                                   ) {
@@ -256,11 +223,11 @@ class DrawPage extends GetView<DoodleController> {
                 tween: Tween(begin: 0.0, end: 1.0),
                 duration: reduceMotion
                     ? Duration.zero
-                    : const Duration(milliseconds: 400),
+                    : const Duration(milliseconds: 360),
                 curve: Curves.easeOutCubic,
                 builder: (ctx, v, child) {
                   return Transform.translate(
-                    offset: Offset(0, -60 * (1 - v)),
+                    offset: Offset(0, -48 * (1 - v)),
                     child: Opacity(opacity: v.clamp(0.0, 1.0), child: child),
                   );
                 },
@@ -278,11 +245,11 @@ class DrawPage extends GetView<DoodleController> {
                 tween: Tween(begin: 0.0, end: 1.0),
                 duration: reduceMotion
                     ? Duration.zero
-                    : const Duration(milliseconds: 400),
+                    : const Duration(milliseconds: 360),
                 curve: Curves.easeOutCubic,
                 builder: (ctx, v, child) {
                   return Transform.translate(
-                    offset: Offset(0, 60 * (1 - v)),
+                    offset: Offset(0, 48 * (1 - v)),
                     child: Opacity(opacity: v.clamp(0.0, 1.0), child: child),
                   );
                 },
@@ -296,7 +263,11 @@ class DrawPage extends GetView<DoodleController> {
   }
 }
 
-// Top Toolbar
+// ───────────────────────────── Top Toolbar ─────────────────────────────
+//
+// 한 줄 필. [홈] | [실행취소 재실행] | [보관함 저장 갤러리 공유] | [지우기] [더보기]
+// 그룹 사이는 헤어라인 세로선으로만 나눈다. 아이콘 색은 잉크(onSurface) 하나,
+// 비활성은 alpha, 파괴적 액션(지우기)만 error.
 
 class _TopToolbar extends StatelessWidget {
   final DoodleController ctrl;
@@ -308,50 +279,47 @@ class _TopToolbar extends StatelessWidget {
     final cs = Get.theme.colorScheme;
 
     return Container(
-      margin: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 0),
-      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: cs.outlineVariant),
-      ),
-      // 기본 IconButton(48dp)로는 9개 액션이 일반 폰 폭을 넘겨 마지막 버튼이
-      // 잘린 채 가로 스크롤되었다. 밀도를 낮춰 한 화면에 모두 들어오게 하고,
-      // 아주 좁은 기기(320dp)에서는 기존처럼 스크롤로 폴백한다.
+      margin: EdgeInsets.fromLTRB(10.w, 8.h, 10.w, 0),
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 3.h),
+      decoration: _floatingPanel(cs),
+      // 기본 IconButton(48dp)로는 9개 액션이 일반 폰 폭을 넘긴다.
+      // 밀도를 낮춰 한 화면에 모두 넣고, 320dp에서는 가운데 그룹만 스크롤한다.
       child: IconButtonTheme(
         data: IconButtonThemeData(
           style: IconButton.styleFrom(
             padding: EdgeInsets.zero,
-            minimumSize: const Size(38, 40),
-            fixedSize: const Size(38, 40),
+            minimumSize: const Size(34, 40),
+            fixedSize: const Size(34, 40),
             iconSize: 19.r,
+            foregroundColor: cs.onSurface,
+            disabledForegroundColor: cs.onSurface.withValues(alpha: 0.28),
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
         ),
         child: Obx(() {
+          final hasContent = ctrl.hasDrawableContent;
           return Row(
             children: [
               IconButton(
-                // Item 3: DRAW가 루트가 되었으므로 leading은 홈 진입점.
-                // 설정/갤러리/프리미엄은 HomePage를 거쳐 이동한다.
                 icon: const Icon(LucideIcons.house),
                 onPressed: () async {
                   _maybeHaptic(settingCtrl);
+                  final canPopBack = DrawPage._canPopBack(context);
                   final shouldPop = await DrawPage._confirmDiscardIfNeeded(
                     ctrl,
                     settingCtrl,
                   );
                   if (!shouldPop) return;
                   ctrl.clearCanvas();
-                  if (Get.previousRoute.isEmpty) {
-                    // 스택 교체 — Home으로 이동해도 다시 Draw로 돌아오게 한다.
-                    await Get.offAllNamed(Routes.HOME);
-                  } else {
+                  if (canPopBack) {
                     Get.back();
+                  } else {
+                    await Get.offAllNamed(Routes.HOME);
                   }
                 },
                 tooltip: 'home'.tr,
               ),
+              _ToolbarDivider(cs: cs),
               Expanded(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -359,12 +327,7 @@ class _TopToolbar extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: Icon(
-                          LucideIcons.undo2,
-                          color: ctrl.canUndo
-                              ? cs.onSurface
-                              : cs.onSurface.withValues(alpha: 0.3),
-                        ),
+                        icon: const Icon(LucideIcons.undo2),
                         onPressed: ctrl.canUndo
                             ? () {
                                 if (settingCtrl.hapticEnabled.value) {
@@ -376,12 +339,7 @@ class _TopToolbar extends StatelessWidget {
                         tooltip: 'undo'.tr,
                       ),
                       IconButton(
-                        icon: Icon(
-                          LucideIcons.redo2,
-                          color: ctrl.canRedo
-                              ? cs.onSurface
-                              : cs.onSurface.withValues(alpha: 0.3),
-                        ),
+                        icon: const Icon(LucideIcons.redo2),
                         onPressed: ctrl.canRedo
                             ? () {
                                 _maybeHaptic(settingCtrl);
@@ -390,58 +348,20 @@ class _TopToolbar extends StatelessWidget {
                             : null,
                         tooltip: 'redo'.tr,
                       ),
-                      // 저장한 작품 보관함으로 바로 이동한다.
-                      // 홈 버튼은 캔버스를 비우고 나가므로, 작업 중인 그림을
-                      // 유지한 채 작품을 열어보려면 이 진입점이 필요하다.
+                      _ToolbarDivider(cs: cs),
+                      // 보관함은 캔버스를 유지한 채 이동한다 (홈 버튼과 다름).
                       IconButton(
-                        icon: Icon(LucideIcons.images, color: cs.onSurface),
+                        icon: const Icon(LucideIcons.images),
                         onPressed: () {
                           _maybeHaptic(settingCtrl);
                           Get.toNamed(Routes.GALLERY);
                         },
                         tooltip: 'gallery_title'.tr,
                       ),
+                      // 앱 내 작품 보관 — 저장 진행 중에는 연타 방지로 비활성.
                       IconButton(
-                        icon: Icon(
-                          LucideIcons.trash2,
-                          color: ctrl.hasDrawableContent
-                              ? cs.error
-                              : cs.error.withValues(alpha: 0.3),
-                        ),
-                        onPressed: ctrl.hasDrawableContent
-                            ? () => _confirmClear(context, cs, settingCtrl)
-                            : null,
-                        tooltip: 'clear_canvas'.tr,
-                      ),
-                      // Design Ref: §5.1 — Save 버튼은 Share 좌측에 배치.
-                      // Plan FR-01/FR-07: Save 시트로 해상도·포맷 선택 후 갤러리 저장.
-                      IconButton(
-                        icon: Icon(
-                          LucideIcons.download,
-                          color: ctrl.hasDrawableContent
-                              ? cs.onSurface
-                              : cs.onSurface.withValues(alpha: 0.3),
-                        ),
-                        onPressed: ctrl.hasDrawableContent
-                            ? () => _openSaveSheet(context, settingCtrl)
-                            : null,
-                        tooltip: 'save_to_gallery_title'.tr,
-                      ),
-                      // Plan FR-11: 작품 저장 버튼 — 갤러리 저장과 별개로 in-app 보관.
-                      // 저장 진행 중에는 연타로 인한 중복 저장을 막기 위해 비활성화한다.
-                      // 이 Row는 상위 Obx 안이라 isSavingArtwork 읽기가 반응형으로 추적된다.
-                      IconButton(
-                        icon: Icon(
-                          LucideIcons.bookmarkPlus,
-                          color:
-                              (ctrl.hasDrawableContent &&
-                                  !ctrl.isSavingArtwork.value)
-                              ? cs.onSurface
-                              : cs.onSurface.withValues(alpha: 0.3),
-                        ),
-                        onPressed:
-                            (ctrl.hasDrawableContent &&
-                                !ctrl.isSavingArtwork.value)
+                        icon: const Icon(LucideIcons.bookmarkPlus),
+                        onPressed: (hasContent && !ctrl.isSavingArtwork.value)
                             ? () {
                                 if (settingCtrl.hapticEnabled.value) {
                                   ctrl.hapticMedium();
@@ -452,13 +372,15 @@ class _TopToolbar extends StatelessWidget {
                         tooltip: 'artwork_save_action'.tr,
                       ),
                       IconButton(
-                        icon: Icon(
-                          LucideIcons.share2,
-                          color: ctrl.hasDrawableContent
-                              ? cs.onSurface
-                              : cs.onSurface.withValues(alpha: 0.3),
-                        ),
-                        onPressed: ctrl.hasDrawableContent
+                        icon: const Icon(LucideIcons.download),
+                        onPressed: hasContent
+                            ? () => _openSaveSheet(context, settingCtrl)
+                            : null,
+                        tooltip: 'save_to_gallery_title'.tr,
+                      ),
+                      IconButton(
+                        icon: const Icon(LucideIcons.share2),
+                        onPressed: hasContent
                             ? () {
                                 if (settingCtrl.hapticEnabled.value) {
                                   ctrl.hapticMedium();
@@ -468,14 +390,26 @@ class _TopToolbar extends StatelessWidget {
                             : null,
                         tooltip: 'share'.tr,
                       ),
+                      _ToolbarDivider(cs: cs),
+                      IconButton(
+                        icon: Icon(
+                          LucideIcons.trash2,
+                          color: hasContent
+                              ? cs.error
+                              : cs.error.withValues(alpha: 0.3),
+                        ),
+                        onPressed: hasContent
+                            ? () => _confirmClear(settingCtrl)
+                            : null,
+                        tooltip: 'clear_canvas'.tr,
+                      ),
                     ],
                   ),
                 ),
               ),
-              // 더보기는 스크롤 영역 밖에 고정한다. 좁은 화면에서 스크롤에 밀려
-              // 사라지면 캔버스 배경색·사진 기능에 아예 닿을 수 없기 때문이다.
+              // 더보기는 스크롤 영역 밖에 고정 — 좁은 화면에서도 항상 닿는다.
               IconButton(
-                icon: Icon(LucideIcons.ellipsis, color: cs.onSurface),
+                icon: const Icon(LucideIcons.ellipsis),
                 onPressed: () {
                   _maybeHaptic(settingCtrl);
                   MoreActionsSheet.show(
@@ -508,8 +442,6 @@ class _TopToolbar extends StatelessWidget {
       context: context,
       settingCtrl: settingCtrl,
       onConfirm: (resolution, format) async {
-        // 마지막 선택 persist + 갤러리 저장 위임.
-        // Plan FR-07: 마지막 선택을 Hive에 저장해 다음 호출 시 prefill.
         await Future.wait<void>([
           settingCtrl.setLastExportResolution(resolution),
           settingCtrl.setLastExportFormat(
@@ -533,65 +465,38 @@ class _TopToolbar extends StatelessWidget {
     }
     final cs = Get.theme.colorScheme;
     Get.bottomSheet(
-      Container(
-        decoration: BoxDecoration(
-          color: cs.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-        ),
-        padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 24.h),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(LucideIcons.paintBucket, size: 18.r, color: cs.primary),
-                SizedBox(width: 8.w),
-                Text(
-                  'canvas_color'.tr,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
+      AppSheetShell(
+        icon: LucideIcons.paintBucket,
+        title: 'canvas_color'.tr,
+        subtitle: 'canvas_color_desc'.tr,
+        scrollable: false,
+        child: Obx(() {
+          final current = ctrl.canvasColor.value;
+          final presets = DoodleController.canvasColorPresets;
+          final isPresetSelected = presets.contains(current);
+          final swatches = <Widget>[
+            for (final c in presets)
+              _buildCanvasColorSwatch(
+                cs: cs,
+                colorValue: c,
+                selected: current == c,
+                onTap: () {
+                  if (settingCtrl.hapticEnabled.value) {
+                    ctrl.hapticSelection();
+                  }
+                  ctrl.setCanvasColor(c);
+                  Get.back();
+                },
+              ),
+            _buildCanvasCustomSlot(
+              cs: cs,
+              customColor: isPresetSelected ? null : current,
+              selected: !isPresetSelected,
+              onTap: () => _openCanvasCustomColorPicker(context, settingCtrl),
             ),
-            SizedBox(height: 4.h),
-            Text(
-              'canvas_color_desc'.tr,
-              style: TextStyle(fontSize: 14.sp, color: cs.onSurfaceVariant),
-            ),
-            SizedBox(height: 16.h),
-            Obx(() {
-              final current = ctrl.canvasColor.value;
-              final presets = DoodleController.canvasColorPresets;
-              final isPresetSelected = presets.contains(current);
-              final swatches = <Widget>[
-                for (final c in presets)
-                  _buildCanvasColorSwatch(
-                    cs: cs,
-                    colorValue: c,
-                    selected: current == c,
-                    onTap: () {
-                      if (settingCtrl.hapticEnabled.value) {
-                        ctrl.hapticSelection();
-                      }
-                      ctrl.setCanvasColor(c);
-                      Get.back();
-                    },
-                  ),
-                _buildCanvasCustomSlot(
-                  cs: cs,
-                  customColor: isPresetSelected ? null : current,
-                  selected: !isPresetSelected,
-                  onTap: () =>
-                      _openCanvasCustomColorPicker(context, settingCtrl),
-                ),
-              ];
-              return Wrap(spacing: 12.w, runSpacing: 12.h, children: swatches);
-            }),
-          ],
-        ),
+          ];
+          return Wrap(spacing: 12.w, runSpacing: 12.h, children: swatches);
+        }),
       ),
       isScrollControlled: false,
     );
@@ -604,14 +509,10 @@ class _TopToolbar extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     final color = Color(colorValue);
-    final luminance = color.computeLuminance();
-    final checkColor = luminance > 0.6 ? Colors.black : Colors.white;
-    final hex = colorValue
-        .toUnsigned(32)
-        .toRadixString(16)
-        .padLeft(8, '0')
-        .substring(2)
-        .toUpperCase();
+    final checkColor = color.computeLuminance() > 0.6
+        ? Colors.black
+        : Colors.white;
+    final hex = _hexOf(colorValue);
     return Semantics(
       key: ValueKey('canvas-color-$hex'),
       button: true,
@@ -628,10 +529,10 @@ class _TopToolbar extends StatelessWidget {
           height: 56.r,
           decoration: BoxDecoration(
             color: color,
-            shape: BoxShape.circle,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd.r),
             border: Border.all(
               color: selected ? cs.primary : cs.outlineVariant,
-              width: selected ? 3 : 1,
+              width: selected ? 2.5 : 1,
             ),
           ),
           child: selected
@@ -642,8 +543,7 @@ class _TopToolbar extends StatelessWidget {
     );
   }
 
-  /// 캔버스 배경에 사용할 커스텀 색상 슬롯.
-  /// 현재 캔버스 색상이 프리셋에 없으면 그 색상을 미리보기로 표시한다.
+  /// 캔버스 배경용 커스텀 색상 슬롯. 프리셋에 없는 색이면 미리보기로 표시.
   Widget _buildCanvasCustomSlot({
     required ColorScheme cs,
     required int? customColor,
@@ -652,8 +552,9 @@ class _TopToolbar extends StatelessWidget {
   }) {
     final hasCustom = customColor != null;
     final color = hasCustom ? Color(customColor) : cs.surfaceContainerHigh;
-    final luminance = color.computeLuminance();
-    final fgColor = luminance > 0.6 ? Colors.black : Colors.white;
+    final fgColor = color.computeLuminance() > 0.6
+        ? Colors.black
+        : Colors.white;
     return Semantics(
       key: const ValueKey('canvas-custom-color'),
       button: true,
@@ -670,15 +571,15 @@ class _TopToolbar extends StatelessWidget {
           height: 56.r,
           decoration: BoxDecoration(
             color: color,
-            shape: BoxShape.circle,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd.r),
             border: Border.all(
               color: selected ? cs.primary : cs.outline,
-              width: selected ? 3 : 1.5,
+              width: selected ? 2.5 : 1,
             ),
           ),
           child: Icon(
-            selected ? LucideIcons.check : LucideIcons.plus,
-            size: 22.r,
+            selected ? LucideIcons.check : LucideIcons.pipette,
+            size: 20.r,
             color: hasCustom ? fgColor : cs.onSurfaceVariant,
           ),
         ),
@@ -699,110 +600,65 @@ class _TopToolbar extends StatelessWidget {
     );
     if (picked == null) return;
     await ctrl.setCanvasColor(picked);
-    // 다이얼로그가 닫힌 뒤 배경색 시트도 함께 닫는다.
     if (Get.isBottomSheetOpen ?? false) Get.back<void>();
   }
 
-  void _confirmClear(
-    BuildContext context,
-    ColorScheme cs,
-    SettingController settingCtrl,
-  ) {
+  void _confirmClear(SettingController settingCtrl) {
     if (!settingCtrl.askBeforeClear.value) {
       ctrl.clearCanvas();
       return;
     }
-
-    Get.dialog(
-      Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.r),
-        ),
-        clipBehavior: Clip.antiAlias,
-        backgroundColor: cs.surface,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 8.h),
-              child: Column(
-                children: [
-                  Container(
-                    width: 52.r,
-                    height: 52.r,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: cs.errorContainer,
-                    ),
-                    child: Icon(
-                      LucideIcons.trash2,
-                      size: 26.r,
-                      color: cs.onErrorContainer,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    'clear_canvas'.tr,
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    'clear_canvas_confirm'.tr,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: cs.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: Get.back,
-                      child: Text('cancel'.tr),
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: cs.error,
-                        foregroundColor: cs.onError,
-                      ),
-                      onPressed: () {
-                        ctrl.clearCanvas();
-                        if (settingCtrl.hapticEnabled.value) {
-                          ctrl.hapticHeavy();
-                        }
-                        Get.back();
-                      },
-                      child: Text('clear'.tr),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+    AppConfirmDialog.show(
+      icon: LucideIcons.trash2,
+      title: 'clear_canvas'.tr,
+      message: 'clear_canvas_confirm'.tr,
+      confirmLabel: 'clear'.tr,
+      cancelLabel: 'cancel'.tr,
+      destructive: true,
+      onConfirm: () {
+        ctrl.clearCanvas();
+        if (settingCtrl.hapticEnabled.value) ctrl.hapticHeavy();
+      },
     );
   }
 }
 
-// Bottom Toolbar
+class _ToolbarDivider extends StatelessWidget {
+  const _ToolbarDivider({required this.cs});
+  final ColorScheme cs;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 1,
+      height: 18,
+      margin: EdgeInsets.symmetric(horizontal: 2.w),
+      color: cs.outlineVariant,
+    );
+  }
+}
+
+/// 캔버스 위에 떠 있는 패널 공통 장식 — 종이색 + 헤어라인 + 아주 옅은 그림자.
+BoxDecoration _floatingPanel(ColorScheme cs, {double radius = 16}) {
+  return BoxDecoration(
+    color: cs.surface,
+    borderRadius: BorderRadius.circular(radius.r),
+    border: Border.all(color: cs.outlineVariant),
+    boxShadow: [
+      BoxShadow(
+        color: cs.shadow.withValues(alpha: 0.10),
+        blurRadius: 14,
+        offset: const Offset(0, 4),
+      ),
+    ],
+  );
+}
+
+// ─────────────────────────── Bottom Toolbar ────────────────────────────
 //
-// 3단 구성: [브러시 퀵] · [굵기] · [색상 퀵].
-// 예전에는 브러시 셀렉터와 굵기 슬라이더가 한 행을 나눠 써서 브러시가 가로
-// 스크롤로 잘렸다. 지금은 각 행이 Expanded 슬롯을 균등 분배해 어떤 폭에서도
-// 스크롤 없이 전부 보이고, 전체 목록은 "+" 슬롯이 여는 바텀시트에서 고른다.
+// 3단: [브러시 퀵] · [굵기] · [색상 퀵]. 각 행은 Expanded 슬롯을 균등 분배해
+// 320dp에서도 스크롤 없이 44dp 터치 타깃을 유지한다. 전체 목록은 "+" 슬롯이
+// 여는 시트에서 고른다.
 
 class _BottomToolbar extends StatelessWidget {
   final DoodleController ctrl;
@@ -813,25 +669,16 @@ class _BottomToolbar extends StatelessWidget {
     final settingCtrl = SettingController.to;
     final cs = Get.theme.colorScheme;
     return Container(
-      margin: EdgeInsets.fromLTRB(12.w, 0, 12.w, 8.h),
-      padding: EdgeInsets.fromLTRB(10.w, 6.h, 10.w, 8.h),
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(22.r),
-        border: Border.all(color: cs.outlineVariant),
-        boxShadow: [
-          BoxShadow(
-            color: cs.shadow.withValues(alpha: 0.06),
-            blurRadius: 16,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
+      margin: EdgeInsets.fromLTRB(10.w, 0, 10.w, 8.h),
+      padding: EdgeInsets.fromLTRB(10.w, 8.h, 10.w, 8.h),
+      decoration: _floatingPanel(cs, radius: AppTheme.radiusLg),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           _BrushQuickRow(ctrl: ctrl),
+          SizedBox(height: 2.h),
           _BrushSizeRow(ctrl: ctrl),
+          SizedBox(height: 2.h),
           _ColorQuickRow(ctrl: ctrl),
           Obx(
             () => settingCtrl.showBrushGuide.value
@@ -840,7 +687,7 @@ class _BottomToolbar extends StatelessWidget {
                     child: Text(
                       'brush_guide_desc'.tr,
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 11.sp,
                         color: cs.onSurfaceVariant,
                       ),
                       textAlign: TextAlign.center,
@@ -877,7 +724,6 @@ class _BrushQuickRow extends StatelessWidget {
                 selected: selected == type,
               ),
             ),
-          // 지우개는 사용 빈도가 높아 최근 목록과 무관하게 자리를 고정한다.
           Expanded(
             child: _BrushSlot(
               ctrl: ctrl,
@@ -962,6 +808,7 @@ class _BrushSlot extends StatelessWidget {
 }
 
 /// 브러시 아이콘 타일. 퀵 행과 전체 시트가 같은 모양을 공유한다.
+/// 선택 = 잉크 블루 채움. 잠금 = 흐린 아이콘 + 자물쇠. 나머지는 투명 배경.
 class _BrushGlyph extends StatelessWidget {
   const _BrushGlyph({
     required this.icon,
@@ -986,40 +833,30 @@ class _BrushGlyph extends StatelessWidget {
       fg = cs.onPrimary;
     } else if (locked) {
       bg = cs.surfaceContainerLow;
-      // 0.35 는 실기기에서 거의 보이지 않아 잠금인지 빈 칸인지 구분이 어려웠다.
       fg = cs.onSurface.withValues(alpha: 0.5);
     } else {
       bg = cs.surfaceContainerHigh;
-      fg = cs.onSurfaceVariant;
+      fg = cs.onSurface;
     }
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
+      duration: const Duration(milliseconds: 160),
       curve: Curves.easeOut,
       width: size,
       height: size,
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: selected
-            ? [
-                BoxShadow(
-                  color: cs.primary.withValues(alpha: 0.38),
-                  blurRadius: 10,
-                  spreadRadius: 1,
-                ),
-              ]
-            : null,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm.r),
       ),
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Icon(icon, size: size * 0.47, color: fg),
+          Icon(icon, size: size * 0.5, color: fg),
           if (locked)
             PositionedDirectional(
               end: 3,
               bottom: 3,
-              child: Icon(LucideIcons.lock, size: 9.r, color: cs.tertiary),
+              child: Icon(LucideIcons.lock, size: 9.r, color: cs.secondary),
             ),
         ],
       ),
@@ -1027,7 +864,8 @@ class _BrushGlyph extends StatelessWidget {
   }
 }
 
-/// 2행 — 굵기. 슬라이더가 행 전체를 쓰므로 예전보다 조작 폭이 3배 넓다.
+/// 2행 — 굵기. [미리보기 점] [슬라이더] [수치].
+/// 미리보기는 브러시 배율·농도를 반영해 "실제로 그어질 굵기"를 보여준다.
 class _BrushSizeRow extends StatelessWidget {
   final DoodleController ctrl;
   const _BrushSizeRow({required this.ctrl});
@@ -1040,52 +878,64 @@ class _BrushSizeRow extends StatelessWidget {
       final minSize = isEraser ? 10.0 : 2.0;
       final maxSize = isEraser ? 60.0 : 30.0;
       final size = ctrl.brushSize.value.clamp(minSize, maxSize);
-      // Sync the observable if it was clamped (e.g. switching eraser -> pen)
       if (size != ctrl.brushSize.value) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           ctrl.brushSize.value = size;
         });
       }
-      final dotSize = (size * 0.55).clamp(5.0, 22.0);
+      final preset = isEraser
+          ? null
+          : BrushPresets.maybeOf(ctrl.brushType.value);
+      final effectiveSize = isEraser
+          ? size * 4.0
+          : size * (preset?.sizeMultiplier ?? 1.0);
+      final dotSize = (effectiveSize * 0.55).clamp(5.0, 22.0);
 
       return SizedBox(
-        height: 34,
+        height: 36,
         child: Row(
           children: [
             SizedBox(
-              width: 26.r,
+              width: 30.r,
               child: Center(
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 150),
                   width: dotSize.r,
                   height: dotSize.r,
                   decoration: BoxDecoration(
-                    color: isEraser ? cs.outline : Color(ctrl.brushColor.value),
+                    color: isEraser
+                        ? cs.surfaceContainerHighest
+                        : Color(
+                            ctrl.brushColor.value,
+                          ).withValues(alpha: preset?.alpha ?? 1.0),
                     shape: BoxShape.circle,
-                    border: Border.all(color: cs.outlineVariant),
+                    border: Border.all(color: cs.outline),
                   ),
                 ),
               ),
             ),
             Expanded(
-              child: SliderTheme(
-                data: SliderTheme.of(context).copyWith(
-                  trackHeight: 3,
-                  thumbShape: const RoundSliderThumbShape(
-                    enabledThumbRadius: 8,
-                  ),
-                  overlayShape: const RoundSliderOverlayShape(
-                    overlayRadius: 16,
-                  ),
+              child: Semantics(
+                label: 'brush_size'.tr,
+                child: Slider(
+                  value: size,
+                  min: minSize,
+                  max: maxSize,
+                  onChanged: (v) => ctrl.brushSize.value = v,
                 ),
-                child: Semantics(
-                  label: 'brush_size'.tr,
-                  child: Slider(
-                    value: size,
-                    min: minSize,
-                    max: maxSize,
-                    onChanged: (v) => ctrl.brushSize.value = v,
-                  ),
+              ),
+            ),
+            SizedBox(
+              width: 30.r,
+              child: Text(
+                size.round().toString(),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w700,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                  color: cs.onSurfaceVariant,
                 ),
               ),
             ),
@@ -1111,11 +961,28 @@ class _ColorQuickRow extends StatelessWidget {
         return SizedBox(
           height: 44,
           child: Center(
-            child: Text(
-              'eraser_mode'.tr,
-              style: TextStyle(fontSize: 12.sp, color: cs.onSurfaceVariant),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  LucideIcons.eraser,
+                  size: 14.r,
+                  color: cs.onSurfaceVariant,
+                ),
+                SizedBox(width: 6.w),
+                Flexible(
+                  child: Text(
+                    'eraser_mode'.tr,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                      color: cs.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
           ),
         );
@@ -1193,7 +1060,7 @@ class _ColorSlot extends StatelessWidget {
   }
 }
 
-/// 색상 원. 선택 시 확대 + 링 + 글로우로 상태를 크게 벌린다.
+/// 색상 원. 선택 시 바깥에 잉크색 링을 두른다 (색 자체는 가리지 않는다).
 class _ColorDot extends StatelessWidget {
   const _ColorDot({
     required this.colorValue,
@@ -1210,39 +1077,31 @@ class _ColorDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = Color(colorValue);
-    // 흰색 등 밝은 색상에서도 체크 표시가 보이도록 휘도 기반 대비 색상 선택.
-    final checkColor = color.computeLuminance() > 0.6
-        ? Colors.black
-        : Colors.white;
+    final ringSize = baseSize + 8;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 150),
-      width: selected ? baseSize + 8 : baseSize,
-      height: selected ? baseSize + 8 : baseSize,
+      width: ringSize,
+      height: ringSize,
+      padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color: color,
         shape: BoxShape.circle,
         border: Border.all(
-          color: selected ? cs.primary : cs.outlineVariant,
-          width: selected ? 3 : 1,
+          color: selected ? cs.primary : Colors.transparent,
+          width: 2,
         ),
-        boxShadow: selected
-            ? [
-                BoxShadow(
-                  color: cs.primary.withValues(alpha: 0.42),
-                  blurRadius: 10,
-                  spreadRadius: 1,
-                ),
-              ]
-            : null,
       ),
-      child: selected
-          ? Icon(LucideIcons.check, size: 16.r, color: checkColor)
-          : null,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          border: Border.all(color: cs.outlineVariant),
+        ),
+      ),
     );
   }
 }
 
-/// 전체 목록을 여는 "+" 슬롯.
+/// 전체 목록을 여는 "+" 슬롯. 선택 항목과 구분되도록 중립 배경 + 점선 느낌의 외곽선.
 class _MoreSlot extends StatelessWidget {
   const _MoreSlot({
     required this.slotKey,
@@ -1259,6 +1118,7 @@ class _MoreSlot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
+    final size = circular ? 28.0 : 38.0;
     return Semantics(
       key: slotKey,
       button: true,
@@ -1273,23 +1133,20 @@ class _MoreSlot extends StatelessWidget {
           height: 44,
           child: Center(
             child: Container(
-              width: circular ? 28 : 38,
-              height: circular ? 28 : 38,
-              // 중립 배경 + primary 외곽선/아이콘.
-              // primaryContainer 를 깔면 "선택된 항목"처럼 보여 혼동을 준다.
+              width: size,
+              height: size,
               decoration: BoxDecoration(
-                color: cs.surfaceContainerHighest,
+                color: cs.surface,
                 shape: circular ? BoxShape.circle : BoxShape.rectangle,
-                borderRadius: circular ? null : BorderRadius.circular(12.r),
-                border: Border.all(
-                  color: cs.primary.withValues(alpha: 0.55),
-                  width: 1.5,
-                ),
+                borderRadius: circular
+                    ? null
+                    : BorderRadius.circular(AppTheme.radiusSm.r),
+                border: Border.all(color: cs.outline, width: 1.2),
               ),
               child: Icon(
                 LucideIcons.plus,
                 size: circular ? 15.r : 18.r,
-                color: cs.primary,
+                color: cs.onSurface,
               ),
             ),
           ),
@@ -1306,10 +1163,9 @@ String _hexOf(int colorValue) => colorValue
     .substring(2)
     .toUpperCase();
 
-// Sheets — 퀵 행에 없는 항목은 여기서 고른다.
+// ───────────────────────────────── Sheets ──────────────────────────────
 
 /// 상단 툴바 더보기 시트 — 캔버스 배경색 / 참조 사진.
-/// 시트가 열린 동안 상태가 바뀌지 않는 액션들이라 스냅샷 값으로 정적으로 그린다.
 class MoreActionsSheet {
   const MoreActionsSheet._();
 
@@ -1320,114 +1176,51 @@ class MoreActionsSheet {
     required VoidCallback onCanvasColor,
   }) {
     return Get.bottomSheet<void>(
-      _SheetShell(
-        icon: LucideIcons.ellipsis,
+      AppSheetShell(
         title: 'more_actions'.tr,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _SheetActionTile(
-              tileKey: const ValueKey('draw-more-canvas-color'),
-              icon: LucideIcons.paintBucket,
-              label: 'canvas_color'.tr,
-              description: 'canvas_color_desc'.tr,
-              onTap: () {
-                Get.back<void>();
-                // 시트가 완전히 닫힌 뒤 다음 시트를 연다.
-                WidgetsBinding.instance.addPostFrameCallback(
-                  (_) => onCanvasColor(),
-                );
-              },
-            ),
-            SizedBox(height: 8.h),
-            _SheetActionTile(
-              tileKey: const ValueKey('draw-more-reference-image'),
-              icon: hasReferenceImage
-                  ? LucideIcons.imageMinus
-                  : LucideIcons.imagePlus,
-              label: hasReferenceImage ? 'remove_image'.tr : 'import_image'.tr,
-              onTap: () {
-                if (settingCtrl.hapticEnabled.value) ctrl.hapticSelection();
-                Get.back<void>();
-                if (hasReferenceImage) {
-                  ctrl.clearReferenceDrawing();
-                } else {
-                  ctrl.pickReferenceImage();
-                }
-              },
-            ),
-          ],
-        ),
-      ),
-      isScrollControlled: true,
-    );
-  }
-}
-
-class _SheetActionTile extends StatelessWidget {
-  const _SheetActionTile({
-    required this.tileKey,
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.description,
-  });
-
-  final Key tileKey;
-  final IconData icon;
-  final String label;
-  final String? description;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
-    return Material(
-      key: tileKey,
-      color: cs.surfaceContainerLow,
-      borderRadius: BorderRadius.circular(14.r),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14.r),
-        onTap: onTap,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
-          child: Row(
+        child: AppPanel(
+          color: Get.theme.colorScheme.surfaceContainerLow,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 20.r, color: cs.primary),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w700,
-                        color: cs.onSurface,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (description != null) ...[
-                      SizedBox(height: 2.h),
-                      Text(
-                        description!,
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          color: cs.onSurfaceVariant,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ],
-                ),
+              AppListRow(
+                key: const ValueKey('draw-more-canvas-color'),
+                icon: LucideIcons.paintBucket,
+                title: 'canvas_color'.tr,
+                subtitle: 'canvas_color_desc'.tr,
+                trailing: const DirectionalChevron(),
+                onTap: () {
+                  Get.back<void>();
+                  WidgetsBinding.instance.addPostFrameCallback(
+                    (_) => onCanvasColor(),
+                  );
+                },
+              ),
+              const Divider(height: 1),
+              AppListRow(
+                key: const ValueKey('draw-more-reference-image'),
+                icon: hasReferenceImage
+                    ? LucideIcons.imageMinus
+                    : LucideIcons.imagePlus,
+                title: hasReferenceImage
+                    ? 'remove_image'.tr
+                    : 'import_image'.tr,
+                trailing: const DirectionalChevron(),
+                onTap: () {
+                  if (settingCtrl.hapticEnabled.value) ctrl.hapticSelection();
+                  Get.back<void>();
+                  if (hasReferenceImage) {
+                    ctrl.clearReferenceDrawing();
+                  } else {
+                    ctrl.pickReferenceImage();
+                  }
+                },
               ),
             ],
           ),
         ),
       ),
+      isScrollControlled: true,
     );
   }
 }
@@ -1441,12 +1234,10 @@ class BrushSheet {
     SettingController settingCtrl,
   ) {
     final cs = Get.theme.colorScheme;
-    // 시트는 항목을 고르는 즉시 닫히므로 반응형(Obx)일 필요가 없다.
-    // 오히려 pop 중인 라우트 안에서 Rx 알림을 받으면 리빌드가 꼬이므로,
-    // 열리는 시점의 선택 상태를 캡처해 정적으로 그린다.
+    // 시트는 선택 즉시 닫히므로 열리는 시점의 상태를 캡처해 정적으로 그린다.
     final selected = ctrl.brushType.value;
     return Get.bottomSheet<void>(
-      _SheetShell(
+      AppSheetShell(
         icon: LucideIcons.paintbrush,
         title: 'brush_all_title'.tr,
         child: Builder(
@@ -1506,7 +1297,6 @@ class _SheetBrushTile extends StatelessWidget {
 
     void handleTap() {
       if (settingCtrl.hapticEnabled.value) ctrl.hapticSelection();
-      // 잠금 해제 다이얼로그가 시트 위에 겹치지 않도록 먼저 시트를 닫는다.
       Get.back<void>();
       if (locked) {
         ctrl.unlockBrush(type);
@@ -1536,7 +1326,7 @@ class _SheetBrushTile extends StatelessWidget {
                 icon: icon,
                 selected: selected,
                 locked: locked,
-                size: 44,
+                size: 46,
                 cs: cs,
               ),
               SizedBox(height: 6.h),
@@ -1569,11 +1359,10 @@ class ColorSheet {
     SettingController settingCtrl,
   ) {
     final cs = Get.theme.colorScheme;
-    // BrushSheet과 같은 이유로 정적 렌더 (선택 즉시 닫힘).
     final current = ctrl.brushColor.value;
     final custom = ctrl.customColor.value;
     return Get.bottomSheet<void>(
-      _SheetShell(
+      AppSheetShell(
         icon: LucideIcons.palette,
         title: 'pick_color'.tr,
         child: Builder(
@@ -1595,7 +1384,6 @@ class ColorSheet {
                       Get.back<void>();
                     },
                   ),
-                // 커스텀 슬롯: 저장된 커스텀 색이 있으면 그 색을, 없으면 "+"를 보여준다.
                 Semantics(
                   key: const ValueKey('draw-sheet-custom-color'),
                   button: true,
@@ -1617,13 +1405,9 @@ class ColorSheet {
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: custom != null
-                                ? Color(custom)
-                                : cs.primaryContainer.withValues(alpha: 0.5),
+                            color: custom != null ? Color(custom) : cs.surface,
                             shape: BoxShape.circle,
-                            border: Border.all(
-                              color: cs.primary.withValues(alpha: 0.45),
-                            ),
+                            border: Border.all(color: cs.outline, width: 1.2),
                           ),
                           child: Icon(
                             LucideIcons.pipette,
@@ -1632,7 +1416,7 @@ class ColorSheet {
                                 ? (Color(custom).computeLuminance() > 0.6
                                       ? Colors.black
                                       : Colors.white)
-                                : cs.primary,
+                                : cs.onSurface,
                           ),
                         ),
                       ),
@@ -1684,7 +1468,7 @@ class _SheetColorTile extends StatelessWidget {
               colorValue: colorValue,
               selected: selected,
               cs: cs,
-              baseSize: 32,
+              baseSize: 30,
             ),
           ),
         ),
@@ -1693,64 +1477,7 @@ class _SheetColorTile extends StatelessWidget {
   }
 }
 
-/// 시트 공통 껍데기 — 둥근 상단 + 제목 + 내용.
-class _SheetShell extends StatelessWidget {
-  const _SheetShell({
-    required this.icon,
-    required this.title,
-    required this.child,
-  });
-
-  final IconData icon;
-  final String title;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
-    return Container(
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(22.r)),
-      ),
-      padding: EdgeInsets.fromLTRB(18.w, 14.h, 18.w, 20.h),
-      child: SafeArea(
-        top: false,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(icon, size: 18.r, color: cs.primary),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w700,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 14.h),
-              child,
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// 브러시 색상용 커스텀 컬러 피커. 확정 시 색상 시트도 함께 닫는다.
-/// 브러시 색상 선택 — Material 팔레트(색조 포함) · 흑백 · 컬러휠 · HEX 입력을
-/// 한 다이얼로그에서 제공한다. 확정 시 색상 시트도 함께 닫는다.
+/// 브러시 색상용 리치 컬러 피커. 확정 시 색상 시트도 함께 닫는다.
 Future<void> _openBrushColorPicker(
   DoodleController ctrl,
   SettingController settingCtrl,
@@ -1783,7 +1510,6 @@ Future<int?> pickRichColor({
       await ColorPicker(
         color: initial,
         onColorChanged: (color) => picked = color,
-        // Material 기본/강조 팔레트 + 흑백 + 자유 색상 휠.
         pickersEnabled: const <ColorPickerType, bool>{
           ColorPickerType.primary: true,
           ColorPickerType.accent: true,
@@ -1791,7 +1517,6 @@ Future<int?> pickRichColor({
           ColorPickerType.wheel: true,
         },
         enableShadesSelection: true,
-        // 그리기 색은 항상 불투명하게 다룬다(지우개가 투명도를 담당).
         enableOpacity: false,
         showRecentColors: recentColors.isNotEmpty,
         maxRecentColors: DoodleController.maxRecentColors,
@@ -1805,7 +1530,7 @@ Future<int?> pickRichColor({
         ),
         heading: Text(
           'pick_color'.tr,
-          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
+          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w800),
         ),
         subheading: Text(
           'color_shades'.tr,
@@ -1846,6 +1571,5 @@ Future<int?> pickRichColor({
       );
 
   if (!confirmed) return null;
-  // 알파 채널은 항상 0xFF 로 강제.
   return picked.toARGB32() | 0xFF000000;
 }

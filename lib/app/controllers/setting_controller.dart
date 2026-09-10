@@ -16,6 +16,7 @@ typedef CanLaunchUrlFn = Future<bool> Function(Uri uri);
 typedef LaunchUrlFn = Future<bool> Function(Uri uri, LaunchMode mode);
 typedef RateAppFn = Future<void> Function();
 typedef UpdateLocaleFn = Future<void> Function(Locale locale);
+typedef DeviceLocaleFn = Locale? Function();
 
 class SettingController extends GetxController {
   SettingController({
@@ -24,11 +25,16 @@ class SettingController extends GetxController {
     LaunchUrlFn? launchUrlFn,
     RateAppFn? rateAppFn,
     UpdateLocaleFn? updateLocaleFn,
+    DeviceLocaleFn? deviceLocaleFn,
   }) : _loadOnInit = loadOnInit,
        _launchUrlFn =
            launchUrlFn ?? ((uri, mode) => launchUrl(uri, mode: mode)),
        _rateAppFn = rateAppFn ?? (() => AppRatingService.to.openStoreListing()),
-       _updateLocaleFn = updateLocaleFn ?? Get.updateLocale;
+       _updateLocaleFn = updateLocaleFn ?? Get.updateLocale,
+       // 테스트에서 기기 로케일을 주입할 수 있도록 seam 을 둔다.
+       // Get.deviceLocale 은 실제 PlatformDispatcher 를 보기 때문에
+       // flutter_test 의 localeTestValue 로는 바꿀 수 없다.
+       _deviceLocaleFn = deviceLocaleFn ?? (() => Get.deviceLocale);
 
   static SettingController get to => Get.find<SettingController>();
   static const String appId = 'doodle_pad';
@@ -79,6 +85,7 @@ class SettingController extends GetxController {
   final LaunchUrlFn _launchUrlFn;
   final RateAppFn _rateAppFn;
   final UpdateLocaleFn _updateLocaleFn;
+  final DeviceLocaleFn _deviceLocaleFn;
 
   static Future<void> ensureBoxOpen() async {
     if (!Hive.isBoxOpen(_kSettingBox)) {
@@ -115,7 +122,12 @@ class SettingController extends GetxController {
     hapticEnabled.value = _readBool(box, _kHapticKey, true);
     showBrushGuide.value = _readBool(box, _kShowBrushGuideKey, true);
     askBeforeClear.value = _readBool(box, _kAskBeforeClearKey, true);
-    final storedLanguage = _readString(box, _kLanguageKey, 'en');
+    // 첫 실행(저장된 언어 없음)에는 기기 로케일을 따른다.
+    // 예전에는 무조건 'en'으로 시작해, 한국어/일본어 기기에서 앱을 처음 켜면
+    // 11개 언어를 지원함에도 영어 UI가 뜨고 사용자가 설정에서 직접 바꿔야 했다.
+    final storedLanguage = box.containsKey(_kLanguageKey)
+        ? _readString(box, _kLanguageKey, _deviceLanguageOrEnglish())
+        : _deviceLanguageOrEnglish();
     language.value = _supportedLanguageCodes.contains(DeviceQaConfig.localeCode)
         ? DeviceQaConfig.localeCode
         : storedLanguage;
@@ -154,6 +166,14 @@ class SettingController extends GetxController {
   @visibleForTesting
   static Set<String> get supportedLanguageCodesForTest =>
       Set.unmodifiable(_supportedLanguageCodes);
+
+  /// 저장된 언어 설정이 없을 때 사용할 기본 언어.
+  /// 기기 로케일이 지원 목록에 있으면 그 언어를, 아니면 영어를 쓴다.
+  String _deviceLanguageOrEnglish() {
+    final code = _deviceLocaleFn()?.languageCode;
+    if (code != null && _supportedLanguageCodes.contains(code)) return code;
+    return 'en';
+  }
 
   Locale get currentLocale {
     final code = language.value;
@@ -228,11 +248,13 @@ class SettingController extends GetxController {
     hapticEnabled.value = true;
     showBrushGuide.value = true;
     askBeforeClear.value = true;
-    language.value = 'en';
+    // 초기화 후 값은 "저장된 설정이 없는 상태"의 기본값과 같아야 한다.
+    // 'en' 으로 고정하면 다음 부팅에서 기기 로케일로 복귀해 값이 어긋난다.
+    language.value = _deviceLanguageOrEnglish();
     lastExportResolution.value = defaultExportResolution;
     lastExportFormat.value = defaultExportFormat;
     shakeToClearEnabled.value = false;
-    await _updateLocaleFn(const Locale('en'));
+    await _updateLocaleFn(currentLocale);
 
     // 드로잉 사용자 선호값(캔버스/커스텀 색상)도 함께 리셋.
     // 보상형 광고로 해금한 브러시(watercolor/airbrush) 상태와 인앱 결제(is_premium)는

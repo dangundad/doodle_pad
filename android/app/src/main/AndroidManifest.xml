@@ -10,7 +10,17 @@
     <!-- 진동 피드백 -->
     <uses-permission android:name="android.permission.VIBRATE"/>
 
-    <application android:label="@string/app_name" android:name="${applicationName}" android:icon="@mipmap/launcher_icon" android:roundIcon="@mipmap/launcher_icon">
+    <!--
+      갤러리 저장(gal 플러그인) — API 29 이하에서는 MediaStore가 아닌 legacy
+      external storage 경로로 쓰기 때문에 이 권한이 반드시 필요하다.
+      minSdk가 24라 이 선언이 없으면 Android 7~10 사용자는 "저장 권한이 필요합니다"
+      토스트만 보고 갤러리 저장을 영영 성공시킬 수 없다(권한 요청 자체가 즉시 거부됨).
+      API 30+ 에서는 선언이 무시된다.
+    -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29" />
+
+    <application android:label="@string/app_name" android:name="${applicationName}" android:icon="@mipmap/launcher_icon" android:roundIcon="@mipmap/launcher_icon" android:requestLegacyExternalStorage="true">
 
         <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop" android:taskAffinity="" android:theme="@style/LaunchTheme" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize">
             <meta-data android:name="io.flutter.embedding.android.NormalTheme" android:resource="@style/NormalTheme" />

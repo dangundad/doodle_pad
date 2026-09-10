@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -49,6 +50,48 @@ void main() {
       expect(controller.language.value, 'ko');
   });
 
+  // 11개 언어를 지원하는데 첫 실행이 무조건 'en' 이면, 한국어/일본어 기기
+  // 사용자도 영어 UI 를 보고 설정에서 직접 바꿔야 했다.
+  test('첫 실행: 저장된 언어가 없으면 기기 로케일을 따른다', () async {
+    await Hive.openBox('doodle_settings_v1');
+    Locale? applied;
+
+    final controller = SettingController(
+      updateLocaleFn: (locale) async => applied = locale,
+      deviceLocaleFn: () => const Locale('ko'),
+    );
+    controller.onInit();
+    await Future<void>.delayed(Duration.zero);
+
+    expect(controller.language.value, 'ko');
+    expect(applied?.languageCode, 'ko');
+  });
+
+  test('첫 실행: 지원하지 않는 기기 로케일은 en 으로 폴백', () async {
+    await Hive.openBox('doodle_settings_v1');
+
+    final controller = SettingController(
+      updateLocaleFn: (_) async {},
+      deviceLocaleFn: () => const Locale('sv'),
+    );
+    controller.onInit();
+
+    expect(controller.language.value, 'en');
+  });
+
+  test('저장된 언어가 있으면 기기 로케일보다 우선한다', () async {
+    final box = await Hive.openBox('doodle_settings_v1');
+    await box.put('language', 'ja');
+
+    final controller = SettingController(
+      updateLocaleFn: (_) async {},
+      deviceLocaleFn: () => const Locale('ko'),
+    );
+    controller.onInit();
+
+    expect(controller.language.value, 'ja');
+  });
+
   test('lastExportResolution / lastExportFormat: 저장 후 재구동 시 복원', () async {
     final controller = SettingController(
       loadOnInit: false,
@@ -63,7 +106,10 @@ void main() {
     expect(controller.lastExportFormat.value, 'jpeg');
 
     // 같은 box를 다시 열고 새 컨트롤러 인스턴스로 readback.
-    final reborn = SettingController(updateLocaleFn: (_) async {});
+    final reborn = SettingController(
+        updateLocaleFn: (_) async {},
+        deviceLocaleFn: () => const Locale('en'),
+      );
     reborn.onInit();
 
     expect(reborn.lastExportResolution.value, 3);
@@ -82,7 +128,10 @@ void main() {
     await controller.setShakeToClearEnabled(true);
     expect(controller.shakeToClearEnabled.value, true);
 
-    final reborn = SettingController(updateLocaleFn: (_) async {});
+    final reborn = SettingController(
+        updateLocaleFn: (_) async {},
+        deviceLocaleFn: () => const Locale('en'),
+      );
     reborn.onInit();
 
     expect(reborn.shakeToClearEnabled.value, true);
@@ -236,9 +285,12 @@ void main() {
   test(
     'clearAppSettings: 인메모리 Rx 와 영속 box 값이 기본값으로 일치',
     () async {
+      // 초기화 후 언어는 "저장값 없음"의 기본값 = 기기 로케일 기반이라,
+      // 실행 머신 로케일에 흔들리지 않도록 en 으로 고정해 검증한다.
       final controller = SettingController(
         loadOnInit: false,
         updateLocaleFn: (_) async {},
+        deviceLocaleFn: () => const Locale('en'),
       );
       controller.onInit();
 
@@ -268,7 +320,10 @@ void main() {
       expect(controller.shakeToClearEnabled.value, isFalse);
 
       // 새 인스턴스로 readback 시에도 기본값이 적용된다(영속 일관성).
-      final reborn = SettingController(updateLocaleFn: (_) async {});
+      final reborn = SettingController(
+        updateLocaleFn: (_) async {},
+        deviceLocaleFn: () => const Locale('en'),
+      );
       reborn.onInit();
       expect(reborn.hapticEnabled.value, isTrue);
       expect(reborn.showBrushGuide.value, isTrue);

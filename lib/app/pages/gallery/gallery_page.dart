@@ -11,10 +11,11 @@ import 'package:doodle_pad/app/controllers/gallery_controller.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/data/models/drawing.dart';
 import 'package:doodle_pad/app/routes/app_pages.dart';
+import 'package:doodle_pad/app/theme/app_theme.dart';
 import 'package:doodle_pad/app/utils/app_toast.dart';
+import 'package:doodle_pad/app/widgets/app_ui.dart';
 
-/// Plan FR-09 — 작품 그리드 + 빈 상태 + 길게누름 삭제.
-/// Design Ref: §5.3 — 2열 정사각 썸네일, AppBar에 작품 수 표시.
+/// 작품 그리드 + 빈 상태 + 길게누름 삭제 + 다중 선택.
 class GalleryPage extends GetView<GalleryController> {
   const GalleryPage({super.key});
 
@@ -27,13 +28,9 @@ class GalleryPage extends GetView<GalleryController> {
           if (controller.deleteMode.value) {
             return Text(
               '${controller.selectedIds.length}${'gallery_selected_suffix'.tr}',
-              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700),
             );
           }
-          return Text(
-            '${'gallery_title'.tr} (${controller.artworks.length})',
-            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700),
-          );
+          return Text('${'gallery_title'.tr} (${controller.artworks.length})');
         }),
         leading: Obx(
           () => IconButton(
@@ -69,6 +66,7 @@ class GalleryPage extends GetView<GalleryController> {
                   : 'gallery_select_mode'.tr,
             );
           }),
+          SizedBox(width: 4.w),
         ],
       ),
       backgroundColor: cs.surface,
@@ -86,11 +84,13 @@ class GalleryPage extends GetView<GalleryController> {
               _OverLimitBanner(count: controller.artworks.length),
             Expanded(
               child: GridView.builder(
-                padding: EdgeInsets.fromLTRB(12.w, 12.h, 12.w, 24.h),
+                padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 24.h),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  mainAxisSpacing: 12.h,
-                  crossAxisSpacing: 12.w,
+                  mainAxisSpacing: 14.h,
+                  crossAxisSpacing: 14.w,
+                  // 캔버스가 세로로 긴 비율이라 셀도 세로로 키워 그림을 크게 보인다.
+                  childAspectRatio: 0.72,
                 ),
                 itemCount: controller.artworks.length,
                 itemBuilder: (context, index) {
@@ -129,98 +129,25 @@ class GalleryPage extends GetView<GalleryController> {
       DoodleController.to.hapticSelection();
     }
 
-    // 현재 캔버스에 작업물이 있으면 사용자 명시 확인 없이 덮어쓰지 않는다.
-    // 홈 진입의 "이어 그리기 / 새로 시작" 다이얼로그와 같은 손실 방어 원칙.
+    // 현재 캔버스에 작업물이 있으면 명시 확인 없이 덮어쓰지 않는다.
     final ctrl = DoodleController.to;
     if (ctrl.hasDrawableContent) {
-      // 앱 공통 다이얼로그 스타일(아이콘 원형 배경 + 좌우 버튼) + 정확한 문구:
-      // "이어/새로" 가 아니라 "현재 캔버스가 이 작품으로 교체됨"을 명시한다.
-      final cs = Get.theme.colorScheme;
-      final proceed = await Get.dialog<bool>(
-        Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.r),
-          ),
-          clipBehavior: Clip.antiAlias,
-          backgroundColor: cs.surface,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 8.h),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 52.r,
-                      height: 52.r,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: cs.primaryContainer,
-                      ),
-                      child: Icon(
-                        LucideIcons.folderOpen,
-                        size: 26.r,
-                        color: cs.onPrimaryContainer,
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    Text(
-                      'artwork_open_overwrite_title'.tr,
-                      style: TextStyle(
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.w700,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      'artwork_open_overwrite_desc'.tr,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: cs.onSurfaceVariant,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () => Get.back(result: false),
-                        child: Text('cancel'.tr),
-                      ),
-                    ),
-                    SizedBox(width: 8.w),
-                    Expanded(
-                      child: FilledButton(
-                        onPressed: () => Get.back(result: true),
-                        child: Text('confirm'.tr),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        barrierDismissible: true,
+      final proceed = await AppConfirmDialog.show(
+        icon: LucideIcons.folderOpen,
+        title: 'artwork_open_overwrite_title'.tr,
+        message: 'artwork_open_overwrite_desc'.tr,
+        confirmLabel: 'confirm'.tr,
+        cancelLabel: 'cancel'.tr,
       );
       if (proceed != true) return;
       if (!context.mounted) return;
     }
 
-    // Design Ref: §6.2 — 재오픈 시 현재 화면 크기를 viewport로 전달해
-    // 저장 시점과 비율이 다른 기기/회전에서도 letterbox 스케일로 좌표를 흡수한다.
-    // DrawPage 캔버스는 Positioned.fill이므로 화면 크기를 근사값으로 사용.
+    // 재오픈 시 현재 화면 크기를 viewport로 전달해 letterbox 스케일로 좌표를 흡수.
     final viewport = MediaQuery.sizeOf(context);
     ctrl.loadArtwork(artwork, viewport: viewport);
 
-    // 그리기 화면에서 넘어온 경우(툴바의 "내 작품")에는 뒤로 돌아가면 된다.
-    // Get.toNamed 로 새 DrawPage 를 쌓으면 스택에 그리기 화면이 중복된다.
+    // 그리기 화면에서 넘어온 경우에는 뒤로 돌아가 스택 중복을 막는다.
     if (Get.previousRoute == Routes.DRAW) {
       Get.back<void>();
       return;
@@ -228,7 +155,6 @@ class GalleryPage extends GetView<GalleryController> {
     await Get.offNamed(Routes.DRAW);
   }
 
-  /// 단건 길게누름 삭제 (일반 모드).
   Future<void> _confirmDeleteSingle(
     BuildContext context,
     Drawing artwork,
@@ -242,7 +168,6 @@ class GalleryPage extends GetView<GalleryController> {
     }
   }
 
-  /// 다중 선택 삭제 (삭제 모드).
   Future<void> _confirmDeleteSelected() async {
     if (!controller.hasSelection) return;
     final count = controller.selectedIds.length;
@@ -255,7 +180,6 @@ class GalleryPage extends GetView<GalleryController> {
     }
   }
 
-  /// 선택된 작품의 썸네일을 공유한다.
   Future<void> _shareSelected() async {
     if (!controller.hasSelection) return;
     final paths = controller.selectedThumbnailPaths();
@@ -285,88 +209,18 @@ class GalleryPage extends GetView<GalleryController> {
     required String title,
     required String message,
   }) {
-    final cs = Get.theme.colorScheme;
-    return Get.dialog<bool>(
-      Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.r),
-        ),
-        clipBehavior: Clip.antiAlias,
-        backgroundColor: cs.surface,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 8.h),
-              child: Column(
-                children: [
-                  Container(
-                    width: 52.r,
-                    height: 52.r,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: cs.errorContainer,
-                    ),
-                    child: Icon(
-                      LucideIcons.trash2,
-                      size: 26.r,
-                      color: cs.onErrorContainer,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    message,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: cs.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () => Get.back(result: false),
-                      child: Text('cancel'.tr),
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: cs.error,
-                        foregroundColor: cs.onError,
-                      ),
-                      onPressed: () => Get.back(result: true),
-                      // 'clear' 는 캔버스 지우기 문맥에서 쓰는 단어라 작품 삭제
-                      // 확인 버튼에서는 부정확하다 (영어: Clear / 한국어: 지우기).
-                      // 'delete' 전용 키로 단건/다중 삭제 의도를 명확히 한다.
-                      child: Text('delete'.tr),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+    return AppConfirmDialog.show(
+      icon: LucideIcons.trash2,
+      title: title,
+      message: message,
+      confirmLabel: 'delete'.tr,
+      cancelLabel: 'cancel'.tr,
+      destructive: true,
     );
   }
 }
 
+/// 빈 상태 — 빈 종이 한 장 + 안내 + 그리기 시작.
 class _GalleryEmpty extends StatelessWidget {
   const _GalleryEmpty({required this.onStartDrawing});
   final VoidCallback onStartDrawing;
@@ -375,22 +229,46 @@ class _GalleryEmpty extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
     return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 32.w),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 24.h),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(LucideIcons.images, size: 56.r, color: cs.outlineVariant),
-            SizedBox(height: 16.h),
+            Container(
+              width: 96.r,
+              height: 124.r,
+              decoration: BoxDecoration(
+                color: cs.surfaceContainerLowest,
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm.r),
+                border: Border.all(color: cs.outlineVariant),
+              ),
+              child: Center(
+                child: Icon(
+                  LucideIcons.pencilLine,
+                  size: 30.r,
+                  color: cs.outlineVariant,
+                ),
+              ),
+            ),
+            SizedBox(height: 20.h),
             Text(
               'gallery_empty_title'.tr,
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
+              style: TextStyle(
+                fontSize: 17.sp,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.3,
+                color: cs.onSurface,
+              ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 6.h),
             Text(
               'gallery_empty_desc'.tr,
-              style: TextStyle(fontSize: 14.sp, color: cs.onSurfaceVariant),
+              style: TextStyle(
+                fontSize: 14.sp,
+                height: 1.4,
+                color: cs.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 20.h),
@@ -414,26 +292,26 @@ class _OverLimitBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
     return Container(
-      margin: EdgeInsets.fromLTRB(12.w, 12.h, 12.w, 0),
+      margin: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 0),
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: cs.errorContainer,
-        borderRadius: BorderRadius.circular(12.r),
+        color: cs.secondaryContainer,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm.r),
       ),
       child: Row(
         children: [
           Icon(
             LucideIcons.triangleAlert,
             size: 16.r,
-            color: cs.onErrorContainer,
+            color: cs.onSecondaryContainer,
           ),
           SizedBox(width: 8.w),
           Expanded(
             child: Text(
               '${'gallery_overlimit_warning'.tr} ($count)',
               style: TextStyle(
-                fontSize: 14.sp,
-                color: cs.onErrorContainer,
+                fontSize: 13.sp,
+                color: cs.onSecondaryContainer,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -457,9 +335,9 @@ class _SelectionActionBar extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
         decoration: BoxDecoration(
-          color: cs.surfaceContainerHigh,
+          color: cs.surface,
           border: Border(top: BorderSide(color: cs.outlineVariant)),
         ),
         child: Row(
@@ -494,6 +372,7 @@ class _SelectionActionBar extends StatelessWidget {
   }
 }
 
+/// 작품 카드 — 종이(흰 표면 + 헤어라인) 위에 그림, 아래에 날짜.
 class _ArtworkCard extends StatelessWidget {
   const _ArtworkCard({
     required this.artwork,
@@ -517,9 +396,16 @@ class _ArtworkCard extends StatelessWidget {
     final created = DateTime.fromMillisecondsSinceEpoch(artwork.createdAt);
     final dateText =
         '${created.year}.${created.month.toString().padLeft(2, '0')}.${created.day.toString().padLeft(2, '0')}';
+    final radius = BorderRadius.circular(AppTheme.radiusMd.r);
     return Material(
-      color: cs.surfaceContainerLow,
-      borderRadius: BorderRadius.circular(14.r),
+      color: cs.surfaceContainerLowest,
+      shape: RoundedRectangleBorder(
+        borderRadius: radius,
+        side: BorderSide(
+          color: selected ? cs.primary : cs.outlineVariant,
+          width: selected ? 2 : 1,
+        ),
+      ),
       clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
@@ -530,21 +416,42 @@ class _ArtworkCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(child: _ThumbnailView(path: artwork.thumbnailPath)),
-                Padding(
+                Expanded(
+                  child: _ThumbnailView(
+                    path: artwork.thumbnailPath,
+                    canvasColor: Color(artwork.canvasColor),
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border(top: BorderSide(color: cs.outlineVariant)),
+                  ),
                   padding: EdgeInsets.symmetric(
                     horizontal: 10.w,
-                    vertical: 6.h,
+                    vertical: 8.h,
                   ),
-                  child: Text(
-                    dateText,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: cs.onSurfaceVariant,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  child: Row(
+                    children: [
+                      Icon(
+                        LucideIcons.calendar,
+                        size: 12.r,
+                        color: cs.outline,
+                      ),
+                      SizedBox(width: 5.w),
+                      Expanded(
+                        child: Text(
+                          dateText,
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: cs.onSurfaceVariant,
+                            fontWeight: FontWeight.w600,
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -553,31 +460,27 @@ class _ArtworkCard extends StatelessWidget {
           if (deleteMode)
             Positioned.fill(
               child: IgnorePointer(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: selected
-                        ? cs.primary.withValues(alpha: 0.18)
-                        : Colors.transparent,
-                    border: Border.all(
-                      color: selected ? cs.primary : Colors.transparent,
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.circular(14.r),
-                  ),
+                child: ColoredBox(
+                  color: selected
+                      ? cs.primary.withValues(alpha: 0.10)
+                      : Colors.transparent,
                 ),
               ),
             ),
           if (deleteMode)
-            Positioned(
-              top: 6.r,
-              right: 6.r,
+            PositionedDirectional(
+              top: 8.r,
+              end: 8.r,
               child: Container(
                 width: 24.r,
                 height: 24.r,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: selected ? cs.primary : cs.surface,
-                  border: Border.all(color: cs.outline),
+                  border: Border.all(
+                    color: selected ? cs.primary : cs.outline,
+                    width: 1.5,
+                  ),
                 ),
                 child: selected
                     ? Icon(LucideIcons.check, size: 15.r, color: cs.onPrimary)
@@ -591,26 +494,29 @@ class _ArtworkCard extends StatelessWidget {
 }
 
 class _ThumbnailView extends StatelessWidget {
-  const _ThumbnailView({required this.path});
+  const _ThumbnailView({required this.path, required this.canvasColor});
   final String? path;
+  final Color canvasColor;
 
   @override
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
     if (path == null) {
       return ColoredBox(
-        color: cs.surfaceContainerHigh,
+        color: cs.surfaceContainerLow,
         child: Center(
           child: Icon(LucideIcons.image, size: 24.r, color: cs.outline),
         ),
       );
     }
-    return Image.file(
-      File(path!),
-      fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) => ColoredBox(
-        color: cs.surfaceContainerHigh,
-        child: Center(
+    // 캔버스는 세로로 긴 비율이라 cover 로는 대부분이 잘린다.
+    // contain 으로 전체를 보여주고 여백은 캔버스 배경색으로 채워 "종이"처럼 보이게 한다.
+    return ColoredBox(
+      color: canvasColor,
+      child: Image.file(
+        File(path!),
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) => Center(
           child: Icon(LucideIcons.imageOff, size: 24.r, color: cs.outline),
         ),
       ),

@@ -144,6 +144,13 @@ class DoodleController extends GetxController
   static const String recentBrushesKey = 'recent_brushes';
   static const String recentColorsKey = 'recent_colors';
 
+  /// 마지막으로 고른 브러시. 최근 목록(recentBrushes)과 별개로 저장한다.
+  ///
+  /// 예전에는 brushType을 영속화하지 않아 재시작 시 항상 pen으로 돌아갔는데,
+  /// 최근 목록은 저장되므로 pen이 퀵 행에서 밀려나 있으면 "선택된 브러시가
+  /// 아무 데도 표시되지 않는" 상태가 됐다(전체 시트를 열어야만 확인 가능).
+  static const String lastBrushTypeKey = 'last_brush_type';
+
   /// 첫 실행 기본값. 저장된 최근 항목이 모자라면 뒤를 이 값으로 채운다.
   static const List<BrushType> defaultRecentBrushes = [
     BrushType.pen,
@@ -166,12 +173,23 @@ class DoodleController extends GetxController
   /// eraser는 툴바에 항상 고정 노출되므로 최근 목록에 넣지 않는다.
   Future<void> useBrush(BrushType type) async {
     brushType.value = type;
-    if (type == BrushType.eraser) return;
-    _promote(recentBrushes, type, maxRecentBrushes);
-    await HiveService.to.setSetting(
-      recentBrushesKey,
-      recentBrushes.map((b) => b.stableId).toList(),
-    );
+    // 두 write 는 반드시 await 이전에 시작한다. 사이에 await 을 끼우면
+    // 두 번째 HiveService.to 조회가 이벤트 루프 한 바퀴 뒤에 일어나고,
+    // 그 사이 컨트롤러가 정리된 경우 "HiveService not found" 로 깨진다.
+    final writes = <Future<void>>[
+      HiveService.to.setSetting(lastBrushTypeKey, type.stableId),
+    ];
+    // eraser 는 툴바에 항상 고정 노출되므로 최근 목록에는 넣지 않는다.
+    if (type != BrushType.eraser) {
+      _promote(recentBrushes, type, maxRecentBrushes);
+      writes.add(
+        HiveService.to.setSetting(
+          recentBrushesKey,
+          recentBrushes.map((b) => b.stableId).toList(),
+        ),
+      );
+    }
+    await Future.wait(writes);
   }
 
   /// 색상 선택 단일 진입점(팔레트·커스텀 피커 공통).
@@ -226,11 +244,13 @@ class DoodleController extends GetxController
     customColor.value = null;
     recentBrushes.assignAll(defaultRecentBrushes);
     recentColors.assignAll(defaultRecentColors);
+    brushType.value = BrushType.pen;
     final box = HiveService.to.settingsBox;
     await box.delete(_canvasColorKey);
     await box.delete(_customColorKey);
     await box.delete(recentBrushesKey);
     await box.delete(recentColorsKey);
+    await box.delete(lastBrushTypeKey);
   }
 
   // Reference image (used by share preview overlay only).
@@ -534,6 +554,24 @@ class DoodleController extends GetxController
         maxRecentColors,
       ),
     );
+
+    // 마지막으로 쓰던 브러시 복원. unlock 상태를 먼저 읽은 뒤라 잠금 판정이 정확하다.
+    // 프리미엄 해지 등으로 다시 잠긴 브러시가 저장되어 있으면 pen으로 폴백한다.
+    final savedBrush = hive.getSetting<int>(lastBrushTypeKey);
+    if (savedBrush != null) {
+      final restored = BrushTypePersistence.fromStableId(savedBrush);
+      brushType.value = isBrushUnlocked(restored) ? restored : BrushType.pen;
+    }
+    _ensureSelectedBrushVisible();
+  }
+
+  /// 마지막 브러시가 퀵 행에 없으면 선택 표시가 사라지므로, 복원된 브러시를
+  /// 최근 목록 맨 앞에 얹어 항상 한 칸을 확보한다. (eraser는 고정 슬롯이라 제외)
+  void _ensureSelectedBrushVisible() {
+    final type = brushType.value;
+    if (type == BrushType.eraser) return;
+    if (recentBrushes.contains(type)) return;
+    _promote(recentBrushes, type, maxRecentBrushes);
   }
 
   void startStroke(Offset point) {
@@ -616,21 +654,89 @@ class DoodleController extends GetxController
       return;
     }
 
-    Get.defaultDialog(
-      title: preset.labelKey.tr,
-      titleStyle: TextStyle(color: Get.theme.colorScheme.onSurface),
-      backgroundColor: Get.theme.colorScheme.surface,
-      middleText: 'brush_unlock_message'.tr,
-      middleTextStyle: TextStyle(color: Get.theme.colorScheme.onSurfaceVariant),
-      textConfirm: 'watch_ad'.tr,
-      textCancel: 'cancel'.tr,
-      confirmTextColor: Get.theme.colorScheme.onPrimary,
-      cancelTextColor: Get.theme.colorScheme.onSurface,
-      buttonColor: Get.theme.colorScheme.primary,
-      onConfirm: () {
-        Get.back();
-        _watchRewardedAdForBrush(type);
-      },
+    // 앱의 다른 모든 다이얼로그(지우기 확인 / 작품 열기 / 작품 삭제)와 같은
+    // 모양을 쓴다. 예전에는 여기만 Get.defaultDialog 라 알약 버튼 + 아이콘 없는
+    // 전혀 다른 스타일이 튀어나와, 잠금 브러시를 누른 순간 다른 앱처럼 보였다.
+    final cs = Get.theme.colorScheme;
+    Get.dialog<void>(
+      Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        clipBehavior: Clip.antiAlias,
+        backgroundColor: cs.surface,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 8.h),
+              child: Column(
+                children: [
+                  Container(
+                    width: 52.r,
+                    height: 52.r,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: cs.primaryContainer,
+                    ),
+                    child: Icon(
+                      preset.icon,
+                      size: 26.r,
+                      color: cs.onPrimaryContainer,
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+                  Text(
+                    preset.labelKey.tr,
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    'brush_unlock_message'.tr,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: cs.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: Get.back,
+                      child: Text('cancel'.tr),
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: FilledButton.icon(
+                      icon: Icon(LucideIcons.play, size: 16.r),
+                      label: Text(
+                        'watch_ad'.tr,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      onPressed: () {
+                        Get.back();
+                        _watchRewardedAdForBrush(type);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

@@ -136,6 +136,24 @@ class BrushPreset {
     _applyPostProcess(canvas, stroke, basePaint, size, isDot: false);
   }
 
+  /// perfect_freehand의 streamline 보정을 그대로 재현한다.
+  ///
+  /// outline은 `pf.getStroke`가 내부적으로 streamline을 적용한 중심선을 쓰는데,
+  /// grain 도트는 보정 전 원본 포인트를 썼다. 그래서 획 끝(테이퍼로 outline이
+  /// 얇아져 사라지는 구간)에 grain 도트만 남아 선에서 떨어진 점처럼 떠 보였다.
+  /// 같은 보정을 적용하면 grain이 항상 그려진 선 위에 얹힌다.
+  static List<ui.Offset> _streamlined(List<ui.Offset> points, double t) {
+    if (points.length < 2 || t <= 0) return points;
+    final factor = 1 - t;
+    final result = <ui.Offset>[points.first];
+    var prev = points.first;
+    for (var i = 1; i < points.length; i++) {
+      prev = prev + (points[i] - prev) * factor;
+      result.add(prev);
+    }
+    return result;
+  }
+
   void _applyPostProcess(
     ui.Canvas canvas,
     DrawingStroke stroke,
@@ -160,7 +178,12 @@ class BrushPreset {
     final minDistSq = minDist * minDist;
     Offset? prev;
 
-    for (final point in stroke.points) {
+    // outline과 같은 중심선을 쓰도록 streamline 보정된 포인트를 사용한다.
+    final grainPoints = isDot
+        ? stroke.points
+        : _streamlined(stroke.points, optionsBuilder(size).streamline);
+
+    for (final point in grainPoints) {
       if (prev != null) {
         final dx = point.dx - prev.dx;
         final dy = point.dy - prev.dy;

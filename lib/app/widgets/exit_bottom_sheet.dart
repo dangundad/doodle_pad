@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:doodle_pad/app/services/purchase_service.dart';
+import 'package:doodle_pad/app/theme/app_theme.dart';
+import 'package:doodle_pad/app/widgets/app_ui.dart';
 
 class ExitBottomSheet extends StatelessWidget {
   const ExitBottomSheet({super.key});
@@ -30,136 +32,119 @@ class ExitBottomSheet extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: EdgeInsets.fromLTRB(14.w, 0, 14.w, 14.h),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: cs.surface,
-            borderRadius: BorderRadius.circular(24.r),
-            border: Border.all(color: cs.outlineVariant),
-            boxShadow: [
-              BoxShadow(
-                color: cs.shadow.withValues(alpha: 0.18),
-                blurRadius: 22,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(20.w),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 44.r,
-                      height: 44.r,
-                      decoration: BoxDecoration(
-                        color: cs.primaryContainer,
-                        borderRadius: BorderRadius.circular(14.r),
-                      ),
-                      child: Icon(
-                        LucideIcons.paintbrush,
-                        color: cs.onPrimaryContainer,
-                        size: 22.r,
-                      ),
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'exit_confirmation'.tr,
-                            style: TextStyle(
-                              fontSize: 20.sp,
-                              fontWeight: FontWeight.w800,
-                              color: cs.onSurface,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(height: 6.h),
-                          Text(
-                            'exit_app_message'.tr,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              height: 1.35,
-                              color: cs.onSurfaceVariant,
-                            ),
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                if (!PurchaseService.isPremiumActive) ...[
-                  SizedBox(height: 14.h),
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(12.w),
-                    decoration: BoxDecoration(
-                      color: cs.surfaceContainerHighest.withValues(alpha: 0.65),
-                      borderRadius: BorderRadius.circular(14.r),
-                    ),
-                    child: Row(
+        padding: EdgeInsets.fromLTRB(12.w, 0, 12.w, 12.h),
+        child: AppPanel(
+          color: cs.surface,
+          radius: AppTheme.radiusLg,
+          padding: EdgeInsets.all(20.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const IconBadge(
+                    LucideIcons.doorOpen,
+                    size: 44,
+                    tone: IconBadgeTone.primary,
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          LucideIcons.badgeCheck,
-                          size: 18.r,
-                          color: cs.primary,
-                        ),
-                        SizedBox(width: 8.w),
-                        Expanded(
-                          child: Text(
-                            'premium_subtitle'.tr,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              color: cs.onSurfaceVariant,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                        Text(
+                          'exit_confirmation'.tr,
+                          style: TextStyle(
+                            fontSize: 19.sp,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.3,
+                            color: cs.onSurface,
                           ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          'exit_app_message'.tr,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            height: 1.4,
+                            color: cs.onSurfaceVariant,
+                          ),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
                 ],
-                SizedBox(height: 18.h),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: Get.back,
-                        icon: Icon(LucideIcons.x, size: 18.r),
-                        label: Text('cancel'.tr),
+              ),
+              if (!PurchaseService.isPremiumActive) ...[
+                SizedBox(height: 14.h),
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 10.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: cs.secondaryContainer,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm.r),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        LucideIcons.crown,
+                        size: 16.r,
+                        color: cs.onSecondaryContainer,
                       ),
-                    ),
-                    SizedBox(width: 10.w),
-                    Expanded(
-                      child: FilledButton.icon(
-                        // iOS는 HIG상 앱이 스스로 종료하면 안 되며
-                        // SystemNavigator.pop도 iOS에서는 무시된다(죽은 버튼 방지).
-                        // iOS에서는 시트만 닫고, Android에서만 실제 종료한다.
-                        onPressed: () {
-                          if (defaultTargetPlatform == TargetPlatform.iOS) {
-                            Get.back();
-                            return;
-                          }
-                          SystemNavigator.pop();
-                        },
-                        icon: Icon(LucideIcons.logOut, size: 18.r),
-                        label: Text('exit'.tr),
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: Text(
+                          'premium_subtitle'.tr,
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w600,
+                            color: cs.onSecondaryContainer,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
-            ),
+              SizedBox(height: 18.h),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: Get.back,
+                      child: Text('cancel'.tr),
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: FilledButton.icon(
+                      // iOS는 HIG상 앱이 스스로 종료하면 안 되며 SystemNavigator.pop도
+                      // 무시된다. iOS에서는 시트만 닫고, Android에서만 실제 종료한다.
+                      onPressed: () {
+                        if (defaultTargetPlatform == TargetPlatform.iOS) {
+                          Get.back();
+                          return;
+                        }
+                        SystemNavigator.pop();
+                      },
+                      icon: Icon(LucideIcons.logOut, size: 18.r),
+                      label: Text('exit'.tr),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

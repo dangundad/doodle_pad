@@ -70,12 +70,14 @@ android {
 
     buildTypes {
         getByName("release") {
-            if (!hasReleaseKeystore) {
-                throw GradleException("Release signing requires android/key.properties. Refusing to sign release with the debug key.")
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
             }
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("config")
+            // key.properties 가 없으면 서명 설정 자체가 존재하지 않는다.
+            // 실제 차단은 아래 taskGraph 가드가 담당한다 (릴리스 태스크 요청 시에만).
+            signingConfig = signingConfigs.findByName("config")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -85,6 +87,23 @@ android {
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
         }
+    }
+}
+
+// 릴리스 서명 가드.
+//
+// 예전에는 이 검사를 `buildTypes { getByName("release") { ... } }` 안에서 throw 했는데,
+// 그 블록은 Gradle의 *configuration* 단계에서 항상 평가되므로 `assembleDebug` 처럼
+// 릴리스와 무관한 빌드까지 함께 실패했다(= key.properties 없는 새 클론에서 디버그 실행 불가).
+// 실제로 릴리스 산출물을 만들려는 태스크가 그래프에 올라왔을 때만 실패시킨다.
+gradle.taskGraph.whenReady {
+    if (hasReleaseKeystore) return@whenReady
+    val releaseTaskPattern = Regex("^:app:(assemble|bundle|package|install)Release")
+    val wantsRelease = allTasks.any { releaseTaskPattern.containsMatchIn(it.path) }
+    if (wantsRelease) {
+        throw GradleException(
+            "Release signing requires android/key.properties. Refusing to sign release with the debug key."
+        )
     }
 }
 

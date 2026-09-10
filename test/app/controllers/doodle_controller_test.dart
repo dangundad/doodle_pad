@@ -285,4 +285,42 @@ void main() {
     expect(controller.recentColors, DoodleController.defaultRecentColors);
     expect(controller.recentBrushes, DoodleController.defaultRecentBrushes);
   });
+
+  test('마지막으로 고른 브러시는 재시작 후에도 복원된다', () async {
+    final first = DoodleController();
+    Get.put<DoodleController>(first);
+    await first.useBrush(BrushType.crayon);
+    await Get.delete<DoodleController>(force: true);
+
+    final restored = DoodleController();
+    Get.put<DoodleController>(restored);
+    restored.onInit();
+
+    expect(restored.brushType.value, BrushType.crayon);
+  });
+
+  test('복원된 브러시가 최근 목록에 없으면 퀵 행에 자리를 확보한다', () async {
+    // 예전에는 brushType 을 저장하지 않아 재시작 시 항상 pen 으로 돌아갔는데,
+    // 최근 목록은 저장돼 pen 이 밀려나 있으면 하단 툴바에서 선택 표시가
+    // 아무 데도 보이지 않았다. 복원 브러시는 반드시 퀵 행에 있어야 한다.
+    final hive = HiveService.to;
+    await hive.setSetting(DoodleController.recentBrushesKey, [
+      BrushType.pencil.stableId,
+      BrushType.marker.stableId,
+      BrushType.brush.stableId,
+      BrushType.highlighter.stableId,
+    ]);
+    await hive.setSetting(
+      DoodleController.lastBrushTypeKey,
+      BrushType.pen.stableId,
+    );
+
+    final controller = DoodleController();
+    Get.put<DoodleController>(controller);
+    controller.onInit();
+
+    expect(controller.brushType.value, BrushType.pen);
+    expect(controller.recentBrushes, contains(BrushType.pen));
+    expect(controller.recentBrushes.length, DoodleController.maxRecentBrushes);
+  });
 }

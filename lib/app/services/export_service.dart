@@ -90,7 +90,7 @@ class ExportService {
 
     return _putWithPermission(
       bytes: bytes,
-      fileName: fileName ?? _defaultFileName(format),
+      fileName: fileName ?? _defaultFileName(),
     );
   }
 
@@ -187,10 +187,14 @@ class ExportService {
     return 2.0;
   }
 
-  String _defaultFileName(ExportImageFormat format) {
+  /// gal은 `name`에 확장자를 포함하지 말 것을 요구하고("Do not include the
+  /// extension"), 실제 bytes에서 판별한 포맷 확장자를 스스로 붙인다.
+  /// 예전에는 여기서 `.png`/`.jpg`까지 넣어 갤러리에 `doodle_123.png.png`,
+  /// `doodle_123.jpg.jpg` 처럼 확장자가 두 번 붙은 파일이 저장됐다.
+  /// (실기기/에뮬레이터 MediaStore에서 재현 확인)
+  String _defaultFileName() {
     final ts = DateTime.now().millisecondsSinceEpoch;
-    final ext = format == ExportImageFormat.jpeg ? 'jpg' : 'png';
-    return 'doodle_$ts.$ext';
+    return 'doodle_$ts';
   }
 
   ExportFailure _mapGalException(GalException e) {

@@ -1,7 +1,7 @@
 import 'dart:ui' as ui;
 
-import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gal/gal.dart';
 
@@ -159,4 +159,53 @@ void main() {
     expect(bytes.length, greaterThan(3));
     expect(bytes.sublist(0, 3), [0xFF, 0xD8, 0xFF]);
   });
+
+  // gal 은 name 에 확장자를 넣지 말 것을 요구하고 스스로 확장자를 붙인다.
+  // 기본 파일명에 `.png`/`.jpg` 를 넣었더니 갤러리에 `doodle_123.png.png`,
+  // `doodle_123.jpg.jpg` 로 저장됐다(실기기 MediaStore 확인).
+  for (final format in ExportImageFormat.values) {
+    testWidgets('기본 파일명에는 확장자가 없다 (${format.name})', (tester) async {
+      final canvasKey = GlobalKey();
+      String? capturedName;
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: RepaintBoundary(
+            key: canvasKey,
+            child: const SizedBox(width: 32, height: 32, child: ColoredBox(
+              color: Color(0xFF4080C0),
+            )),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      final service = ExportService(
+        putBytes: (bytes, {String name = 'image', String? album}) async {
+          capturedName = name;
+        },
+        requestAccess: () async => true,
+      );
+
+      // toImage()/toByteData()는 엔진의 실제 비동기 작업이라 FakeAsync 안에서는
+      // 영원히 완료되지 않는다. runAsync 로 실제 이벤트 루프에서 돌린다.
+      final result = await tester.runAsync(
+        () => service.saveCanvasToGallery(
+          canvasKey: canvasKey,
+          resolutionMultiplier: 1,
+          format: format,
+        ),
+      );
+
+      expect(result?.success, isTrue);
+      expect(capturedName, isNotNull);
+      expect(capturedName, startsWith('doodle_'));
+      expect(
+        capturedName,
+        isNot(contains('.')),
+        reason: 'gal 이 확장자를 붙이므로 name 에는 확장자를 넣으면 안 된다',
+      );
+    });
+  }
 }
