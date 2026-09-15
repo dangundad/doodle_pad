@@ -1,0 +1,24 @@
+Doodle Pad is a simple drawing app for quick sketches, playful doodles, visual notes, and everyday ideas. Open a clean canvas, choose a brush, pick a color, and start drawing right away.
+
+The app keeps the drawing experience light and friendly, so you can focus on the moment instead of complicated menus.
+
+✨ Key features
+
+🎨 10 brushes for every mood
+• Pen, pencil, marker, brush, highlighter, and fountain pen
+• Crayon, watercolor, and airbrush for softer, textured styles
+• Eraser for quick touch-ups
+
+🖌️ Easy creative controls
+• 16 ready-to-use colors plus a custom color picker
+• Brush size slider and canvas background colors
+• Smooth stroke rendering
+• Undo and redo when you want to adjust your drawing
+• Draw on top of a photo from your gallery
+
+💾 Save and come back later
+• Save to your device gallery as PNG or JPEG at 1x, 2x, or 3x resolution
+• Keep drawings in the in-app artwork gallery and reopen them anytime to keep drawing
+• Share finished drawings with messaging apps, social apps, or other Android share options
+
+Doodle Pad — draw it, save it, and pick it back up whenever you want.
