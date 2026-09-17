@@ -1,6 +1,6 @@
 Zeichenblock ist eine einfache Zeichen-App für schnelle Skizzen, spielerische Doodles, visuelle Notizen und alltägliche Ideen. Öffne eine saubere Zeichenfläche, wähle einen Pinsel und eine Farbe und beginne sofort zu zeichnen.
 
-Die App bleibt leicht und freundlich, damit du dich auf den Moment konzentrieren kannst statt auf komplizierte Menüs.
+Nutze sie auf dem Sofa, in einer Besprechung oder immer dann, wenn dir eine Idee kommt. Die App bleibt leicht und freundlich, damit du dich auf den Moment konzentrieren kannst statt auf komplizierte Menüs.
 
 ✨ Hauptfunktionen
 
@@ -8,17 +8,28 @@ Die App bleibt leicht und freundlich, damit du dich auf den Moment konzentrieren
 • Stift, Bleistift, Marker, Pinsel, Textmarker und Füller
 • Wachsmaler, Aquarell und Airbrush für weichere, strukturierte Stile
 • Radierer für schnelle Korrekturen
+• Strichstärke, die deiner Zeichengeschwindigkeit folgt
 
 🖌️ Einfache Kreativsteuerung
-• 16 sofort nutzbare Farben plus eigene Farbauswahl
+• 16 sofort nutzbare Farben plus eigene Farbauswahl mit HEX-Eingabe
 • Regler für Pinselgröße und Farben für den Hintergrund der Zeichenfläche
-• Glatte Strichdarstellung
 • Rückgängig und Wiederholen, wenn du etwas anpassen möchtest
-• Zeichne auf einem Foto aus deiner Galerie
+• Schüttle dein Handy, um die Zeichenfläche zu leeren
+
+📷 Auf eigenen Fotos zeichnen
+• Hole ein Bild aus deiner Galerie und zeichne direkt darauf
+• Konturen nachzeichnen, Fotos beschriften oder Doodles ergänzen
+• Das Foto wird mit deiner Zeichnung gespeichert, sodass du später weitermachen kannst
 
 💾 Speichern und später fortsetzen
 • Speichere in deiner Gerätegalerie als PNG oder JPEG mit 1x, 2x oder 3x Auflösung
 • Bewahre Zeichnungen in der App-Galerie auf und öffne sie jederzeit zum Weiterzeichnen
 • Teile fertige Zeichnungen über Messenger, soziale Apps oder andere Android-Freigaben
+
+💎 Optional: Premium
+• Kostenlos mit Werbung nutzen
+• Werbung mit einem einmaligen Kauf entfernen
+• Aquarell und Airbrush ohne Werbevideo freischalten
+• Kauf jederzeit wiederherstellen
 
 Zeichenblock — zeichnen, speichern und jederzeit wieder aufnehmen.

@@ -20,7 +20,7 @@ class PremiumPage extends GetView<PremiumController> {
   @override
   Widget build(BuildContext context) {
     final service = PurchaseService.to;
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       backgroundColor: cs.surface,

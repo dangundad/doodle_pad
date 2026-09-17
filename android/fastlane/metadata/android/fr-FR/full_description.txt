@@ -1,6 +1,6 @@
 Bloc dessin est une application simple pour les croquis rapides, les doodles ludiques, les notes visuelles et les idées du quotidien. Ouvrez une toile propre, choisissez un pinceau, sélectionnez une couleur et commencez à dessiner tout de suite.
 
-L’expérience reste légère et agréable, pour vous laisser vous concentrer sur l’instant plutôt que sur des menus compliqués.
+Utilisez-la sur le canapé, pendant une réunion ou dès qu'une idée arrive. L'expérience reste légère et agréable, pour vous laisser vous concentrer sur l'instant plutôt que sur des menus compliqués.
 
 ✨ Fonctions principales
 
@@ -8,17 +8,28 @@ L’expérience reste légère et agréable, pour vous laisser vous concentrer s
 • Stylo, crayon, marqueur, pinceau, surligneur et plume
 • Crayon de cire, aquarelle et aérographe pour des styles plus doux et texturés
 • Gomme pour des retouches rapides
+• Épaisseur du trait qui suit la vitesse de votre doigt
 
 🖌️ Commandes créatives faciles
-• 16 couleurs prêtes à utiliser et un sélecteur de couleur personnalisée
+• 16 couleurs prêtes à utiliser et un sélecteur de couleur avec saisie HEX
 • Réglage de la taille du pinceau et couleurs de fond de toile
-• Rendu de trait fluide
 • Annuler et rétablir pour ajuster votre dessin
-• Dessiner par-dessus une photo de votre galerie
+• Secouez le téléphone pour effacer la toile
+
+📷 Dessiner sur vos propres photos
+• Importez une photo de votre galerie et dessinez directement dessus
+• Décalquez un contour, annotez une photo ou ajoutez des gribouillages
+• La photo est conservée avec votre dessin, pour reprendre plus tard
 
 💾 Enregistrer et reprendre plus tard
-• Enregistrez dans la galerie de l’appareil en PNG ou JPEG, en résolution 1x, 2x ou 3x
-• Gardez vos dessins dans la galerie d’œuvres intégrée et rouvrez-les quand vous voulez
+• Enregistrez dans la galerie de l'appareil en PNG ou JPEG, en résolution 1x, 2x ou 3x
+• Gardez vos dessins dans la galerie d'œuvres intégrée et rouvrez-les quand vous voulez
 • Partagez vos dessins terminés via messageries, réseaux sociaux ou autres options Android
+
+💎 Version Premium facultative
+• Utilisation gratuite avec publicité
+• Achat unique pour supprimer la publicité
+• Aquarelle et aérographe débloqués sans regarder de publicité
+• Vous pouvez restaurer votre achat à tout moment
 
 Bloc dessin — dessinez, enregistrez et reprenez votre idée quand vous voulez.

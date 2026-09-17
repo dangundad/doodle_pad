@@ -12,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import 'package:doodle_pad/app/admob/ads_interstitial.dart';
 import 'package:doodle_pad/app/admob/ads_rewarded.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/data/brushes/brush_preset.dart';
@@ -876,7 +877,18 @@ class DoodleController extends GetxController
       format: format,
     );
     _showExportResultToast(result);
+    if (result.success) _notifyInterstitialMilestone();
     return result;
+  }
+
+  /// 저장이 끝난 "작업 완료" 지점을 전면 광고 매니저에 알린다.
+  ///
+  /// 실제 노출 여부는 InterstitialAdManager 의 빈도 제한이 결정한다. 여기서는
+  /// 그리는 도중이 아니라 저장이 끝난 순간에만 알린다는 규칙만 지킨다.
+  /// 광고는 사용자 흐름을 막지 않도록 await 하지 않는다.
+  void _notifyInterstitialMilestone() {
+    if (!Get.isRegistered<InterstitialAdManager>()) return;
+    unawaited(InterstitialAdManager.to.notifyMilestoneReached());
   }
 
   /// Plan FR-08/FR-11 — 현재 캔버스를 작품으로 저장.
@@ -958,6 +970,7 @@ class DoodleController extends GetxController
             description: 'artwork_save_success'.tr,
           ),
         );
+        _notifyInterstitialMilestone();
         return saved;
       } catch (_) {
         AppToast.show(

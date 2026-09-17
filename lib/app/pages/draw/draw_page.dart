@@ -76,7 +76,7 @@ class DrawPage extends GetView<DoodleController> {
   @override
   Widget build(BuildContext context) {
     final settingCtrl = SettingController.to;
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
     final themeBrightness = Theme.of(context).brightness;
 
@@ -277,7 +277,7 @@ class _TopToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settingCtrl = SettingController.to;
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
 
     return Container(
       margin: EdgeInsets.fromLTRB(10.w, 8.h, 10.w, 0),
@@ -470,7 +470,7 @@ class _TopToolbar extends StatelessWidget {
     if (settingCtrl.hapticEnabled.value) {
       ctrl.hapticSelection();
     }
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     Get.bottomSheet(
       AppSheetShell(
         icon: LucideIcons.paintBucket,
@@ -674,7 +674,7 @@ class _BottomToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settingCtrl = SettingController.to;
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     return Container(
       margin: EdgeInsets.fromLTRB(10.w, 0, 10.w, 8.h),
       padding: EdgeInsets.fromLTRB(10.w, 8.h, 10.w, 8.h),
@@ -770,7 +770,7 @@ class _BrushSlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     final isEraser = type == BrushType.eraser;
     final preset = isEraser ? null : BrushPresets.of(type);
     final locked = !isEraser && !ctrl.isBrushUnlocked(type);
@@ -879,7 +879,7 @@ class _BrushSizeRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     return Obx(() {
       final isEraser = ctrl.brushType.value == BrushType.eraser;
       final minSize = isEraser ? 10.0 : 2.0;
@@ -961,7 +961,7 @@ class _ColorQuickRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settingCtrl = SettingController.to;
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     return Obx(() {
       // 지우개는 색상 개념이 없으므로 같은 높이의 안내로 대체해 레이아웃 점프를 막는다.
       if (ctrl.brushType.value == BrushType.eraser) {
@@ -1039,7 +1039,7 @@ class _ColorSlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     final hex = _hexOf(colorValue);
     return Semantics(
       key: ValueKey('draw-color-$hex'),
@@ -1124,7 +1124,7 @@ class _MoreSlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     final size = circular ? 28.0 : 38.0;
     return Semantics(
       key: slotKey,
@@ -1270,7 +1270,7 @@ class BrushSheet {
                 cs: cs,
               ),
             ];
-            return Wrap(spacing: 8.w, runSpacing: 12.h, children: tiles);
+            return Wrap(spacing: 5.w, runSpacing: 12.h, children: tiles);
           },
         ),
       ),
@@ -1325,7 +1325,7 @@ class _SheetBrushTile extends StatelessWidget {
         excludeFromSemantics: true,
         onTap: handleTap,
         child: SizedBox(
-          width: 60.w,
+          width: 63.w,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -1510,7 +1510,7 @@ Future<int?> pickRichColor({
   required Color initial,
   List<Color> recentColors = const <Color>[],
 }) async {
-  final cs = Get.theme.colorScheme;
+  final cs = Theme.of(context).colorScheme;
   Color picked = initial;
 
   final confirmed =

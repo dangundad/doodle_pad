@@ -1,6 +1,6 @@
 Dibujo Fácil es una app sencilla para bocetos rápidos, garabatos divertidos, notas visuales e ideas cotidianas. Abre un lienzo limpio, elige un pincel, selecciona un color y empieza a dibujar al instante.
 
-La experiencia es ligera y agradable, para que puedas concentrarte en el momento en lugar de perderte en menús complicados.
+Úsala en el sofá, en una reunión o justo cuando llega una idea. La experiencia es ligera y agradable, para que puedas concentrarte en el momento en lugar de perderte en menús complicados.
 
 ✨ Funciones principales
 
@@ -8,17 +8,28 @@ La experiencia es ligera y agradable, para que puedas concentrarte en el momento
 • Pluma, lápiz, marcador, pincel, resaltador y pluma fuente
 • Crayón, acuarela y aerógrafo para estilos más suaves y con textura
 • Borrador para retoques rápidos
+• Grosor de trazo que sigue la velocidad de tu dedo
 
 🖌️ Controles creativos sencillos
-• 16 colores listos para usar y selector de color personalizado
+• 16 colores listos para usar y selector de color con entrada HEX
 • Control de tamaño del pincel y colores de fondo del lienzo
-• Trazos suaves
 • Deshacer y rehacer cuando quieras ajustar el dibujo
-• Dibuja encima de una foto de tu galería
+• Agita el teléfono para borrar el lienzo
+
+📷 Dibuja sobre tus propias fotos
+• Trae una foto de tu galería y dibuja directamente encima
+• Calca un contorno, anota una foto o añade garabatos
+• La foto se guarda junto con tu dibujo, así puedes continuar después
 
 💾 Guarda y vuelve más tarde
 • Guarda en la galería del dispositivo como PNG o JPEG en resolución 1x, 2x o 3x
 • Conserva dibujos en la galería de obras de la app y vuelve a abrirlos cuando quieras
 • Comparte dibujos terminados con apps de mensajería, redes sociales u otras opciones de Android
+
+💎 Premium opcional
+• Uso gratuito con anuncios
+• Una sola compra elimina los anuncios
+• Acuarela y aerógrafo se desbloquean sin ver anuncios
+• Restaura la compra en cualquier momento
 
 Dibujo Fácil — dibuja, guarda y continúa cuando quieras.

@@ -302,7 +302,7 @@ class _LanguageRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(14.w, 12.h, 14.w, 14.h),

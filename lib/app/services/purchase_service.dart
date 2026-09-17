@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:doodle_pad/app/admob/ads_interstitial.dart';
 import 'package:doodle_pad/app/admob/ads_rewarded.dart';
@@ -10,6 +9,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:doodle_pad/app/services/hive_service.dart';
 import 'package:doodle_pad/app/utils/app_constants.dart';
+import 'package:doodle_pad/app/utils/app_toast.dart';
 
 class PurchaseService extends GetxService {
   PurchaseService({
@@ -170,10 +170,11 @@ class PurchaseService extends GetxService {
       }
 
       if (!available.value || product == null) {
-        Get.snackbar(
-          'purchase_error'.tr,
-          'purchase_unavailable'.tr,
-          snackPosition: SnackPosition.BOTTOM,
+        AppToast.show(
+          AppToastMessage.error(
+            title: 'purchase_error'.tr,
+            description: 'purchase_unavailable'.tr,
+          ),
         );
         return;
       }
@@ -190,10 +191,11 @@ class PurchaseService extends GetxService {
       if (!launched) {
         statusMessage.value = 'purchase_failed'.tr;
         isLoading.value = false;
-        Get.snackbar(
-          'purchase_error'.tr,
-          'purchase_failed'.tr,
-          snackPosition: SnackPosition.BOTTOM,
+        AppToast.show(
+          AppToastMessage.error(
+            title: 'purchase_error'.tr,
+            description: 'purchase_failed'.tr,
+          ),
         );
       }
     } catch (e) {
@@ -201,10 +203,11 @@ class PurchaseService extends GetxService {
       errorMessage.value = e.toString();
       isLoading.value = false;
 
-      Get.snackbar(
-        'purchase_error'.tr,
-        'purchase_failed'.tr,
-        snackPosition: SnackPosition.BOTTOM,
+      AppToast.show(
+        AppToastMessage.error(
+          title: 'purchase_error'.tr,
+          description: 'purchase_failed'.tr,
+        ),
       );
     }
   }
@@ -223,10 +226,11 @@ class PurchaseService extends GetxService {
       statusMessage.value = 'restore_error'.tr;
       errorMessage.value = e.toString();
 
-      Get.snackbar(
-        'purchase_error'.tr,
-        'restore_error'.tr,
-        snackPosition: SnackPosition.BOTTOM,
+      AppToast.show(
+        AppToastMessage.error(
+          title: 'purchase_error'.tr,
+          description: 'restore_error'.tr,
+        ),
       );
     } finally {
       isLoading.value = false;
@@ -267,10 +271,11 @@ class PurchaseService extends GetxService {
 
   void _handlePurchaseError(IAPError? error) {
     errorMessage.value = error?.message ?? 'purchase_failed'.tr;
-    Get.snackbar(
-      'purchase_error'.tr,
-      'purchase_failed'.tr,
-      snackPosition: SnackPosition.BOTTOM,
+    AppToast.show(
+      AppToastMessage.error(
+        title: 'purchase_error'.tr,
+        description: 'purchase_failed'.tr,
+      ),
     );
   }
 
@@ -284,12 +289,11 @@ class PurchaseService extends GetxService {
     isLoading.value = false;
 
     statusMessage.value = 'purchase_success'.tr;
-    Get.snackbar(
-      'purchase_success'.tr,
-      'premium_ready'.tr,
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green.withValues(alpha: 0.85),
-      colorText: Colors.white,
+    AppToast.show(
+      AppToastMessage.success(
+        title: 'purchase_success'.tr,
+        description: 'premium_ready'.tr,
+      ),
     );
   }
 

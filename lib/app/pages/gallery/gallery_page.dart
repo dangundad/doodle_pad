@@ -32,7 +32,7 @@ class GalleryPage extends GetView<GalleryController> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: Obx(() {
@@ -243,7 +243,7 @@ class _GalleryEmpty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     return Center(
       child: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 24.h),
@@ -306,7 +306,7 @@ class _OverLimitBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     return Container(
       margin: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 0),
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
@@ -346,7 +346,7 @@ class _SelectionActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     final ctrl = GalleryController.to;
     return SafeArea(
       top: false,
@@ -408,7 +408,7 @@ class _ArtworkCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     final created = DateTime.fromMillisecondsSinceEpoch(artwork.createdAt);
     final dateText =
         '${created.year}.${created.month.toString().padLeft(2, '0')}.${created.day.toString().padLeft(2, '0')}';
@@ -512,7 +512,7 @@ class _ThumbnailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     if (path == null) {
       return ColoredBox(
         color: cs.surfaceContainerLow,

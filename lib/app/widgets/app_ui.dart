@@ -228,43 +228,106 @@ class AppConfirmDialog extends StatelessWidget {
               ),
             ),
             SizedBox(height: 18.h),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Get.back(result: false),
-                    child: Text(
-                      cancelLabel,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8.w),
-                Expanded(
-                  child: FilledButton(
-                    style: destructive
-                        ? FilledButton.styleFrom(
-                            backgroundColor: cs.error,
-                            foregroundColor: cs.onError,
-                          )
-                        : null,
-                    onPressed: () {
-                      onConfirm?.call();
-                      Get.back(result: true);
-                    },
-                    child: Text(
-                      confirmLabel,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-              ],
+            _DialogActions(
+              cancelLabel: cancelLabel,
+              confirmLabel: confirmLabel,
+              destructive: destructive,
+              cs: cs,
+              onConfirm: onConfirm,
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+/// 확인 다이얼로그의 액션 버튼 두 개.
+///
+/// 기본은 [취소 | 확인] 가로 배치지만, 라벨이 길어 반폭 버튼 안에 들어가지
+/// 않으면 세로로 쌓는다. 가로 배치를 고집하면 `Keep drawing`(en),
+/// `Continuer à dessiner`(fr), `Continuar desenhando`(pt) 같은 라벨이
+/// 360dp 화면에서 `Keep drawi…`로 잘려 무슨 버튼인지 알 수 없게 된다.
+/// 세로로 쌓을 때는 Material 관례대로 확인 버튼을 위에 둔다.
+class _DialogActions extends StatelessWidget {
+  const _DialogActions({
+    required this.cancelLabel,
+    required this.confirmLabel,
+    required this.destructive,
+    required this.cs,
+    this.onConfirm,
+  });
+
+  final String cancelLabel;
+  final String confirmLabel;
+  final bool destructive;
+  final ColorScheme cs;
+  final VoidCallback? onConfirm;
+
+  /// 버튼 내부 좌우 패딩 + 여유. Material3 기본(24dp×2)에 약간의 안전 마진.
+  static const double _buttonHorizontalPadding = 52;
+
+  double _labelWidth(BuildContext context, String text) {
+    final painter = TextPainter(
+      text: TextSpan(text: text, style: Theme.of(context).textTheme.labelLarge),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+      maxLines: 1,
+    )..layout();
+    return painter.width;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final gap = 8.w;
+
+    final cancelButton = OutlinedButton(
+      onPressed: () => Get.back(result: false),
+      child: Text(cancelLabel, maxLines: 1, overflow: TextOverflow.ellipsis),
+    );
+    final confirmButton = FilledButton(
+      style: destructive
+          ? FilledButton.styleFrom(
+              backgroundColor: cs.error,
+              foregroundColor: cs.onError,
+            )
+          : null,
+      onPressed: () {
+        onConfirm?.call();
+        Get.back(result: true);
+      },
+      child: Text(confirmLabel, maxLines: 1, overflow: TextOverflow.ellipsis),
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final needed =
+            _labelWidth(context, cancelLabel) +
+            _labelWidth(context, confirmLabel) +
+            _buttonHorizontalPadding * 2 +
+            gap;
+        final stacked =
+            constraints.maxWidth.isFinite && needed > constraints.maxWidth;
+
+        if (!stacked) {
+          return Row(
+            children: [
+              Expanded(child: cancelButton),
+              SizedBox(width: gap),
+              Expanded(child: confirmButton),
+            ],
+          );
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            confirmButton,
+            SizedBox(height: gap),
+            cancelButton,
+          ],
+        );
+      },
     );
   }
 }

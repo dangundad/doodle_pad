@@ -223,32 +223,25 @@ class BrushPreset {
 
     final radius = size / 2;
     const dotCount = 25;
-    final minDist = radius * 0.3;
-    final minDistSq = minDist * minDist;
-    Offset? prev;
 
-    for (final point in stroke.points) {
-      if (prev != null) {
-        final ddx = point.dx - prev.dx;
-        final ddy = point.dy - prev.dy;
-        if (ddx * ddx + ddy * ddy < minDistSq) {
-          for (var i = 0; i < dotCount; i++) {
-            random.nextDouble();
-            random.nextDouble();
-            random.nextDouble();
-            random.nextDouble();
-          }
-          continue;
-        }
-      }
-      prev = point;
+    // 스프레이 중심 사이의 간격. 입력점이 이보다 멀리 떨어져 있으면 그 사이를
+    // 보간해 채운다.
+    //
+    // 예전에는 입력점 위치에만 뿌려서, 빠르게 그으면 점 뭉치가 띄엄띄엄 찍히고
+    // 이어진 스프레이로 보이지 않았다(터치 샘플링 주기상 수십 px씩 건너뛴다).
+    // 굵기에 비례시켜, 굵은 에어브러시일수록 간격을 넓혀 그리기 비용을 잡는다.
+    final step = math.max(radius * 0.5, 2.0);
 
+    // 한 세그먼트가 비정상적으로 길 때(제스처 점프 등) 그리기 비용 상한.
+    const maxStepsPerSegment = 64;
+
+    void sprayAt(Offset center) {
       for (var i = 0; i < dotCount; i++) {
         final angle = random.nextDouble() * 2 * math.pi;
         final dist =
             random.nextDouble() * radius * (0.3 + random.nextDouble() * 0.7);
-        final dx = point.dx + dist * math.cos(angle);
-        final dy = point.dy + dist * math.sin(angle);
+        final dx = center.dx + dist * math.cos(angle);
+        final dy = center.dy + dist * math.sin(angle);
         final normalizedDist = dist / radius;
         final opacity = (1.0 - normalizedDist * 0.7) * 0.35;
         dotPaint.color = stroke.color.withValues(
@@ -260,6 +253,28 @@ class BrushPreset {
           dotPaint,
         );
       }
+    }
+
+    if (stroke.points.isEmpty) return;
+
+    var prev = stroke.points.first;
+    sprayAt(prev);
+
+    for (var i = 1; i < stroke.points.length; i++) {
+      final point = stroke.points[i];
+      final dx = point.dx - prev.dx;
+      final dy = point.dy - prev.dy;
+      final distance = math.sqrt(dx * dx + dy * dy);
+      // step보다 가까운 점은 건너뛴다. prev를 갱신하지 않으므로 다음 점까지의
+      // 거리가 누적되고, random 소비 순서도 결정적으로 유지된다.
+      if (distance < step) continue;
+
+      final steps = math.min((distance / step).floor(), maxStepsPerSegment);
+      for (var s = 1; s <= steps; s++) {
+        final t = s / steps;
+        sprayAt(Offset(prev.dx + dx * t, prev.dy + dy * t));
+      }
+      prev = point;
     }
   }
 }

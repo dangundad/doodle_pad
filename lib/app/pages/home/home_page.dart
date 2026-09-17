@@ -69,7 +69,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
 
     return PopScope(
@@ -261,7 +261,7 @@ class _TitleBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     final isRtl = Directionality.of(context) == TextDirection.rtl;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -330,7 +330,7 @@ class _FeatureChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
       decoration: BoxDecoration(
@@ -366,7 +366,7 @@ class _StartDrawingCta extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     final settingCtrl = SettingController.to;
 
     return Tooltip(
@@ -419,7 +419,7 @@ class _MyArtworksCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Get.theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     return ValueListenableBuilder(
       valueListenable: HiveService.to.drawingsBox.listenable(),
       builder: (context, Box<Drawing> box, _) {

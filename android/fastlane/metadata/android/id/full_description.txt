@@ -1,6 +1,6 @@
 Gambar Mudah adalah aplikasi menggambar sederhana untuk sketsa cepat, coretan santai, catatan visual, dan ide sehari-hari. Buka kanvas bersih, pilih kuas, pilih warna, lalu mulai menggambar saat itu juga.
 
-Pengalaman menggambar dibuat ringan dan ramah, sehingga kamu bisa fokus pada momen tanpa menu yang rumit.
+Pakai di sofa, saat rapat, atau begitu sebuah ide muncul. Pengalaman menggambar dibuat ringan dan ramah, sehingga kamu bisa fokus pada momen tanpa menu yang rumit.
 
 ✨ Fitur utama
 
@@ -8,17 +8,28 @@ Pengalaman menggambar dibuat ringan dan ramah, sehingga kamu bisa fokus pada mom
 • Pena, pensil, marker, kuas, highlighter, dan pena tinta
 • Krayon, cat air, dan airbrush untuk gaya yang lebih lembut dan bertekstur
 • Penghapus untuk perbaikan cepat
+• Ketebalan goresan mengikuti kecepatan jarimu
 
 🖌️ Kontrol kreatif yang mudah
-• 16 warna siap pakai dan pemilih warna kustom
+• 16 warna siap pakai dan pemilih warna dengan input HEX
 • Slider ukuran kuas dan warna latar kanvas
-• Goresan halus
 • Undo dan redo saat ingin menyesuaikan gambar
-• Gambar di atas foto dari galeri
+• Goyangkan ponsel untuk menghapus kanvas
+
+📷 Menggambar di atas fotomu sendiri
+• Ambil foto dari galeri lalu gambar langsung di atasnya
+• Jiplak garis, beri catatan pada foto, atau tambahkan coretan
+• Foto ikut tersimpan bersama karya, jadi kamu bisa melanjutkan nanti
 
 💾 Simpan dan lanjutkan nanti
 • Simpan ke galeri perangkat sebagai PNG atau JPEG pada resolusi 1x, 2x, atau 3x
 • Simpan gambar di galeri karya dalam app dan buka lagi kapan saja untuk melanjutkan
 • Bagikan gambar selesai ke aplikasi pesan, media sosial, atau opsi berbagi Android lainnya
+
+💎 Premium sesuai kebutuhan
+• Gunakan secara gratis dengan iklan
+• Satu kali pembelian untuk menghapus iklan
+• Cat air dan airbrush terbuka tanpa menonton iklan
+• Pulihkan pembelian kapan saja
 
 Gambar Mudah — gambar, simpan, lalu lanjutkan lagi kapan pun kamu mau.
