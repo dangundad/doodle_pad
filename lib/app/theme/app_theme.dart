@@ -14,6 +14,21 @@ abstract final class AppTheme {
   static const double radiusMd = 14;
   static const double radiusLg = 20;
 
+  /// 목록 아이콘 배지용 색 — 그림 도구 상자처럼 알록달록하게 쓰되, 흰 글리프가
+  /// 올라가므로 라이트/다크 어디서나 흰색 대비 3:1 이상인 톤만 고른다.
+  /// 화면 하나에서 같은 색이 이웃하지 않게 배치한다.
+  static const Color badgeInk = Color(0xFF2F4FBF);
+  static const Color badgeCherry = Color(0xFFD03B2C);
+  static const Color badgeTangerine = Color(0xFFC0670F);
+  static const Color badgeLeaf = Color(0xFF2B7A57);
+  static const Color badgeSea = Color(0xFF0E7490);
+  static const Color badgeGrape = Color(0xFF6B4FBF);
+  static const Color badgeBerry = Color(0xFFBE1A5E);
+  static const Color badgeSky = Color(0xFF1173AD);
+
+  /// 앱 마크를 담는 배지 배경 — 런처 아이콘과 같은 크레용 노랑.
+  static const Color badgeCream = Color(0xFFFCE79A);
+
   static const ColorScheme lightScheme = ColorScheme(
     brightness: Brightness.light,
     primary: Color(0xFF2F4FBF),
@@ -157,6 +172,17 @@ abstract final class AppTheme {
     },
   );
 
+  /// AppBar 타이틀 크기(논리 px).
+  ///
+  /// 테마는 `static final` 이라 ScreenUtil 초기화 전에 만들어질 수 있어
+  /// `.sp` 를 쓸 수 없다. 고정값으로 두되 M3 titleLarge(22)에 준하는 크기를 준다.
+  static const double appBarTitleSize = 21;
+
+  /// 이 Flutter 버전의 `ThemeData.textTheme` 은 사이즈가 **null** 인 스타일을
+  /// 준다(플레인 M3 테마도 동일). 사이즈가 null 인 스타일을 그대로 쓰면
+  /// `Text` 가 프레임워크 폴백 14px 로 그려져, AppBar 타이틀이 본문(15.sp)보다
+  /// 작아 보이는 버그가 났다. 테마가 손대는 스타일에는 M3 기본 사이즈를
+  /// 명시해 폴백에 기대지 않는다.
   static ThemeData _finish(ThemeData theme) {
     final cs = theme.colorScheme;
     final text = theme.textTheme;
@@ -166,32 +192,39 @@ abstract final class AppTheme {
       dividerColor: cs.outlineVariant,
       textTheme: text.copyWith(
         headlineMedium: text.headlineMedium?.copyWith(
+          fontSize: text.headlineMedium?.fontSize ?? 28,
           fontWeight: FontWeight.w800,
           letterSpacing: -0.6,
           height: 1.15,
         ),
         headlineSmall: text.headlineSmall?.copyWith(
+          fontSize: text.headlineSmall?.fontSize ?? 24,
           fontWeight: FontWeight.w800,
           letterSpacing: -0.4,
           height: 1.2,
         ),
         titleLarge: text.titleLarge?.copyWith(
+          fontSize: text.titleLarge?.fontSize ?? 22,
           fontWeight: FontWeight.w700,
           letterSpacing: -0.3,
         ),
         titleMedium: text.titleMedium?.copyWith(
+          fontSize: text.titleMedium?.fontSize ?? 16,
           fontWeight: FontWeight.w700,
           letterSpacing: -0.1,
         ),
         labelSmall: text.labelSmall?.copyWith(
+          fontSize: text.labelSmall?.fontSize ?? 11,
           fontWeight: FontWeight.w700,
           letterSpacing: 0.6,
         ),
       ),
       appBarTheme: theme.appBarTheme.copyWith(
         titleTextStyle: text.titleLarge?.copyWith(
+          fontSize: appBarTitleSize,
           fontWeight: FontWeight.w700,
           letterSpacing: -0.3,
+          height: 1.2,
           color: cs.onSurface,
         ),
       ),

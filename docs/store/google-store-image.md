@@ -13,11 +13,18 @@
 
 ## 스크린샷 구성 (6장)
 
+> **규칙**: 제목과 부제목은 모바일 화면 가독성을 위해 **최대 2~3단어**를 넘지 않도록 간결하게 구성합니다.
+
 ### 1장: 홈 화면과 빠른 시작
-- **제목(KO)**: **간단한 그림판**
-- **부제목(KO)**: **열면 바로 그리기**
-- **Title(EN)**: **Simple Drawing Pad**
-- **Subtitle(EN)**: **Open and draw**
+- **기본안**:
+  - **제목(KO)**: **간단한 그림판**
+  - **부제목(KO)**: **열면 바로 그리기**
+  - **Title(EN)**: **Simple Drawing Pad**
+  - **Subtitle(EN)**: **Open and draw**
+- **후보군 (KO / EN)**:
+  - **후보 1 (행동·직관)**: 쉬운 그림판 / 켜고 바로 그리기 (Easy Drawing Pad / Tap and draw)
+  - **후보 2 (감성·종이)**: 가벼운 스케치북 / 새 종이처럼 (Light Sketchpad / Like fresh paper)
+  - **후보 3 (기능·ASO)**: 간단 그림판 / 무료 낙서 앱 (Simple Paint App / Free doodle app)
 
 > 1장은 첫인상이므로 기능 나열 대신 **"이건 간단한 그림판이다"** 한 가지만 전달한다.
 > 드로잉·캔버스·툴 같은 앱 용어보다 그림판·낙서·그리기처럼 누구나 아는 말을 쓴다.
@@ -33,10 +40,15 @@
 ---
 
 ### 2장: 풀스크린 드로잉 캔버스
-- **제목(KO)**: **넓은 캔버스**
-- **부제목(KO)**: **방해 없이 그리기**
-- **Title(EN)**: **Full Canvas**
-- **Subtitle(EN)**: **Draw with focus**
+- **기본안**:
+  - **제목(KO)**: **넓은 캔버스**
+  - **부제목(KO)**: **방해 없는 화면**
+  - **Title(EN)**: **Full Canvas**
+  - **Subtitle(EN)**: **Draw with focus**
+- **후보군 (KO / EN)**:
+  - **후보 1 (행동·직관)**: 화면 가득 / 거침없이 그리기 (Edge to Edge / Draw freely)
+  - **후보 2 (감성·종이)**: 종이처럼 넓게 / 여백 가득 (Spacious Canvas / Room to sketch)
+  - **후보 3 (기능·ASO)**: 풀스크린 드로잉 / 넓은 작업 공간 (Fullscreen Drawing / More open space)
 
 **캡처 화면**: 실제 선이 그려진 드로잉 화면
 - **포함 요소**:
@@ -48,10 +60,15 @@
 ---
 
 ### 3장: 브러시와 색상 팔레트
-- **제목(KO)**: **10종 브러시**
-- **부제목(KO)**: **펜·연필·마커·수채화·에어브러시 외**
-- **Title(EN)**: **10 Brushes**
-- **Subtitle(EN)**: **Pen, pencil, marker, and more**
+- **기본안**:
+  - **제목(KO)**: **10종 브러시**
+  - **부제목(KO)**: **질감까지 다르게**
+  - **Title(EN)**: **10 Brushes**
+  - **Subtitle(EN)**: **Real brush textures**
+- **후보군 (KO / EN)**:
+  - **후보 1 (행동·직관)**: 다양한 브러시 / 살아있는 필감 (Diverse Brushes / Feel the strokes)
+  - **후보 2 (감성·종이)**: 펜부터 수채화까지 / 풍부한 질감 (Pen to Watercolor / Natural textures)
+  - **후보 3 (기능·ASO)**: 브러시 & 색상 / 16색 커스텀 팔레트 (Brushes & Colors / 16 color palette)
 
 **캡처 화면**: 브러시 선택 시트 또는 색상 선택 시트가 열린 화면
 - **포함 요소**:
@@ -63,10 +80,15 @@
 ---
 
 ### 4장: 사진 위 드로잉
-- **제목(KO)**: **사진 위에 그리기**
-- **부제목(KO)**: **따라 그리고 메모하기**
-- **Title(EN)**: **Draw on Photos**
-- **Subtitle(EN)**: **Trace and mark up**
+- **기본안**:
+  - **제목(KO)**: **사진 위 드로잉**
+  - **부제목(KO)**: **밑그림 따라 그리기**
+  - **Title(EN)**: **Draw on Photos**
+  - **Subtitle(EN)**: **Trace and sketch**
+- **후보군 (KO / EN)**:
+  - **후보 1 (행동·직관)**: 사진 위에 / 쉽게 따라 그리기 (Trace Photos / Trace it easily)
+  - **후보 2 (감성·종이)**: 사진도 종이처럼 / 그 위에 덧그리기 (Photos as Paper / Sketch right over)
+  - **후보 3 (기능·ASO)**: 사진 스케치 / 사진 불러와 그리기 (Photo Markup / Import and sketch)
 
 **캡처 화면**: 갤러리 사진을 참조로 깔고 그 위에 선을 그린 상태
 - **포함 요소**:
@@ -78,10 +100,15 @@
 ---
 
 ### 5장: 작품 보관함과 저장
-- **제목(KO)**: **저장하고 이어 그리기**
-- **부제목(KO)**: **보관함에서 다시 열기**
-- **Title(EN)**: **Save and Reuse**
-- **Subtitle(EN)**: **Reopen anytime**
+- **기본안**:
+  - **제목(KO)**: **저장과 보관함**
+  - **부제목(KO)**: **언제든 다시 열기**
+  - **Title(EN)**: **Save and Reopen**
+  - **Subtitle(EN)**: **Pick up anytime**
+- **후보군 (KO / EN)**:
+  - **후보 1 (행동·직관)**: 언제든 이어서 / 꺼내서 계속 그리기 (Continue Later / Open and finish)
+  - **후보 2 (감성·종이)**: 소중한 그림들 / 안심 보관함 (Saved Artworks / Stored safely)
+  - **후보 3 (기능·ASO)**: 저장 & 공유 / PNG · JPEG 지원 (Save & Share / High-res export)
 
 **캡처 화면**: 앱 내 작품 보관함 그리드 또는 저장 옵션 시트
 - **포함 요소**:
@@ -93,10 +120,15 @@
 ---
 
 ### 6장: 설정 / 후원형 Premium
-- **제목(KO)**: **광고 없이 그리기**
-- **부제목(KO)**: **한 번 후원으로 깔끔하게**
-- **Title(EN)**: **Ad-Free Drawing**
-- **Subtitle(EN)**: **One-time support**
+- **기본안**:
+  - **제목(KO)**: **광고 없는 그림판**
+  - **부제목(KO)**: **단 한 번 후원**
+  - **Title(EN)**: **Ad-Free Drawing**
+  - **Subtitle(EN)**: **One-time support**
+- **후보군 (KO / EN)**:
+  - **후보 1 (행동·직관)**: 광고 없이 / 깔끔하게 몰입하기 (No Ads / Draw without ads)
+  - **후보 2 (감성·종이)**: 깔끔한 캔버스 / 평생 소장 (Clean Canvas / Ad-free forever)
+  - **후보 3 (기능·ASO)**: 프리미엄 후원 / 광고 제거 해금 (Premium Support / Unlock all brushes)
 
 **캡처 화면**: Premium 화면 또는 설정 화면
 - **포함 요소**:
@@ -111,41 +143,41 @@
 
 > 규칙: 제목·부제목 모두 **2~3단어**를 넘지 않는다. (위 6장 구성안은 "기본안"으로 유지)
 
-### 후보군 A — 행동 중심
-바로 무엇을 할 수 있는지 동사로 전달. 첫 인상에서 "쓰기 쉬움"을 강조할 때.
+### 후보군 1 — 직관·행동 중심
+바로 무엇을 할 수 있는지 동사로 직관적 전달. 첫 인상에서 "쓰기 쉬움"을 강조할 때.
 
 | 장 | 제목(KO) | 부제목(KO) | Title(EN) | Subtitle(EN) |
 | --- | --- | --- | --- | --- |
 | 1 | 쉬운 그림판 | 켜고 바로 그리기 | Easy Drawing Pad | Tap and draw |
-| 2 | 화면 가득 | 방해 없는 화면 | Edge to Edge | Distraction free |
-| 3 | 브러시 10종 | 질감까지 다르게 | Ten Brushes | Real textures |
-| 4 | 사진 위에 | 따라 그리기 | On Your Photos | Trace it |
-| 5 | 언제든 이어서 | 열고 계속 그리기 | Pick Up Later | Reopen anytime |
-| 6 | 광고 없이 | 한 번 후원 | No Ads | One-time support |
+| 2 | 화면 가득 | 거침없이 그리기 | Edge to Edge | Draw freely |
+| 3 | 다양한 브러시 | 살아있는 필감 | Diverse Brushes | Feel the strokes |
+| 4 | 사진 위에 | 쉽게 따라 그리기 | Trace Photos | Trace it easily |
+| 5 | 언제든 이어서 | 꺼내서 계속 그리기 | Continue Later | Open and finish |
+| 6 | 광고 없이 | 깔끔하게 몰입하기 | No Ads | Draw without ads |
 
-### 후보군 B — 감성 / 톤 중심
-앱의 "종이 + 잉크" 테마를 그대로 문구로 옮긴 안. 디자인 톤과 가장 잘 붙는다.
+### 후보군 2 — 감성·종이 테마 중심
+앱의 "종이 + 잉크" 테마를 문구로 옮긴 안. 따뜻하고 자연스러운 드로잉 톤을 강조할 때.
 
 | 장 | 제목(KO) | 부제목(KO) | Title(EN) | Subtitle(EN) |
 | --- | --- | --- | --- | --- |
-| 1 | 가벼운 그림판 | 새 종이처럼 | A Light Sketchpad | Like fresh paper |
-| 2 | 종이처럼 넓게 | 여백 가득 | Paper Wide Open | Room to sketch |
-| 3 | 펜부터 수채화까지 | 브러시 10종 | Pen to Watercolor | 10 brushes |
-| 4 | 사진도 종이로 | 위에 덧그리기 | Photos as Paper | Draw over it |
-| 5 | 그림은 남는다 | 보관함에 저장 | Nothing Gets Lost | Saved locally |
-| 6 | 깔끔한 캔버스 | 광고 없는 후원 | Clean Canvas | Ad-free forever |
+| 1 | 가벼운 스케치북 | 새 종이처럼 | Light Sketchpad | Like fresh paper |
+| 2 | 종이처럼 넓게 | 여백 가득 | Spacious Canvas | Room to sketch |
+| 3 | 펜부터 수채화까지 | 풍부한 질감 | Pen to Watercolor | Natural textures |
+| 4 | 사진도 종이처럼 | 그 위에 덧그리기 | Photos as Paper | Sketch right over |
+| 5 | 소중한 그림들 | 안심 보관함 | Saved Artworks | Stored safely |
+| 6 | 깔끔한 캔버스 | 평생 소장 | Clean Canvas | Ad-free forever |
 
-### 후보군 C — 혜택 / 키워드 중심 (ASO)
-검색 키워드를 문구에 직접 노출. 스토어 검색 유입을 우선할 때.
+### 후보군 3 — 기능·ASO 검색 중심
+검색 키워드를 문구에 직접 노출. 스토어 검색 유입과 실용성을 우선할 때.
 
 | 장 | 제목(KO) | 부제목(KO) | Title(EN) | Subtitle(EN) |
 | --- | --- | --- | --- | --- |
 | 1 | 간단 그림판 | 무료 낙서 앱 | Simple Paint App | Free doodle app |
-| 2 | 풀스크린 드로잉 | 넓은 작업 공간 | Fullscreen Drawing | More space |
-| 3 | 브러시 & 색상 | 16색 + 커스텀 | Brushes & Colors | 16 colors, custom |
-| 4 | 사진 위 드로잉 | 밑그림 따라 그리기 | Draw on Photo | Trace a picture |
-| 5 | 저장 & 공유 | PNG · JPEG 저장 | Save & Share | PNG or JPEG |
-| 6 | 프리미엄 후원 | 광고 제거 해금 | Premium Support | Ads removed |
+| 2 | 풀스크린 드로잉 | 넓은 작업 공간 | Fullscreen Drawing | More open space |
+| 3 | 브러시 & 색상 | 16색 커스텀 팔레트 | Brushes & Colors | 16 color palette |
+| 4 | 사진 스케치 | 사진 불러와 그리기 | Photo Markup | Import and sketch |
+| 5 | 저장 & 공유 | PNG · JPEG 지원 | Save & Share | High-res export |
+| 6 | 프리미엄 후원 | 광고 제거 해금 | Premium Support | Unlock all brushes |
 
 ### 1장 전용 추가 후보 (간단한 그림판 강조)
 1장은 설치를 결정짓는 화면이라 후보를 넓게 둔다. 모두 **쉬운 단어 + 2~3단어** 원칙을 지킨다.
@@ -154,12 +186,12 @@
 | --- | --- | --- | --- | --- | --- |
 | 1 | 간단한 그림판 | 열면 바로 그리기 | Simple Drawing Pad | Open and draw | 기본안, 가장 무난 |
 | 2 | 쉬운 그림판 | 켜고 바로 그리기 | Easy Drawing Pad | Tap and draw | 행동 유도 |
-| 3 | 가벼운 그림판 | 새 종이처럼 | A Light Sketchpad | Like fresh paper | 종이 테마 |
+| 3 | 가벼운 스케치북 | 새 종이처럼 | Light Sketchpad | Like fresh paper | 종이 테마 |
 | 4 | 간단 그림판 | 무료 낙서 앱 | Simple Paint App | Free doodle app | 검색 키워드 |
-| 5 | 손가락 그림판 | 배울 것 없음 | Finger Drawing Pad | Nothing to learn | 진입장벽 없음 |
-| 6 | 그냥 그림판 | 복잡한 기능 없이 | Just a Drawing Pad | No clutter | 군더더기 없음 |
-| 7 | 낙서용 그림판 | 심심할 때 한 장 | Doodle Pad | For quick doodles | 가벼운 용도 |
-| 8 | 누구나 그림판 | 아이도 어른도 | Drawing Pad for All | Kids and adults | 사용자 범위 |
+| 5 | 손가락 그림판 | 쉬운 시작 | Finger Drawing Pad | Easy to start | 진입장벽 없음 |
+| 6 | 순수 그림판 | 군더더기 없이 | Pure Drawing Pad | Zero clutter | 심플함 강조 |
+| 7 | 낙서 그림판 | 가벼운 낙서 | Doodle Pad | Just for fun | 가벼운 용도 |
+| 8 | 누구나 그림판 | 모두를 위한 | Drawing Pad | For everyone | 사용자 범위 |
 
 **쓰지 않을 표현**
 - 전문가 느낌을 주는 말: 드로잉 툴, 스케치 워크플로우, 레이어, 벡터
@@ -167,9 +199,9 @@
 - 과장 표현: 최고의, 완벽한, 올인원
 
 ### 후보군 선택 가이드
-- 한 스크린샷 세트 안에서는 **하나의 후보군으로 통일**한다. (A~C를 섞지 않는다)
+- 한 스크린샷 세트 안에서는 **하나의 후보군으로 통일**한다. (후보군 1~3을 섞지 않는다)
 - 영문 제목은 Title Case, 부제목은 문장 첫 글자만 대문자로 통일한다.
-- 이미지에 얹기 전 360dp 기준으로 잘림을 확인한다. 특히 `Drawing Pad for All`, `16 colors, custom`처럼 3단어인 항목은 줄바꿈 여부를 미리 점검한다.
+- 이미지에 얹기 전 360dp 기준으로 잘림을 확인한다. 특히 3단어인 항목은 줄바꿈 여부를 미리 점검한다.
 
 ---
 

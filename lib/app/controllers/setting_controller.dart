@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_ce/hive.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
@@ -17,6 +18,7 @@ typedef LaunchUrlFn = Future<bool> Function(Uri uri, LaunchMode mode);
 typedef RateAppFn = Future<void> Function();
 typedef UpdateLocaleFn = Future<void> Function(Locale locale);
 typedef DeviceLocaleFn = Locale? Function();
+typedef PackageInfoFn = Future<PackageInfo> Function();
 
 class SettingController extends GetxController {
   SettingController({
@@ -26,7 +28,9 @@ class SettingController extends GetxController {
     RateAppFn? rateAppFn,
     UpdateLocaleFn? updateLocaleFn,
     DeviceLocaleFn? deviceLocaleFn,
+    PackageInfoFn? packageInfoFn,
   }) : _loadOnInit = loadOnInit,
+       _packageInfoFn = packageInfoFn ?? PackageInfo.fromPlatform,
        _launchUrlFn =
            launchUrlFn ?? ((uri, mode) => launchUrl(uri, mode: mode)),
        _rateAppFn = rateAppFn ?? (() => AppRatingService.to.openStoreListing()),
@@ -86,6 +90,7 @@ class SettingController extends GetxController {
   final RateAppFn _rateAppFn;
   final UpdateLocaleFn _updateLocaleFn;
   final DeviceLocaleFn _deviceLocaleFn;
+  final PackageInfoFn _packageInfoFn;
 
   static Future<void> ensureBoxOpen() async {
     if (!Hive.isBoxOpen(_kSettingBox)) {
@@ -93,11 +98,29 @@ class SettingController extends GetxController {
     }
   }
 
+  /// 설정 화면에 보여 줄 앱 버전(`1.0.0 (1)`).
+  /// pubspec 값을 상수로 베껴 두면 버전을 올릴 때 화면만 옛 값으로 남으므로
+  /// 설치된 패키지에서 직접 읽는다. 조회 전/실패 시에는 빈 문자열이다.
+  final RxString appVersion = ''.obs;
+
   @override
   void onInit() {
     super.onInit();
     if (_loadOnInit) {
       _loadSync();
+    }
+    unawaited(_loadAppVersion());
+  }
+
+  Future<void> _loadAppVersion() async {
+    try {
+      final info = await _packageInfoFn();
+      appVersion.value = info.buildNumber.isEmpty
+          ? info.version
+          : '${info.version} (${info.buildNumber})';
+    } catch (error) {
+      // 플러그인이 없는 환경(테스트/데스크톱)에서는 버전 줄을 비워 둔다.
+      Get.log('[SettingController] package info load failed: $error');
     }
   }
 
@@ -276,21 +299,8 @@ class SettingController extends GetxController {
     }
   }
 
-  Future<void> sendFeedback() async {
-    final uri = Uri(
-      scheme: 'mailto',
-      path: DeveloperInfo.DEVELOPER_EMAIL,
-      query: _encodeQueryParameters({'subject': 'feedback_email_subject'.tr}),
-    );
-    await _openExternalLink(uri, mode: LaunchMode.platformDefault);
-  }
-
   Future<void> openMoreApps() async {
     await _openExternalLink(Uri.parse(AppUrls.GOOGLE_PLAY_MOREAPPS));
-  }
-
-  Future<void> openPrivacyPolicy() async {
-    await _openExternalLink(Uri.parse(AppUrls.PRIVACY_POLICY));
   }
 
   Future<void> _openExternalLink(
@@ -326,14 +336,5 @@ class SettingController extends GetxController {
     final value = box.get(key, defaultValue: fallback);
     if (value is String) return value;
     return fallback;
-  }
-
-  String _encodeQueryParameters(Map<String, String> params) {
-    return params.entries
-        .map(
-          (entry) =>
-              '${Uri.encodeComponent(entry.key)}=${Uri.encodeComponent(entry.value)}',
-        )
-        .join('&');
   }
 }

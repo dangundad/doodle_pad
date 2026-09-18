@@ -1,6 +1,7 @@
 // Doodle Pad 공통 배너 광고 위젯.
-// UMP 동의(`AdHelper.canRequestAds`)와 Premium 상태(`PurchaseService.isPremiumActive`)를
-// 모두 통과한 경우에만 광고를 요청한다.
+// 플랫폼 광고 설정(`AdHelper.isPlatformAdMobConfigured`), UMP 동의 + SDK 초기화
+// (`AdHelper.mobileAdsReady` → `AdHelper.canRequestAds`), Premium 상태
+// (`PurchaseService.isPremiumActive`)를 모두 통과한 경우에만 광고를 요청한다.
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -21,7 +22,7 @@ class BannerAdWidget extends StatefulWidget {
   const BannerAdWidget({
     super.key,
     required this.adUnitId,
-    required this.type,
+    this.type = AdHelper.banner,
     this.bannerType = BannerType.adaptive,
     this.debugLabel,
   });
@@ -45,7 +46,6 @@ class BannerAdState extends State<BannerAdWidget> {
   bool _isLoadStarted = false;
   int _retryAttempt = 0;
   Timer? _retryTimer;
-  Worker? _consentWorker;
   Worker? _premiumWorker;
   Worker? _devPremiumWorker;
 
@@ -54,13 +54,12 @@ class BannerAdState extends State<BannerAdWidget> {
     super.didChangeDependencies();
     if (!_isLoadStarted) {
       _isLoadStarted = true;
-      _scheduleLoadWhenReady();
+      _startLoad();
     }
   }
 
   @override
   void dispose() {
-    _consentWorker?.dispose();
     _premiumWorker?.dispose();
     _devPremiumWorker?.dispose();
     _retryTimer?.cancel();
@@ -70,16 +69,11 @@ class BannerAdState extends State<BannerAdWidget> {
 
   bool get _isPremiumActive => PurchaseService.isPremiumActive;
 
-  void _scheduleLoadWhenReady() {
-    if (_isPremiumActive) {
-      _updateAdLoadedState(false);
-    } else if (AdHelper.canRequestAds.value) {
+  void _startLoad() {
+    if (!_isPremiumActive) {
       unawaited(_loadBanner());
     } else {
-      _consentWorker = ever<bool>(AdHelper.canRequestAds, (canRequest) {
-        if (!mounted || !canRequest || _isPremiumActive) return;
-        unawaited(_loadBanner());
-      });
+      _updateAdLoadedState(false);
     }
 
     // PurchaseService 가 등록된 경우에만 Premium 전환을 감지한다.
@@ -103,9 +97,7 @@ class BannerAdState extends State<BannerAdWidget> {
       _disposeBanner();
       return;
     }
-    if (AdHelper.canRequestAds.value && _bannerAd == null) {
-      unawaited(_loadBanner());
-    }
+    if (_bannerAd == null) unawaited(_loadBanner());
   }
 
   Future<void> _loadBanner() async {
@@ -115,21 +107,32 @@ class BannerAdState extends State<BannerAdWidget> {
       _updateAdLoadedState(false);
       return;
     }
-    if (!AdHelper.canRequestAds.value) {
-      _updateAdLoadedState(false);
-      return;
-    }
-    if (!AdHelper.hasUsableAdUnitId(widget.adUnitId)) {
+    // 광고를 지원하지 않는 플랫폼/미설정 빌드에서는 게이트를 기다리지도 않는다.
+    if (!AdHelper.isPlatformAdMobConfigured ||
+        !AdHelper.hasUsableAdUnitId(widget.adUnitId)) {
       debugPrint(
-        '${widget.debugLabel ?? widget.type} BannerAd skipped: release ad unit id is not configured',
+        '${widget.debugLabel ?? widget.type} BannerAd skipped: ad unit id is not configured',
       );
       _updateAdLoadedState(false);
       return;
     }
 
+    _isLoading = true;
+
+    // 광고 초기화는 첫 프레임 이후로 지연되므로 초기화 시도가 끝날 때까지 기다린다.
+    await AdHelper.mobileAdsReady;
+
+    // 동의를 얻지 못해 SDK 초기화를 건너뛴 경우 광고를 요청하지 않는다.
+    if (!mounted || !AdHelper.canRequestAds || _isPremiumActive) {
+      _isLoading = false;
+      _updateAdLoadedState(false);
+      return;
+    }
+
+    // 재시도 진입 시 남아 있을 수 있는 이전 인스턴스를 정리한다.
+    // `_disposeBanner` 가 `_isLoading` 을 내리므로 이후 다시 올린다.
     _disposeBanner(updateState: false);
     if (!mounted) return;
-
     _isLoading = true;
 
     late final AdSize adSize;
@@ -167,6 +170,7 @@ class BannerAdState extends State<BannerAdWidget> {
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (Ad ad) async {
+          debugPrint('${widget.debugLabel ?? widget.type} BannerAd loaded.');
           if (_isPremiumActive) {
             ad.dispose();
             _isLoading = false;
@@ -260,5 +264,42 @@ class BannerAdState extends State<BannerAdWidget> {
       height: actualHeight,
       child: AdWidget(ad: _bannerAd!),
     );
+  }
+}
+
+/// 페이지 하단 고정 배너 바.
+/// 홈·설정·프리미엄이 같은 배너 하나를 공유한다.
+/// 프리미엄 사용자에게는 어떤 공간도 차지하지 않도록 완전히 숨긴다.
+class AdBannerBar extends StatelessWidget {
+  const AdBannerBar({super.key, this.safeArea = true});
+
+  /// 화면 최하단이 아니라 다른 고정 바(예: 프리미엄 구매 바) 위에 놓일 때는
+  /// false 로 둔다. true 로 두면 아래쪽 제스처 바 여백이 이중으로 붙는다.
+  final bool safeArea;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!AdHelper.isPlatformAdMobConfigured) {
+      return const SizedBox.shrink();
+    }
+    if (!Get.isRegistered<PurchaseService>()) {
+      return const SizedBox.shrink();
+    }
+    return Obx(() {
+      if (PurchaseService.isPremiumActive) {
+        return const SizedBox.shrink();
+      }
+      // heightFactor 를 비우면 Center 가 "느슨한" 제약(0..maxHeight)을 가득
+      // 채운다. `Scaffold.bottomNavigationBar` 슬롯이 바로 그런 제약을 주기
+      // 때문에, 광고가 아직 없을 때(=자식 높이 0) 바가 화면 전체를 먹고
+      // body 높이가 0이 되어 화면이 통째로 비어 버린다(설정 화면 실제 사례).
+      // heightFactor: 1 로 항상 자식 높이만큼만 차지하게 고정한다.
+      final banner = Center(
+        heightFactor: 1,
+        child: BannerAdWidget(adUnitId: AdHelper.bannerAdUnitId),
+      );
+      if (!safeArea) return banner;
+      return SafeArea(top: false, child: banner);
+    });
   }
 }

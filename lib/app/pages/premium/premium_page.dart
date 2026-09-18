@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import 'package:doodle_pad/app/admob/ads_banner.dart';
 import 'package:doodle_pad/app/controllers/premium_controller.dart';
 import 'package:doodle_pad/app/services/purchase_service.dart';
 import 'package:doodle_pad/app/theme/app_theme.dart';
@@ -45,7 +46,20 @@ class PremiumPage extends GetView<PremiumController> {
       bottomNavigationBar: Obx(
         () => service.isPremium.value
             ? const SizedBox.shrink()
-            : _PurchaseBar(controller: controller, service: service, cs: cs),
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 배너는 구매 바 "위"에 둔다. 아래에 두면 결제 CTA 바로 밑에
+                  // 광고가 붙어 오탭 위험이 커진다(AdMob 정책). 아래쪽 제스처 바
+                  // 여백은 _PurchaseBar 의 SafeArea 가 이미 처리하므로 끈다.
+                  const AdBannerBar(safeArea: false),
+                  _PurchaseBar(
+                    controller: controller,
+                    service: service,
+                    cs: cs,
+                  ),
+                ],
+              ),
       ),
     );
   }
@@ -65,10 +79,10 @@ class _UpgradeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 24.h),
+      padding: EdgeInsets.fromLTRB(16.w, 6.h, 16.w, 24.h),
       children: [
         _HeroPanel(cs: cs),
-        SizedBox(height: 22.h),
+        SizedBox(height: 16.h),
         SectionLabel('premium_plan_title'.tr),
         Obx(
           () => Column(
@@ -124,36 +138,36 @@ class _HeroPanel extends StatelessWidget {
     return AppPanel(
       color: cs.surfaceContainerLow,
       radius: AppTheme.radiusLg,
-      padding: EdgeInsets.all(18.w),
+      padding: EdgeInsets.fromLTRB(16.w, 14.h, 16.w, 14.h),
+      // stretch 로 두어야 Divider 와 혜택 Row 가 패널 폭을 채운다.
+      // 헤더(아이콘/제목/부제)만 가운데로 모은다.
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const IconBadge(
-            LucideIcons.crown,
-            size: 48,
-            tone: IconBadgeTone.accent,
-          ),
-          SizedBox(height: 14.h),
+          const Center(child: AppIconMark(size: 52)),
+          SizedBox(height: 10.h),
           Text(
             'premium_support_title'.tr,
+            textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 24.sp,
+              fontSize: 18.sp,
               fontWeight: FontWeight.w800,
-              letterSpacing: -0.6,
-              height: 1.15,
+              letterSpacing: -0.3,
+              height: 1.2,
               color: cs.onSurface,
             ),
           ),
-          SizedBox(height: 6.h),
+          SizedBox(height: 4.h),
           Text(
             'premium_subtitle'.tr,
+            textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 14.sp,
-              height: 1.4,
+              fontSize: 13.sp,
+              height: 1.35,
               color: cs.onSurfaceVariant,
             ),
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 14.h),
           Divider(height: 1, color: cs.outlineVariant),
           SizedBox(height: 12.h),
           for (var i = 0; i < benefits.length; i++)
@@ -444,11 +458,7 @@ class _OwnedPremiumView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const IconBadge(
-              LucideIcons.crown,
-              size: 72,
-              tone: IconBadgeTone.accent,
-            ),
+            const AppIconMark(size: 72),
             SizedBox(height: 18.h),
             Text(
               'premium_owned'.tr,

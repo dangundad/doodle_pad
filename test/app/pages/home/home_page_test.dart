@@ -9,6 +9,7 @@ import 'package:hive_ce/hive.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:doodle_pad/app/admob/ads_banner.dart';
+import 'package:doodle_pad/app/admob/ads_helper.dart';
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
 import 'package:doodle_pad/app/controllers/setting_controller.dart';
 import 'package:doodle_pad/app/data/models/drawing.dart';
@@ -30,6 +31,10 @@ void main() {
 
   setUp(() async {
     Get.testMode = true;
+    // 테스트 호스트는 Android/iOS가 아니라 광고 슬롯이 통째로 꺼진다.
+    // 배너 노출/숨김 계약을 보려면 플랫폼 게이트를 열어 둬야 한다.
+    AdHelper.resetInitializationStateForTest();
+    AdHelper.platformAdMobConfiguredOverride = true;
 
     tempDir = await Directory.systemTemp.createTemp(
       'doodle_pad_home_page_test_',
@@ -63,6 +68,7 @@ void main() {
   });
 
   tearDown(() async {
+    AdHelper.resetInitializationStateForTest();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(vibrationChannel, null);
     Get.reset();
@@ -100,7 +106,25 @@ void main() {
     await tester.pumpWidget(_buildApp(initialRoute: Routes.HOME));
     await tester.pump();
 
+    expect(find.byType(AdBannerBar), findsOneWidget);
     expect(find.byType(BannerAdWidget), findsOneWidget);
+  });
+
+  testWidgets('광고를 지원하지 않는 플랫폼에서는 배너 슬롯이 아예 만들어지지 않는다', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    AdHelper.platformAdMobConfiguredOverride = false;
+    Get.put<PurchaseService>(FakePurchaseService(), permanent: true);
+
+    await tester.pumpWidget(_buildApp(initialRoute: Routes.HOME));
+    await tester.pump();
+
+    expect(find.byType(AdBannerBar), findsOneWidget);
+    expect(find.byType(BannerAdWidget), findsNothing);
   });
 
   testWidgets('settings icon navigates to /settings', (tester) async {

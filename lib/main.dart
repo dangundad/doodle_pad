@@ -131,7 +131,7 @@ class _DoodlePadAppState extends State<DoodlePadApp> {
 
   Future<void> _initializeAds() async {
     try {
-      await AdHelper.initializeConsentAndAds();
+      await AdHelper.initializeAds();
     } catch (e) {
       debugPrint('AdMob initialization failed: $e');
     }

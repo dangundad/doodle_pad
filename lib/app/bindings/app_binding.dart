@@ -1,6 +1,7 @@
 import 'package:hive_ce/hive.dart';
 import 'package:get/get.dart';
 
+import 'package:doodle_pad/app/admob/ads_app_open.dart';
 import 'package:doodle_pad/app/admob/ads_interstitial.dart';
 import 'package:doodle_pad/app/admob/ads_rewarded.dart';
 import 'package:doodle_pad/app/controllers/doodle_controller.dart';
@@ -114,6 +115,10 @@ class AppBinding implements Bindings {
 
     if (!Get.isRegistered<RewardedAdManager>()) {
       Get.put(RewardedAdManager(), permanent: true);
+    }
+
+    if (!Get.isRegistered<AppOpenAdManager>()) {
+      Get.put(AppOpenAdManager(), permanent: true);
     }
 
     if (!Get.isRegistered<AppRatingService>()) {

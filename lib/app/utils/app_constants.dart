@@ -6,19 +6,26 @@ abstract class HiveKeys {
   static const String IS_PREMIUM = 'is_premium';
 }
 
+/// 앱 에셋 경로
+abstract class AppAssets {
+  static const String APP_ICON = 'assets/images/icon/icon.png';
+
+  /// 배경이 투명한 앱 마크(스프링 노트 낙서). 아이콘 배지 안에 넣어 쓴다.
+  static const String APP_MARK = 'assets/images/splash/splash_big.png';
+}
+
 /// 관련 URL
 abstract class AppUrls {
   static const String GOOGLE_PLAY_MOREAPPS =
-      'https://play.google.com/store/apps/developer?id=DangunDad';
+      'https://play.google.com/store/apps/dev?id=6394874508156155344';
 
   static const String PACKAGE_NAME = 'com.dangundad.doodlepad';
+
+  /// 스토어 등록정보(Play Console / App Store Connect)에 넣는 개인정보처리방침
+  /// 주소. 앱 안에서는 더 이상 링크하지 않지만, 광고 SDK를 쓰는 앱은 스토어
+  /// 등록정보에 이 URL이 반드시 있어야 하므로 저장소에 남겨 둔다.
   static const String PRIVACY_POLICY =
       'https://dangundad.github.io/privacy/doodle-pad';
-}
-
-/// 개발자 정보
-abstract class DeveloperInfo {
-  static const String DEVELOPER_EMAIL = 'dangundad@gmail.com';
 }
 
 abstract class HiveBoxNames {

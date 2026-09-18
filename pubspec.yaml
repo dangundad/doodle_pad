@@ -31,6 +31,7 @@ dependencies:
   in_app_purchase_android: ^0.5.3
   in_app_review: ^2.0.12
   lucide_icons_flutter: ^3.1.20
+  package_info_plus: ^10.2.1
   path_provider: ^2.1.6
   perfect_freehand: ^2.5.2+1
   rate_my_app: ^2.4.1

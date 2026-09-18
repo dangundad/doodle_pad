@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:doodle_pad/app/admob/ads_app_open.dart';
 import 'package:doodle_pad/app/admob/ads_interstitial.dart';
 import 'package:doodle_pad/app/admob/ads_rewarded.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -386,6 +387,9 @@ class PurchaseService extends GetxService {
       if (Get.isRegistered<RewardedAdManager>()) {
         await Get.delete<RewardedAdManager>(force: true);
       }
+      if (Get.isRegistered<AppOpenAdManager>()) {
+        await Get.delete<AppOpenAdManager>(force: true);
+      }
       return;
     }
 
@@ -394,6 +398,9 @@ class PurchaseService extends GetxService {
     }
     if (!Get.isRegistered<RewardedAdManager>()) {
       Get.put(RewardedAdManager(), permanent: true);
+    }
+    if (!Get.isRegistered<AppOpenAdManager>()) {
+      Get.put(AppOpenAdManager(), permanent: true);
     }
   }
 }

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:doodle_pad/app/theme/app_theme.dart';
+import 'package:doodle_pad/app/utils/app_constants.dart';
 
 /// 앱 공통 UI 프리미티브.
 ///
@@ -99,15 +100,23 @@ class IconBadge extends StatelessWidget {
     super.key,
     this.size = 40,
     this.tone = IconBadgeTone.neutral,
+    this.background,
   });
 
   final IconData icon;
   final double size;
   final IconBadgeTone tone;
 
+  /// 지정하면 [tone] 대신 이 색으로 채우고 글리프는 흰색으로 그린다.
+  /// 색은 직접 만들지 말고 `AppTheme.badge*` 토큰을 쓴다(흰색 대비 검증됨).
+  final Color? background;
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    if (background != null) {
+      return _box(background!, Colors.white);
+    }
     final (bg, fg) = switch (tone) {
       IconBadgeTone.neutral => (cs.surfaceContainerHigh, cs.onSurface),
       IconBadgeTone.primary => (cs.primaryContainer, cs.onPrimaryContainer),
@@ -116,20 +125,78 @@ class IconBadge extends StatelessWidget {
       IconBadgeTone.danger => (cs.errorContainer, cs.onErrorContainer),
       IconBadgeTone.ink => (cs.onSurface, cs.surface),
     };
-    return Container(
-      width: size.r,
-      height: size.r,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular((size * 0.3).r),
-      ),
-      child: Icon(icon, size: (size * 0.5).r, color: fg),
-    );
+    return _box(bg, fg);
   }
+
+  Widget _box(Color bg, Color fg) => Container(
+    width: size.r,
+    height: size.r,
+    alignment: Alignment.center,
+    decoration: BoxDecoration(
+      color: bg,
+      borderRadius: BorderRadius.circular((size * 0.3).r),
+    ),
+    child: Icon(icon, size: (size * 0.5).r, color: fg),
+  );
 }
 
 enum IconBadgeTone { neutral, primary, accent, success, danger, ink }
+
+/// 앱 런처 아이콘을 IconBadge 와 같은 규격(정사각 + 둥근 모서리 + 헤어라인)으로
+/// 렌더한다. 아이콘 이미지는 자체 배경이 꽉 찬 그림이라 tone 배경을 쓰지 않는다.
+class AppIconMark extends StatelessWidget {
+  const AppIconMark({
+    super.key,
+    this.size = 52,
+    this.asset = AppAssets.APP_ICON,
+    this.background,
+    this.inset = 0,
+  });
+
+  final double size;
+
+  /// 기본은 런처 아이콘. 배경이 투명한 마크(`AppAssets.APP_MARK`)를 쓸 때는
+  /// [background] 와 [inset] 을 함께 준다.
+  final String asset;
+
+  /// 지정하면 배지를 이 색으로 채우고 헤어라인을 생략한다.
+  final Color? background;
+
+  /// 배지 안쪽 여백 비율(0~0.3). 투명 마크가 모서리에 닿지 않게 한다.
+  final double inset;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final side = size.r;
+    final filled = background != null;
+
+    return Container(
+      width: side,
+      height: side,
+      clipBehavior: Clip.antiAlias,
+      padding: EdgeInsets.all(side * inset),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(side * 0.28),
+        // 라이트 테마에서 크림색 배지가 베이지 패널에 묻히지 않도록
+        // 채웠을 때도 헤어라인은 남긴다.
+        border: Border.all(color: cs.outlineVariant),
+      ),
+      child: Image.asset(
+        asset,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.medium,
+        // 에셋을 못 읽어도 레이아웃이 무너지지 않게 중립 글리프로 대체한다.
+        errorBuilder: (_, _, _) => Icon(
+          LucideIcons.palette,
+          size: side * 0.5,
+          color: filled ? Colors.white : cs.onSurfaceVariant,
+        ),
+      ),
+    );
+  }
+}
 
 /// 앱 공통 확인 다이얼로그.
 ///
@@ -427,6 +494,8 @@ class AppListRow extends StatelessWidget {
     this.trailing,
     this.onTap,
     this.tone = IconBadgeTone.neutral,
+    this.iconBackground,
+    this.leading,
   });
 
   final IconData icon;
@@ -435,6 +504,12 @@ class AppListRow extends StatelessWidget {
   final Widget? trailing;
   final VoidCallback? onTap;
   final IconBadgeTone tone;
+
+  /// 아이콘 배지를 채울 색(`AppTheme.badge*`). 글리프는 흰색이 된다.
+  final Color? iconBackground;
+
+  /// 배지 자리를 통째로 대체한다(예: 앱 마크). 지정하면 [icon] 은 무시된다.
+  final Widget? leading;
 
   @override
   Widget build(BuildContext context) {
@@ -445,7 +520,13 @@ class AppListRow extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
         child: Row(
           children: [
-            IconBadge(icon, size: 36, tone: tone),
+            leading ??
+                IconBadge(
+                  icon,
+                  size: 36,
+                  tone: tone,
+                  background: iconBackground,
+                ),
             SizedBox(width: 12.w),
             Expanded(
               child: Column(

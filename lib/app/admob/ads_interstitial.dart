@@ -50,25 +50,35 @@ class InterstitialAdManager extends GetxController {
 
   InterstitialAd? _interstitialAd;
   final RxBool isAdReady = false.obs;
-  Worker? _consentWorker;
+  bool _isLoading = false;
+  Worker? _premiumWorker;
 
   @override
   void onInit() {
     super.onInit();
-    if (AdHelper.canRequestAds.value) {
-      loadAd();
-    } else {
-      _consentWorker = ever<bool>(AdHelper.canRequestAds, (canRequest) {
-        if (canRequest) {
-          _consentWorker?.dispose();
-          _consentWorker = null;
-          loadAd();
+    unawaited(loadAd());
+
+    // 프리미엄 해제(개발자 토글 OFF·환불·복원 검증 실패) 후에도 다시 로드될 수 있도록
+    // 상태 변화를 감시한다. 이 매니저는 permanent 싱글톤이라 재로드 경로가 없으면
+    // 앱을 재시작할 때까지 전면 광고가 영영 준비되지 않는다.
+    if (Get.isRegistered<PurchaseService>()) {
+      _premiumWorker = ever<bool>(PurchaseService.to.isPremium, (isPremium) {
+        if (isPremium) {
+          _interstitialAd?.dispose();
+          _interstitialAd = null;
+          isAdReady.value = false;
+          debugPrint('Premium purchased - interstitial ad disposed');
+          return;
         }
+        if (_interstitialAd == null) unawaited(loadAd());
       });
     }
   }
 
   Future<void> loadAd() async {
+    // 중복 로드 방지: 이미 요청이 진행 중이거나 준비된 광고가 있으면 스킵
+    if (_isLoading || _interstitialAd != null) return;
+
     // Premium 사용자는 광고 로딩 자체를 하지 않는다.
     // PurchaseService 캐시 prime + _syncAdsForPremiumStatus와 함께 다중 방어선을 형성한다.
     if (PurchaseService.isPremiumActive) {
@@ -77,17 +87,24 @@ class InterstitialAdManager extends GetxController {
       isAdReady.value = false;
       return;
     }
-    if (!AdHelper.canRequestAds.value) {
-      debugPrint('Interstitial ad skipped: consent/init not ready');
+    final adUnitId = AdHelper.interstitialAdUnitId;
+    if (!AdHelper.isPlatformAdMobConfigured ||
+        !AdHelper.hasUsableAdUnitId(adUnitId)) {
+      debugPrint('Interstitial ad skipped: ad unit id is not configured');
       _interstitialAd = null;
       isAdReady.value = false;
       return;
     }
-    final adUnitId = AdHelper.interstitialAdUnitId;
-    if (!AdHelper.hasUsableAdUnitId(adUnitId)) {
-      debugPrint(
-        'Interstitial ad skipped: release ad unit id is not configured',
-      );
+
+    _isLoading = true;
+
+    // 광고 초기화는 첫 프레임 이후로 지연되므로 초기화 시도가 끝날 때까지 기다린다.
+    await AdHelper.mobileAdsReady;
+
+    // 동의를 얻지 못해 SDK 초기화를 건너뛴 경우 광고를 요청하지 않는다.
+    if (!AdHelper.canRequestAds || PurchaseService.isPremiumActive) {
+      debugPrint('Interstitial ad skipped: consent/init not ready');
+      _isLoading = false;
       _interstitialAd = null;
       isAdReady.value = false;
       return;
@@ -99,6 +116,7 @@ class InterstitialAdManager extends GetxController {
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
           debugPrint('Interstitial ad loaded');
+          _isLoading = false;
           _interstitialAd = ad;
           isAdReady.value = true;
 
@@ -121,6 +139,7 @@ class InterstitialAdManager extends GetxController {
         },
         onAdFailedToLoad: (error) {
           debugPrint('Interstitial ad failed to load: $error');
+          _isLoading = false;
           _interstitialAd = null;
           isAdReady.value = false;
         },
@@ -194,8 +213,8 @@ class InterstitialAdManager extends GetxController {
 
   @override
   void onClose() {
-    _consentWorker?.dispose();
-    _consentWorker = null;
+    _premiumWorker?.dispose();
+    _premiumWorker = null;
     _interstitialAd?.dispose();
     super.onClose();
   }
